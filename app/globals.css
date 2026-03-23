@@ -1,0 +1,27 @@
+@import "tailwindcss";
+
+:root {
+  --font-sans: "Avenir Next", "Segoe UI", "Helvetica Neue", sans-serif;
+  --font-mono: "IBM Plex Mono", "SFMono-Regular", monospace;
+}
+
+html {
+  font-family: var(--font-sans);
+}
+
+body {
+  margin: 0;
+}
+
+a {
+  text-decoration: none;
+}
+
+code,
+pre {
+  font-family: var(--font-mono);
+}
+
+::selection {
+  background: rgba(217, 119, 6, 0.22);
+}

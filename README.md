@@ -1,0 +1,105 @@
+# Enterprise Agent Work Graph
+
+## 项目一句话
+面向企业多 Agent 协作场景的共享数据中枢，统一承载 memory、trace、artifact，并通过 policy、permission、audit 形成可管理、可复用、可追溯的工作图谱。
+
+## 这是什么
+这不是单点 Agent memory，也不是企业网盘或通用 workspace。
+
+它要解决的是企业在 Agent 进入生产后出现的核心问题：
+
+- Agent 记住了什么
+- Agent 做了什么
+- Agent 产出了什么
+- Agent 依据什么规则访问了哪些数据
+- 出问题时如何追溯、审计与归责
+
+## 核心判断
+- 企业买的不是“更强记忆”，而是“可管理的 Agent 工作体系”。
+- Memory、Trace、Artifact 必须挂在同一条任务主线上，否则只是三个存储桶。
+- `Episode` 是系统主索引，不是附件字段。
+- Policy、Permission、Audit 是产品主能力，不是后补治理层。
+
+## MVP 聚焦
+MVP 只做一件事：跑通企业多 Agent 共享工作资产中心的最小闭环。
+
+1. Agent 创建 `episode`
+2. 写入 `memory`
+3. 持续追加 `trace`
+4. 生成 `artifact`
+5. 管理者查看 episode 全链路和访问审计
+
+## 当前交付
+当前仓库已经包含一个可本地运行的 MVP：
+
+- Next.js 全栈应用
+- Prisma + SQLite 本地数据层
+- 中英文切换
+- 5 个核心页面
+- 7 个基础 API
+- 一套可演示的 seeded demo 数据
+
+## 本地运行
+```bash
+npm install
+npm run db:setup
+npm run dev
+```
+
+默认入口：
+- `http://localhost:3000/zh/projects`
+- `http://localhost:3000/en/projects`
+
+## 当前 MVP 页面
+- `/{locale}/projects`: 项目列表
+- `/{locale}/projects/{projectId}`: 项目总览
+- `/{locale}/projects/{projectId}/episodes/{episodeId}`: Episode 复盘
+- `/{locale}/artifacts/{artifactId}`: Artifact 详情
+- `/{locale}/audit`: 审计视图
+
+## 当前 MVP API
+- `POST /api/episodes`
+- `POST /api/memory`
+- `GET /api/memory`
+- `POST /api/traces`
+- `POST /api/artifacts`
+- `GET /api/graph?episodeId=...&locale=zh|en`
+- `POST /api/access`
+- `GET /api/audit?projectId=...&episodeId=...&locale=zh|en`
+
+## 产品边界
+做：
+- 多 Agent 共享上下文
+- Episode 级任务链路追踪
+- Artifact 来源可回链
+- Policy 注入
+- Permission + Audit 治理
+
+不做：
+- 完整 Web 办公套件
+- 通用 IM
+- 替代 Notion / Obsidian / 企业网盘
+- 复杂 BI 仪表盘
+- MVP 阶段完整私有化产品
+
+## 仓库结构
+- `docs/product-spec.md`: 产品定义、场景、范围、验收标准
+- `docs/architecture.md`: 对象模型、关系模型、数据流、存储抽象、API
+- `docs/mvp-plan.md`: MVP 的实现逻辑、范围、路线图和最终产品形态
+- `docs/product-surface.md`: 第一版产品的页面、视图、交互和 demo 形态
+- `docs/page-specs.md`: 第一版 5 个核心页面的字段级规格
+- `docs/discussion-insights.md`: 从原始讨论中提炼出的关键洞察和思路演进
+- `docs/open-questions.md`: 当前关键未决问题
+- `AGENTS.md`: 实现约束与工程规则
+- `.agent/PLANS.md`: 分阶段执行计划
+
+## 当前命名
+- 英文工作名：`Enterprise Agent Work Graph`
+- 中文工作名：`企业级 Agent 工作图谱`
+- 目录名：`enterprise-agent-work-graph`
+
+## 现在最重要的不是
+不是先做炫 UI，不是先做全能平台，不是先接很多协议。
+
+最重要的是先证明一件事：
+一个项目内，至少两个 Agent 能围绕同一条 `episode` 主线共享上下文、产物和治理约束，并且管理者能完整复盘。

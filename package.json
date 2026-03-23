@@ -1,0 +1,41 @@
+{
+  "name": "enterprise-agent-work-graph",
+  "version": "1.0.0",
+  "description": "面向企业多 Agent 协作场景的共享数据中枢，统一承载 memory、trace、artifact，并通过 policy、permission、audit 形成可管理、可复用、可追溯的工作图谱。",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "dev": "next dev --webpack",
+    "build": "next build --webpack",
+    "start": "next start",
+    "lint": "eslint .",
+    "db:push": "prisma db push",
+    "db:seed": "node prisma/seed.mjs",
+    "db:setup": "prisma db push && node prisma/seed.mjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "@prisma/client": "^6.10.1",
+    "next": "^16.2.1",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.2.2",
+    "@types/node": "^25.5.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "eslint": "^9.39.4",
+    "eslint-config-next": "^16.2.1",
+    "prisma": "^6.10.1",
+    "tailwindcss": "^4.2.2",
+    "typescript": "^5.9.3"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.mjs"
+  }
+}
