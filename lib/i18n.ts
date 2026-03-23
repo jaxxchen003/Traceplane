@@ -90,6 +90,44 @@ type Dictionary = {
     hitReason: string;
     noEvents: string;
   };
+  controls: {
+    createEpisode: string;
+    continueEpisode: string;
+    addMemory: string;
+    addTrace: string;
+    addArtifact: string;
+    titleZh: string;
+    titleEn: string;
+    summaryZh: string;
+    summaryEn: string;
+    goalZh: string;
+    goalEn: string;
+    contentZh: string;
+    contentEn: string;
+    primaryAgent: string;
+    actorAgent: string;
+    type: string;
+    source: string;
+    importance: string;
+    sensitivity: string;
+    toolName: string;
+    eventType: string;
+    shortResultZh: string;
+    shortResultEn: string;
+    decisionZh: string;
+    decisionEn: string;
+    resultZh: string;
+    resultEn: string;
+    artifactKey: string;
+    fileType: string;
+    shareScope: string;
+    linkedMemoryIds: string;
+    sourceTraceEvent: string;
+    submit: string;
+    creating: string;
+    created: string;
+    refreshHint: string;
+  };
   statuses: Record<string, string>;
   traceTypes: Record<string, string>;
 };
@@ -171,6 +209,44 @@ export const dictionary: Record<Locale, Dictionary> = {
       permission: "权限决策",
       hitReason: "命中原因",
       noEvents: "当前筛选条件下没有审计记录。"
+    },
+    controls: {
+      createEpisode: "创建新任务链",
+      continueEpisode: "继续写入当前任务链",
+      addMemory: "新增记忆",
+      addTrace: "追加 Trace",
+      addArtifact: "生成 Artifact",
+      titleZh: "中文标题",
+      titleEn: "英文标题",
+      summaryZh: "中文摘要",
+      summaryEn: "英文摘要",
+      goalZh: "中文目标",
+      goalEn: "英文目标",
+      contentZh: "中文内容",
+      contentEn: "英文内容",
+      primaryAgent: "主 Agent",
+      actorAgent: "执行 Agent",
+      type: "类型",
+      source: "来源",
+      importance: "重要度",
+      sensitivity: "敏感级别",
+      toolName: "工具名",
+      eventType: "事件类型",
+      shortResultZh: "中文短结果",
+      shortResultEn: "英文短结果",
+      decisionZh: "中文决策",
+      decisionEn: "英文决策",
+      resultZh: "中文结果",
+      resultEn: "英文结果",
+      artifactKey: "Artifact Key",
+      fileType: "文件类型",
+      shareScope: "共享范围",
+      linkedMemoryIds: "关联 Memory",
+      sourceTraceEvent: "来源 Trace",
+      submit: "提交",
+      creating: "提交中...",
+      created: "已创建",
+      refreshHint: "提交成功后页面会自动刷新。"
     },
     statuses: {
       ACTIVE: "进行中",
@@ -266,6 +342,44 @@ export const dictionary: Record<Locale, Dictionary> = {
       permission: "Permission",
       hitReason: "Hit reason",
       noEvents: "No audit events match the current filter."
+    },
+    controls: {
+      createEpisode: "Create episode",
+      continueEpisode: "Continue episode",
+      addMemory: "Add memory",
+      addTrace: "Append trace",
+      addArtifact: "Create artifact",
+      titleZh: "Chinese title",
+      titleEn: "English title",
+      summaryZh: "Chinese summary",
+      summaryEn: "English summary",
+      goalZh: "Chinese goal",
+      goalEn: "English goal",
+      contentZh: "Chinese content",
+      contentEn: "English content",
+      primaryAgent: "Primary agent",
+      actorAgent: "Actor agent",
+      type: "Type",
+      source: "Source",
+      importance: "Importance",
+      sensitivity: "Sensitivity",
+      toolName: "Tool name",
+      eventType: "Event type",
+      shortResultZh: "Chinese short result",
+      shortResultEn: "English short result",
+      decisionZh: "Chinese decision",
+      decisionEn: "English decision",
+      resultZh: "Chinese result",
+      resultEn: "English result",
+      artifactKey: "Artifact key",
+      fileType: "File type",
+      shareScope: "Share scope",
+      linkedMemoryIds: "Linked memories",
+      sourceTraceEvent: "Source trace",
+      submit: "Submit",
+      creating: "Submitting...",
+      created: "Created",
+      refreshHint: "The page refreshes automatically after a successful write."
     },
     statuses: {
       ACTIVE: "Active",

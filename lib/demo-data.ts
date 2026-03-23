@@ -118,6 +118,25 @@ export async function getProjectOverview(projectId: string, locale: Locale) {
   };
 }
 
+export async function getProjectAgents(projectId: string, locale: Locale) {
+  const project = await prisma.project.findUnique({
+    where: { id: projectId },
+    include: {
+      projectAgents: {
+        include: { agent: true }
+      }
+    }
+  });
+
+  if (!project) return [];
+
+  return project.projectAgents.map(({ agent }) => ({
+    id: agent.id,
+    name: agent.name,
+    role: localize(agent.roleI18n, locale)
+  }));
+}
+
 export async function getEpisodeReview(episodeId: string, locale: Locale) {
   const episode = await prisma.episode.findUnique({
     where: { id: episodeId },

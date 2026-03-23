@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { EpisodeControlPanel } from "@/components/demo-control-panel";
 import { Panel } from "@/components/panel";
 import { StatusBadge } from "@/components/status-badge";
 import { formatDate, formatDuration } from "@/lib/format";
-import { getEpisodeReview } from "@/lib/demo-data";
+import { getEpisodeReview, getProjectAgents } from "@/lib/demo-data";
 import { getDictionary, isLocale } from "@/lib/i18n";
 
 export default async function EpisodeReviewPage({
@@ -15,7 +16,10 @@ export default async function EpisodeReviewPage({
   const { locale, projectId, episodeId } = await params;
   if (!isLocale(locale)) notFound();
 
-  const episode = await getEpisodeReview(episodeId, locale);
+  const [episode, agents] = await Promise.all([
+    getEpisodeReview(episodeId, locale),
+    getProjectAgents(projectId, locale)
+  ]);
   if (!episode || episode.projectId !== projectId) notFound();
 
   const dict = getDictionary(locale);
@@ -104,6 +108,23 @@ export default async function EpisodeReviewPage({
         </div>
 
         <div className="space-y-6">
+          <Panel title={dict.controls.continueEpisode} eyebrow="Write Path">
+            <EpisodeControlPanel
+              locale={locale}
+              episodeId={episode.id}
+              projectId={projectId}
+              agents={agents}
+              traces={episode.timeline.map((item) => ({
+                id: item.id,
+                label: `Step ${item.stepIndex} · ${item.stepTitle}`
+              }))}
+              memories={episode.memories.map((item) => ({
+                id: item.id,
+                label: item.title
+              }))}
+            />
+          </Panel>
+
           <Panel title={dict.common.summary} eyebrow={dict.episode.goal}>
             <div className="space-y-4 text-sm leading-6 text-slate-700">
               <div>{episode.goal}</div>

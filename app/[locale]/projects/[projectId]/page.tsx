@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { ProjectControlPanel } from "@/components/demo-control-panel";
 import { Panel } from "@/components/panel";
 import { StatusBadge } from "@/components/status-badge";
 import { formatDate } from "@/lib/format";
-import { getProjectOverview } from "@/lib/demo-data";
+import { getProjectAgents, getProjectOverview } from "@/lib/demo-data";
 import { getDictionary, isLocale } from "@/lib/i18n";
 
 export default async function ProjectOverviewPage({
@@ -15,7 +16,11 @@ export default async function ProjectOverviewPage({
   const { locale, projectId } = await params;
   if (!isLocale(locale)) notFound();
 
-  const [project, dict] = await Promise.all([getProjectOverview(projectId, locale), Promise.resolve(getDictionary(locale))]);
+  const [project, agents, dict] = await Promise.all([
+    getProjectOverview(projectId, locale),
+    getProjectAgents(projectId, locale),
+    Promise.resolve(getDictionary(locale))
+  ]);
   if (!project) notFound();
 
   return (
@@ -90,6 +95,8 @@ export default async function ProjectOverviewPage({
           </div>
         </Panel>
       </div>
+
+      <ProjectControlPanel locale={locale} projectId={project.id} policyVersion={project.activePolicyVersion} agents={agents} />
 
       <Panel title={dict.common.recentEpisodes} eyebrow="Episodes">
         {project.episodes.length === 0 ? (
