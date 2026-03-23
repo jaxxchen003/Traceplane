@@ -9,7 +9,10 @@
     "dev": "next dev --webpack",
     "build": "next build --webpack",
     "start": "next start",
+    "start:demo": "node scripts/start-demo.mjs",
     "lint": "eslint .",
+    "ci": "npm run lint && npm run build",
+    "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:seed": "node prisma/seed.mjs",
     "db:setup": "prisma db push && node prisma/seed.mjs"

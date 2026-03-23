@@ -3,6 +3,12 @@ node_modules
 dist
 coverage
 .DS_Store
+.env
+.env.local
+.env.production
 prisma/dev.db
 prisma/dev.db-journal
 *.log
+.vercel
+.turbo
+!.env.example

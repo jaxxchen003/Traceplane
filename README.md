@@ -36,13 +36,14 @@ MVP 只做一件事：跑通企业多 Agent 共享工作资产中心的最小闭
 - Prisma + SQLite 本地数据层
 - 中英文切换
 - 5 个核心页面
-- 7 个基础 API
+- 9 个基础 API 路由
 - 一套可演示的 seeded demo 数据
 - 项目页与 Episode 页内嵌交互式写入控制面
 
 ## 本地运行
 ```bash
 npm install
+cp .env.example .env
 npm run db:setup
 npm run dev
 ```
@@ -67,6 +68,38 @@ npm run dev
 - `GET /api/graph?episodeId=...&locale=zh|en`
 - `POST /api/access`
 - `GET /api/audit?projectId=...&episodeId=...&locale=zh|en`
+- `GET /api/health`
+
+## 环境变量
+- `DATABASE_URL`: Prisma 数据库连接。默认本地示例为 `file:./dev.db`
+- `NEXT_PUBLIC_DEFAULT_LOCALE`: 默认语言，当前示例为 `zh`
+- `DEMO_RESET_ENABLED`: 仅用于 demo 容器首次启动或强制重置时自动重建 demo 数据
+
+可直接从 `.env.example` 复制一份：
+```bash
+cp .env.example .env
+```
+
+## Docker 运行
+```bash
+docker build -t enterprise-agent-work-graph .
+docker run --rm -p 3000:3000 --env-file .env enterprise-agent-work-graph
+```
+
+容器默认会在 SQLite 文件不存在时自动执行：
+- `prisma db push`
+- `node prisma/seed.mjs`
+
+然后启动应用。
+
+## 持续集成
+仓库已包含 GitHub Actions CI：
+- `npm ci`
+- `npm run db:generate`
+- `npm run lint`
+- `npm run build`
+
+工作流文件位于 `.github/workflows/ci.yml`。
 
 ## 产品边界
 做：
