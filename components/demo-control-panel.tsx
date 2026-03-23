@@ -22,17 +22,18 @@ type MemoryOption = {
   label: string;
 };
 
-type ArtifactOption = {
-  id: string;
-  label: string;
-};
-
 function fieldClass() {
   return "w-full rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-slate-900";
 }
 
 function labelClass() {
   return "mb-1 block text-xs uppercase tracking-[0.14em] text-slate-500";
+}
+
+function messageClass(message: string) {
+  return message.toLowerCase().includes("fail") || message.toLowerCase().includes("error")
+    ? "text-rose-600"
+    : "text-emerald-700";
 }
 
 function normalizeI18n(zh: string, en: string) {
@@ -92,6 +93,7 @@ export function ProjectControlPanel({
     }
 
     const created = await response.json();
+    setMessage(dict.controls.created);
     startTransition(() => {
       router.push(`/${locale}/projects/${projectId}/episodes/${created.id}`);
       router.refresh();
@@ -146,7 +148,9 @@ export function ProjectControlPanel({
           </div>
         </div>
         <div className="flex items-center justify-between gap-3 pt-1">
-          <div className="text-xs text-slate-500">{message || dict.controls.refreshHint}</div>
+          <div className={`text-xs ${message ? messageClass(message) : "text-slate-500"}`}>
+            {message || dict.controls.refreshHint}
+          </div>
           <button type="submit" className="rounded-full bg-slate-950 px-4 py-2 text-sm font-medium text-white" disabled={isPending}>
             {isPending ? dict.controls.creating : dict.controls.submit}
           </button>
@@ -174,7 +178,9 @@ export function EpisodeControlPanel({
   const dict = getDictionary(locale);
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
-  const [message, setMessage] = useState("");
+  const [memoryMessage, setMemoryMessage] = useState("");
+  const [traceMessage, setTraceMessage] = useState("");
+  const [artifactMessage, setArtifactMessage] = useState("");
   const [memoryForm, setMemoryForm] = useState({
     agentId: agents[0]?.id ?? "",
     type: "SEMANTIC",
@@ -215,7 +221,10 @@ export function EpisodeControlPanel({
     contentEn: ""
   });
 
-  async function submitJson(url: string, payload: unknown) {
+  async function submitJson(url: string, payload: unknown, kind: "memory" | "trace" | "artifact") {
+    const setMessage =
+      kind === "memory" ? setMemoryMessage : kind === "trace" ? setTraceMessage : setArtifactMessage;
+
     setMessage("");
     const response = await fetch(url, {
       method: "POST",
@@ -243,7 +252,7 @@ export function EpisodeControlPanel({
           className="space-y-3"
           onSubmit={async (event) => {
             event.preventDefault();
-            await submitJson("/api/memory", {
+            const ok = await submitJson("/api/memory", {
               episodeId,
               projectId,
               agentId: memoryForm.agentId,
@@ -253,7 +262,16 @@ export function EpisodeControlPanel({
               source: memoryForm.source,
               importance: Number(memoryForm.importance),
               sensitivity: memoryForm.sensitivity
-            });
+            }, "memory");
+            if (ok) {
+              setMemoryForm((current) => ({
+                ...current,
+                titleZh: "",
+                titleEn: "",
+                contentZh: "",
+                contentEn: ""
+              }));
+            }
           }}
         >
           <div className="grid gap-3 md:grid-cols-2">
@@ -318,7 +336,9 @@ export function EpisodeControlPanel({
             </div>
           </div>
           <div className="flex items-center justify-between gap-3">
-            <div className="text-xs text-slate-500">{message || dict.controls.refreshHint}</div>
+            <div className={`text-xs ${memoryMessage ? messageClass(memoryMessage) : "text-slate-500"}`}>
+              {memoryMessage || dict.controls.refreshHint}
+            </div>
             <button type="submit" className="rounded-full bg-slate-950 px-4 py-2 text-sm font-medium text-white" disabled={isPending}>
               {isPending ? dict.controls.creating : dict.controls.submit}
             </button>
@@ -331,7 +351,7 @@ export function EpisodeControlPanel({
           className="space-y-3"
           onSubmit={async (event) => {
             event.preventDefault();
-            await submitJson("/api/traces", {
+            const ok = await submitJson("/api/traces", {
               episodeId,
               projectId,
               actorAgentId: traceForm.actorAgentId,
@@ -343,7 +363,22 @@ export function EpisodeControlPanel({
               decisionSummaryI18n: traceForm.decisionZh ? normalizeI18n(traceForm.decisionZh, traceForm.decisionEn) : null,
               resultSummaryI18n: traceForm.resultZh ? normalizeI18n(traceForm.resultZh, traceForm.resultEn) : null,
               linkedMemoryIds: traceForm.linkedMemoryIds
-            });
+            }, "trace");
+            if (ok) {
+              setTraceForm((current) => ({
+                ...current,
+                toolName: "",
+                titleZh: "",
+                titleEn: "",
+                shortResultZh: "",
+                shortResultEn: "",
+                decisionZh: "",
+                decisionEn: "",
+                resultZh: "",
+                resultEn: "",
+                linkedMemoryIds: []
+              }));
+            }
           }}
         >
           <div className="grid gap-3 md:grid-cols-2">
@@ -432,7 +467,9 @@ export function EpisodeControlPanel({
             </div>
           </div>
           <div className="flex items-center justify-between gap-3">
-            <div className="text-xs text-slate-500">{message || dict.controls.refreshHint}</div>
+            <div className={`text-xs ${traceMessage ? messageClass(traceMessage) : "text-slate-500"}`}>
+              {traceMessage || dict.controls.refreshHint}
+            </div>
             <button type="submit" className="rounded-full bg-slate-950 px-4 py-2 text-sm font-medium text-white" disabled={isPending}>
               {isPending ? dict.controls.creating : dict.controls.submit}
             </button>
@@ -445,7 +482,7 @@ export function EpisodeControlPanel({
           className="space-y-3"
           onSubmit={async (event) => {
             event.preventDefault();
-            await submitJson("/api/artifacts", {
+            const ok = await submitJson("/api/artifacts", {
               episodeId,
               projectId,
               createdByAgentId: artifactForm.createdByAgentId,
@@ -457,7 +494,18 @@ export function EpisodeControlPanel({
               shareScope: artifactForm.shareScope,
               sensitivity: artifactForm.sensitivity,
               linkedMemoryIds: artifactForm.linkedMemoryIds
-            });
+            }, "artifact");
+            if (ok) {
+              setArtifactForm((current) => ({
+                ...current,
+                artifactKey: "",
+                titleZh: "",
+                titleEn: "",
+                contentZh: "",
+                contentEn: "",
+                linkedMemoryIds: []
+              }));
+            }
           }}
         >
           <div className="grid gap-3 md:grid-cols-2">
@@ -556,7 +604,9 @@ export function EpisodeControlPanel({
             </div>
           </div>
           <div className="flex items-center justify-between gap-3">
-            <div className="text-xs text-slate-500">{message || dict.controls.refreshHint}</div>
+            <div className={`text-xs ${artifactMessage ? messageClass(artifactMessage) : "text-slate-500"}`}>
+              {artifactMessage || dict.controls.refreshHint}
+            </div>
             <button type="submit" className="rounded-full bg-slate-950 px-4 py-2 text-sm font-medium text-white" disabled={isPending}>
               {isPending ? dict.controls.creating : dict.controls.submit}
             </button>

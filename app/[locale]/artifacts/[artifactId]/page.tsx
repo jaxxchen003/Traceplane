@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { ArtifactPreview } from "@/components/artifact-preview";
 import { Panel } from "@/components/panel";
 import { formatDate } from "@/lib/format";
 import { getArtifactDetail } from "@/lib/demo-data";
@@ -48,9 +49,7 @@ export default async function ArtifactDetailPage({
 
       <div className="grid gap-6 xl:grid-cols-[1.5fr_0.9fr]">
         <Panel title={dict.common.preview} eyebrow={artifact.type}>
-          <pre className="overflow-x-auto rounded-[24px] bg-slate-950 p-5 text-sm leading-7 text-slate-100">
-            {artifact.content || "—"}
-          </pre>
+          <ArtifactPreview type={artifact.type} content={artifact.content || ""} />
         </Panel>
 
         <div className="space-y-6">

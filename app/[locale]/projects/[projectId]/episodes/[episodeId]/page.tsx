@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 
 import { EpisodeControlPanel } from "@/components/demo-control-panel";
 import { Panel } from "@/components/panel";
+import { RelationshipFlow } from "@/components/relationship-flow";
 import { StatusBadge } from "@/components/status-badge";
 import { formatDate, formatDuration } from "@/lib/format";
 import { getEpisodeReview, getProjectAgents } from "@/lib/demo-data";
@@ -93,16 +94,35 @@ export default async function EpisodeReviewPage({
           </Panel>
 
           <Panel title={dict.episode.relationshipMap} eyebrow="Edges">
-            <div className="grid gap-3 text-sm text-slate-700">
-              {episode.relationships.map((edge) => (
-                <div key={edge.id} className="rounded-2xl border border-slate-200 bg-white px-4 py-3">
-                  <span className="font-medium text-slate-900">{edge.edgeType}</span>
-                  <span className="mx-2 text-slate-400">·</span>
-                  <span>{edge.fromNodeType}:{edge.fromNodeId.slice(-6)}</span>
-                  <span className="mx-2 text-slate-400">→</span>
-                  <span>{edge.toNodeType}:{edge.toNodeId.slice(-6)}</span>
-                </div>
-              ))}
+            <div className="space-y-4">
+              <RelationshipFlow
+                memories={episode.memories.map((memory) => ({
+                  id: memory.id,
+                  label: memory.title,
+                  meta: `${memory.type} · ${memory.sensitivity}`
+                }))}
+                traces={episode.timeline.map((trace) => ({
+                  id: trace.id,
+                  label: `Step ${trace.stepIndex} · ${trace.stepTitle}`,
+                  meta: trace.actor
+                }))}
+                artifacts={episode.artifacts.map((artifact) => ({
+                  id: artifact.id,
+                  label: artifact.title,
+                  meta: `${artifact.type} · v${artifact.version}`
+                }))}
+              />
+              <div className="grid gap-3 text-sm text-slate-700">
+                {episode.relationships.map((edge) => (
+                  <div key={edge.id} className="rounded-2xl border border-slate-200 bg-white px-4 py-3">
+                    <span className="font-medium text-slate-900">{edge.edgeType}</span>
+                    <span className="mx-2 text-slate-400">·</span>
+                    <span>{edge.fromNodeType}:{edge.fromNodeId.slice(-6)}</span>
+                    <span className="mx-2 text-slate-400">→</span>
+                    <span>{edge.toNodeType}:{edge.toNodeId.slice(-6)}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </Panel>
         </div>
