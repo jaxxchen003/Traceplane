@@ -1,96 +1,9 @@
-import { Prisma } from "@prisma/client";
-
 import { prisma } from "@/lib/prisma";
 import { localize } from "@/lib/format";
 import type { Locale } from "@/lib/i18n";
 
-type ProjectListRecord = Prisma.ProjectGetPayload<{
-  include: {
-    projectAgents: true;
-    episodes: {
-      include: {
-        artifacts: true;
-      };
-    };
-    auditEvents: true;
-  };
-}>;
-
-type ProjectOverviewRecord = Prisma.ProjectGetPayload<{
-  include: {
-    projectAgents: {
-      include: {
-        agent: true;
-      };
-    };
-    episodes: {
-      include: {
-        primaryAgent: true;
-        artifacts: true;
-      };
-    };
-    auditEvents: true;
-  };
-}>;
-
-type EpisodeReviewRecord = Prisma.EpisodeGetPayload<{
-  include: {
-    project: true;
-    primaryAgent: true;
-    episodeAgents: {
-      include: {
-        agent: true;
-      };
-    };
-    memoryItems: true;
-    traceEvents: {
-      include: {
-        actorAgent: true;
-      };
-    };
-    artifacts: {
-      include: {
-        createdByAgent: true;
-      };
-    };
-    auditEvents: true;
-  };
-}>;
-
-type ArtifactDetailRecord = Prisma.ArtifactGetPayload<{
-  include: {
-    episode: {
-      include: {
-        project: true;
-      };
-    };
-    createdByAgent: true;
-    sourceTraceEvent: true;
-  };
-}>;
-
-type ArtifactVersionRecord = Prisma.ArtifactGetPayload<{
-  include: {
-    createdByAgent: true;
-  };
-}>;
-
-type EdgeRecord = Prisma.NodeEdgeGetPayload<Record<string, never>>;
-type TraceRecord = Prisma.TraceEventGetPayload<Record<string, never>>;
-type MemoryRecord = Prisma.MemoryItemGetPayload<Record<string, never>>;
-type AuditRecord = Prisma.AuditEventGetPayload<Record<string, never>>;
-
-function statusWeight(status: string) {
-  return status === "denied" ? 2 : status === "warning" ? 1 : 0;
-}
-
-export async function getWorkspaceSummary() {
-  const workspace = await prisma.workspace.findFirst();
-  return workspace;
-}
-
-export async function getProjects(locale: Locale) {
-  const projects = await prisma.project.findMany({
+async function findProjectsForList() {
+  return prisma.project.findMany({
     include: {
       projectAgents: true,
       episodes: {
@@ -102,6 +15,94 @@ export async function getProjects(locale: Locale) {
     },
     orderBy: { updatedAt: "desc" }
   });
+}
+
+async function findProjectForOverview(projectId: string) {
+  return prisma.project.findUnique({
+    where: { id: projectId },
+    include: {
+      projectAgents: {
+        include: { agent: true }
+      },
+      episodes: {
+        include: {
+          primaryAgent: true,
+          artifacts: true
+        },
+        orderBy: { updatedAt: "desc" }
+      },
+      auditEvents: true
+    }
+  });
+}
+
+async function findProjectAgentList(projectId: string) {
+  return prisma.project.findUnique({
+    where: { id: projectId },
+    include: {
+      projectAgents: {
+        include: { agent: true }
+      }
+    }
+  });
+}
+
+async function findEpisodeForReview(episodeId: string) {
+  return prisma.episode.findUnique({
+    where: { id: episodeId },
+    include: {
+      project: true,
+      primaryAgent: true,
+      episodeAgents: { include: { agent: true } },
+      memoryItems: { orderBy: { createdAt: "asc" } },
+      traceEvents: { include: { actorAgent: true }, orderBy: { stepIndex: "asc" } },
+      artifacts: { include: { createdByAgent: true }, orderBy: [{ artifactKey: "asc" }, { version: "desc" }] },
+      auditEvents: { orderBy: { occurredAt: "desc" } }
+    }
+  });
+}
+
+async function findArtifactForDetail(artifactId: string) {
+  return prisma.artifact.findUnique({
+    where: { id: artifactId },
+    include: {
+      episode: { include: { project: true } },
+      createdByAgent: true,
+      sourceTraceEvent: true
+    }
+  });
+}
+
+async function findArtifactVersions(artifactKey: string) {
+  return prisma.artifact.findMany({
+    where: { artifactKey },
+    include: { createdByAgent: true },
+    orderBy: { version: "desc" }
+  });
+}
+
+type ProjectListRecord = Awaited<ReturnType<typeof findProjectsForList>>[number];
+type ProjectOverviewRecord = NonNullable<Awaited<ReturnType<typeof findProjectForOverview>>>;
+type ProjectAgentsRecord = NonNullable<Awaited<ReturnType<typeof findProjectAgentList>>>;
+type EpisodeReviewRecord = NonNullable<Awaited<ReturnType<typeof findEpisodeForReview>>>;
+type ArtifactDetailRecord = NonNullable<Awaited<ReturnType<typeof findArtifactForDetail>>>;
+type ArtifactVersionRecord = Awaited<ReturnType<typeof findArtifactVersions>>[number];
+type EdgeRecord = Awaited<ReturnType<typeof prisma.nodeEdge.findMany>>[number];
+type TraceRecord = Awaited<ReturnType<typeof prisma.traceEvent.findMany>>[number];
+type MemoryRecord = Awaited<ReturnType<typeof prisma.memoryItem.findMany>>[number];
+type AuditRecord = Awaited<ReturnType<typeof prisma.auditEvent.findMany>>[number];
+
+function statusWeight(status: string) {
+  return status === "denied" ? 2 : status === "warning" ? 1 : 0;
+}
+
+export async function getWorkspaceSummary() {
+  const workspace = await prisma.workspace.findFirst();
+  return workspace;
+}
+
+export async function getProjects(locale: Locale) {
+  const projects = await findProjectsForList();
 
   return projects.map((project: ProjectListRecord) => {
     const riskEvents = project.auditEvents.filter((event: AuditRecord) => event.result !== "success");
@@ -125,22 +126,7 @@ export async function getProjects(locale: Locale) {
 }
 
 export async function getProjectOverview(projectId: string, locale: Locale) {
-  const project = await prisma.project.findUnique({
-    where: { id: projectId },
-    include: {
-      projectAgents: {
-        include: { agent: true }
-      },
-      episodes: {
-        include: {
-          primaryAgent: true,
-          artifacts: true
-        },
-        orderBy: { updatedAt: "desc" }
-      },
-      auditEvents: true
-    }
-  });
+  const project = await findProjectForOverview(projectId);
 
   if (!project) return null;
 
@@ -213,18 +199,11 @@ export async function getProjectOverview(projectId: string, locale: Locale) {
 }
 
 export async function getProjectAgents(projectId: string, locale: Locale) {
-  const project = await prisma.project.findUnique({
-    where: { id: projectId },
-    include: {
-      projectAgents: {
-        include: { agent: true }
-      }
-    }
-  });
+  const project = await findProjectAgentList(projectId);
 
   if (!project) return [];
 
-  return project.projectAgents.map(({ agent }: { agent: { id: string; name: string; roleI18n: Prisma.JsonValue } }) => ({
+  return project.projectAgents.map(({ agent }: ProjectAgentsRecord["projectAgents"][number]) => ({
     id: agent.id,
     name: agent.name,
     role: localize(agent.roleI18n, locale)
@@ -232,18 +211,7 @@ export async function getProjectAgents(projectId: string, locale: Locale) {
 }
 
 export async function getEpisodeReview(episodeId: string, locale: Locale) {
-  const episode = await prisma.episode.findUnique({
-    where: { id: episodeId },
-    include: {
-      project: true,
-      primaryAgent: true,
-      episodeAgents: { include: { agent: true } },
-      memoryItems: { orderBy: { createdAt: "asc" } },
-      traceEvents: { include: { actorAgent: true }, orderBy: { stepIndex: "asc" } },
-      artifacts: { include: { createdByAgent: true }, orderBy: [{ artifactKey: "asc" }, { version: "desc" }] },
-      auditEvents: { orderBy: { occurredAt: "desc" } }
-    }
-  });
+  const episode = await findEpisodeForReview(episodeId);
 
   if (!episode) return null;
 
@@ -352,22 +320,11 @@ export async function getEpisodeReview(episodeId: string, locale: Locale) {
 }
 
 export async function getArtifactDetail(artifactId: string, locale: Locale) {
-  const artifact = await prisma.artifact.findUnique({
-    where: { id: artifactId },
-    include: {
-      episode: { include: { project: true } },
-      createdByAgent: true,
-      sourceTraceEvent: true
-    }
-  });
+  const artifact = await findArtifactForDetail(artifactId);
 
   if (!artifact) return null;
 
-  const versions = await prisma.artifact.findMany({
-    where: { artifactKey: artifact.artifactKey },
-    include: { createdByAgent: true },
-    orderBy: { version: "desc" }
-  });
+  const versions = await findArtifactVersions(artifact.artifactKey);
 
   const edges = await prisma.nodeEdge.findMany({
     where: {
