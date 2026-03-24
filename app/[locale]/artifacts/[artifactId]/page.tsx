@@ -22,24 +22,24 @@ export default async function ArtifactDetailPage({
 
   return (
     <div className="space-y-6">
-      <section className="rounded-[30px] border border-white/60 bg-white/90 px-6 py-7 shadow-[0_20px_60px_rgba(15,23,42,0.08)]">
+      <section className="rounded-[34px] border border-white/10 bg-[linear-gradient(180deg,rgba(8,15,32,0.92),rgba(2,6,23,0.96))] px-6 py-7 shadow-[0_30px_90px_rgba(2,6,23,0.45)]">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div>
-            <div className="text-[11px] uppercase tracking-[0.24em] text-slate-400">{dict.artifact.title}</div>
-            <h1 className="mt-2 text-3xl font-semibold text-slate-950">{artifact.title}</h1>
-            <p className="mt-3 text-sm text-slate-600">
+            <div className="text-[11px] uppercase tracking-[0.24em] text-cyan-200/80">{dict.artifact.title}</div>
+            <h1 className="mt-2 text-3xl font-semibold text-white">{artifact.title}</h1>
+            <p className="mt-3 text-sm text-slate-300">
               {artifact.type} · v{artifact.currentVersion} · {artifact.createdBy}
             </p>
           </div>
           <div className="flex gap-3">
             {artifact.uri ? (
-              <a href={artifact.uri} className="rounded-full border border-slate-300 px-4 py-2 text-sm text-slate-800 hover:border-slate-900">
+              <a href={artifact.uri} className="rounded-full border border-white/10 bg-white/6 px-4 py-2 text-sm text-slate-100 hover:border-white/20">
                 {dict.common.download}
               </a>
             ) : null}
             <Link
               href={`/${locale}/projects/${artifact.sourceProjectId}/episodes/${artifact.sourceEpisodeId}`}
-              className="rounded-full bg-slate-950 px-4 py-2 text-sm text-white"
+              className="rounded-full border border-cyan-400/30 bg-cyan-400/12 px-4 py-2 text-sm text-cyan-50"
             >
               {dict.common.backToProject}
             </Link>
@@ -56,8 +56,8 @@ export default async function ArtifactDetailPage({
           <Panel title={dict.common.versionHistory} eyebrow="Versions">
             <div className="space-y-3">
               {artifact.versions.map((version: { id: string; version: number; generatedBy: string; createdAt: Date }) => (
-                <div key={version.id} className="rounded-2xl border border-slate-200 bg-white px-4 py-4 text-sm text-slate-700">
-                  <div className="font-medium text-slate-950">v{version.version}</div>
+                <div key={version.id} className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 text-sm text-slate-300">
+                  <div className="font-medium text-white">v{version.version}</div>
                   <div className="mt-1">{version.generatedBy}</div>
                   <div className="mt-1 text-slate-500">{formatDate(version.createdAt, locale)}</div>
                 </div>
@@ -66,26 +66,26 @@ export default async function ArtifactDetailPage({
           </Panel>
 
           <Panel title={dict.common.provenance} eyebrow={dict.artifact.sourceEpisode}>
-            <div className="space-y-4 text-sm text-slate-700">
+            <div className="space-y-4 text-sm text-slate-300">
               <div>
-                <div className="mb-1 text-[11px] uppercase tracking-[0.18em] text-slate-400">{dict.artifact.sourceEpisode}</div>
-                <div className="font-medium text-slate-950">{artifact.sourceEpisodeTitle}</div>
+                <div className="mb-1 text-[11px] uppercase tracking-[0.18em] text-slate-500">{dict.artifact.sourceEpisode}</div>
+                <div className="font-medium text-white">{artifact.sourceEpisodeTitle}</div>
               </div>
               <div>
-                <div className="mb-1 text-[11px] uppercase tracking-[0.18em] text-slate-400">Trace</div>
+                <div className="mb-1 text-[11px] uppercase tracking-[0.18em] text-slate-500">Trace</div>
                 <div className="space-y-2">
                   {artifact.sourceTraces.map((trace: { id: string; stepIndex: number; title: string }) => (
-                    <div key={trace.id} className="rounded-xl bg-slate-50 px-3 py-2">
+                    <div key={trace.id} className="rounded-xl border border-white/10 bg-white/5 px-3 py-2">
                       Step {trace.stepIndex} · {trace.title}
                     </div>
                   ))}
                 </div>
               </div>
               <div>
-                <div className="mb-1 text-[11px] uppercase tracking-[0.18em] text-slate-400">{dict.common.memories}</div>
+                <div className="mb-1 text-[11px] uppercase tracking-[0.18em] text-slate-500">{dict.common.memories}</div>
                 <div className="space-y-2">
                   {artifact.sourceMemories.map((memory: { id: string; title: string }) => (
-                    <div key={memory.id} className="rounded-xl bg-slate-50 px-3 py-2">
+                    <div key={memory.id} className="rounded-xl border border-white/10 bg-white/5 px-3 py-2">
                       {memory.title}
                     </div>
                   ))}
@@ -95,7 +95,7 @@ export default async function ArtifactDetailPage({
           </Panel>
 
           <Panel title={dict.common.reuse} eyebrow={dict.artifact.consumedBy}>
-            <div className="text-sm text-slate-700">
+            <div className="text-sm text-slate-300">
               {artifact.consumedByAgents.length > 0 ? artifact.consumedByAgents.length : 0} downstream agent references
             </div>
           </Panel>

@@ -119,6 +119,8 @@ docker run --rm -p 3000:3000 --env-file .env enterprise-agent-work-graph
 ## 仓库结构
 - `docs/product-spec.md`: 产品定义、场景、范围、验收标准
 - `docs/architecture.md`: 对象模型、关系模型、数据流、存储抽象、API
+- `docs/platform-architecture-v1.md`: 平台级底层架构判断，明确为什么默认自建而不是直接押注 db9
+- `docs/storage-runtime-interface.md`: 存储运行时接口边界，定义未来如何支持可替换 backend
 - `docs/mvp-plan.md`: MVP 的实现逻辑、范围、路线图和最终产品形态
 - `docs/product-surface.md`: 第一版产品的页面、视图、交互和 demo 形态
 - `docs/page-specs.md`: 第一版 5 个核心页面的字段级规格
@@ -131,6 +133,12 @@ docker run --rm -p 3000:3000 --env-file .env enterprise-agent-work-graph
 - 英文工作名：`Enterprise Agent Work Graph`
 - 中文工作名：`企业级 Agent 工作图谱`
 - 目录名：`enterprise-agent-work-graph`
+
+## 当前平台判断
+- 默认路线：自建底层产品架构
+- 借鉴对象：吸收 `db9` 在 `table + files + agent-native runtime` 上的设计优点
+- 当前不做：把 `db9` 作为唯一核心底层引擎
+- 未来预留：通过 runtime adapter 支持 `db9` 这类 backend
 
 ## 现在最重要的不是
 不是先做炫 UI，不是先做全能平台，不是先接很多协议。

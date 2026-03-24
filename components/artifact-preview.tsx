@@ -14,7 +14,7 @@ export function ArtifactPreview({
   content: string;
 }) {
   if (!content) {
-    return <div className="rounded-[24px] border border-dashed border-slate-300 px-5 py-8 text-sm text-slate-500">No preview content</div>;
+    return <div className="rounded-[24px] border border-dashed border-white/16 px-5 py-8 text-sm text-slate-500">No preview content</div>;
   }
 
   if (type === "JSON") {
@@ -28,19 +28,19 @@ export function ArtifactPreview({
   if (type === "MARKDOWN") {
     const lines = content.split("\n").filter((line) => line.trim().length > 0);
     return (
-      <article className="rounded-[24px] bg-white p-6 shadow-[inset_0_0_0_1px_rgba(148,163,184,0.2)]">
+      <article className="rounded-[24px] bg-white/5 p-6 shadow-[inset_0_0_0_1px_rgba(148,163,184,0.12)]">
         <div className="space-y-3">
           {lines.map((line, index) =>
             line.startsWith("#") ? (
-              <h3 key={`${line}-${index}`} className="text-xl font-semibold text-slate-950">
+              <h3 key={`${line}-${index}`} className="text-xl font-semibold text-white">
                 {line.replace(/^#+\s*/, "")}
               </h3>
             ) : line.startsWith("- ") || /^\d+\.\s/.test(line) ? (
-              <div key={`${line}-${index}`} className="text-sm leading-7 text-slate-700">
+              <div key={`${line}-${index}`} className="text-sm leading-7 text-slate-300">
                 {line}
               </div>
             ) : (
-              <p key={`${line}-${index}`} className="text-sm leading-7 text-slate-700">
+              <p key={`${line}-${index}`} className="text-sm leading-7 text-slate-300">
                 {line}
               </p>
             )

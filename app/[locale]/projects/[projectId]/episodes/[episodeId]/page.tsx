@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { EpisodeControlPanel } from "@/components/demo-control-panel";
+import { GraphTheater } from "@/components/graph-theater";
 import { Panel } from "@/components/panel";
 import { RelationshipFlow } from "@/components/relationship-flow";
 import { StatusBadge } from "@/components/status-badge";
@@ -24,37 +25,179 @@ export default async function EpisodeReviewPage({
   if (!episode || episode.projectId !== projectId) notFound();
 
   const dict = getDictionary(locale);
+  const graphNodes = [
+    {
+      id: "episode-core",
+      label: episode.title,
+      meta:
+        locale === "zh"
+          ? `${episode.timeline.length} 个执行事件`
+          : `${episode.timeline.length} execution events`,
+      x: 50,
+      y: 22,
+      z: 0.98,
+      tone: "agent" as const
+    },
+    ...episode.memories.slice(0, 3).map((memory: {
+      id: string;
+      title: string;
+      type: string;
+      sensitivity: string;
+    }, index: number) => ({
+      id: `memory-${memory.id}`,
+      label: memory.title,
+      meta:
+        locale === "zh"
+          ? `${memory.type} · ${memory.sensitivity}`
+          : `${memory.type} · ${memory.sensitivity}`,
+      x: [20, 38, 78][index] ?? 22,
+      y: [34, 56, 40][index] ?? 36,
+      z: 0.78 - index * 0.1,
+      tone: "memory" as const
+    })),
+    ...episode.timeline.slice(0, 3).map((trace: {
+      id: string;
+      stepIndex: number;
+      stepTitle: string;
+      actor: string;
+    }, index: number) => ({
+      id: `trace-${trace.id}`,
+      label: `Step ${trace.stepIndex}`,
+      meta: `${trace.stepTitle} · ${trace.actor}`,
+      x: [46, 62, 76][index] ?? 48,
+      y: [52, 66, 52][index] ?? 58,
+      z: 0.7 - index * 0.08,
+      tone: "trace" as const
+    })),
+    ...episode.artifacts.slice(0, 2).map((artifact: {
+      id: string;
+      title: string;
+      type: string;
+      version: number;
+    }, index: number) => ({
+      id: `artifact-${artifact.id}`,
+      label: artifact.title,
+      meta: `${artifact.type} · v${artifact.version}`,
+      x: index === 0 ? 28 : 70,
+      y: 82,
+      z: 0.52,
+      tone: "artifact" as const
+    })),
+    {
+      id: "policy-node",
+      label: locale === "zh" ? "Policy Envelope" : "Policy Envelope",
+      meta: episode.policyVersion,
+      x: 84,
+      y: 26,
+      z: 0.72,
+      tone: "policy" as const
+    },
+    {
+      id: "audit-node",
+      label: locale === "zh" ? "Audit Signals" : "Audit Signals",
+      meta:
+        locale === "zh"
+          ? `${episode.auditSummary.policyHitCount + episode.auditSummary.permissionDeniedCount} 个命中`
+          : `${episode.auditSummary.policyHitCount + episode.auditSummary.permissionDeniedCount} hits`,
+      x: 14,
+      y: 70,
+      z: 0.62,
+      tone: "audit" as const
+    }
+  ];
+  const graphEdges = [
+    ...episode.memories.slice(0, 3).map((memory: { id: string }) => ({
+      from: `memory-${memory.id}`,
+      to: "episode-core",
+      emphasis: "soft" as const
+    })),
+    ...episode.timeline.slice(0, 3).map((trace: { id: string }) => ({
+      from: "episode-core",
+      to: `trace-${trace.id}`,
+      emphasis: "strong" as const
+    })),
+    ...episode.artifacts.slice(0, 2).map((artifact: { id: string }) => ({
+      from: `trace-${episode.timeline[0]?.id ?? ""}`,
+      to: `artifact-${artifact.id}`,
+      emphasis: "soft" as const
+    })),
+    { from: "episode-core", to: "policy-node", emphasis: "soft" as const },
+    { from: "episode-core", to: "audit-node", emphasis: "soft" as const }
+  ].filter((edge) => !edge.from.endsWith("-"));
 
   return (
     <div className="space-y-6">
-      <section className="rounded-[30px] border border-white/60 bg-slate-950 px-6 py-7 text-white shadow-[0_30px_80px_rgba(15,23,42,0.2)]">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-          <div>
-            <div className="mb-3 flex items-center gap-3">
-              <h1 className="text-3xl font-semibold">{episode.title}</h1>
+      <GraphTheater
+        title={episode.title}
+        subtitle={
+          locale === "zh"
+            ? "这个舞台把 memory、execution、artifacts、policy 和 audit 压到同一个视图里。上层是空间关系，下层仍保留结构化管理和复盘。"
+            : "This stage compresses memory, execution, artifacts, policy, and audit into one view, then pairs it with structured management below."
+        }
+        nodes={graphNodes}
+        edges={graphEdges}
+        stats={[
+          { label: dict.common.project, value: episode.projectName },
+          { label: dict.common.policyVersion, value: episode.policyVersion },
+          {
+            label: dict.common.duration,
+            value: formatDuration(episode.startedAt, episode.endedAt)
+          }
+        ]}
+      />
+
+      <section className="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
+        <Panel title={locale === "zh" ? "Episode Brief" : "Episode Brief"} eyebrow={dict.common.summary}>
+          <div className="space-y-5 text-sm leading-7 text-slate-300">
+            <div className="flex flex-wrap items-center gap-3">
               <StatusBadge label={dict.statuses[episode.status]} raw={episode.status} />
+              <div className="text-white">{episode.summary}</div>
             </div>
-            <p className="max-w-3xl text-sm leading-7 text-slate-300">{episode.summary}</p>
+            <div className="grid gap-4 lg:grid-cols-3">
+              <div className="rounded-[22px] border border-white/10 bg-white/5 px-4 py-4">
+                <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500">{dict.common.startedAt}</div>
+                <div className="mt-2 text-base font-semibold text-white">{formatDate(episode.startedAt, locale)}</div>
+              </div>
+              <div className="rounded-[22px] border border-white/10 bg-white/5 px-4 py-4">
+                <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500">{dict.common.duration}</div>
+                <div className="mt-2 text-base font-semibold text-white">
+                  {formatDuration(episode.startedAt, episode.endedAt)}
+                </div>
+              </div>
+              <div className="rounded-[22px] border border-white/10 bg-white/5 px-4 py-4">
+                <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
+                  {dict.common.participatingAgents}
+                </div>
+                <div className="mt-2 text-base font-semibold text-white">
+                  {episode.participatingAgents.length}
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="grid min-w-[320px] grid-cols-2 gap-4 text-sm text-slate-300">
-            <div>
-              <div className="text-[11px] uppercase tracking-[0.2em] text-amber-200/70">{dict.common.project}</div>
-              <div className="mt-1 font-medium text-white">{episode.projectName}</div>
+        </Panel>
+
+        <Panel title={dict.episode.auditSummary} eyebrow={dict.common.auditTrail}>
+          <div className="grid gap-3 text-sm text-slate-300">
+            <div className="rounded-[20px] border border-cyan-400/16 bg-cyan-400/8 px-4 py-4">
+              {episode.auditSummary.readCount} reads
             </div>
-            <div>
-              <div className="text-[11px] uppercase tracking-[0.2em] text-amber-200/70">{dict.common.policyVersion}</div>
-              <div className="mt-1 font-medium text-white">{episode.policyVersion}</div>
+            <div className="rounded-[20px] border border-emerald-400/16 bg-emerald-400/8 px-4 py-4">
+              {episode.auditSummary.writeCount} writes
             </div>
-            <div>
-              <div className="text-[11px] uppercase tracking-[0.2em] text-amber-200/70">{dict.common.startedAt}</div>
-              <div className="mt-1 font-medium text-white">{formatDate(episode.startedAt, locale)}</div>
+            <div className="rounded-[20px] border border-rose-400/16 bg-rose-400/8 px-4 py-4">
+              {episode.auditSummary.permissionDeniedCount} denials
             </div>
-            <div>
-              <div className="text-[11px] uppercase tracking-[0.2em] text-amber-200/70">{dict.common.duration}</div>
-              <div className="mt-1 font-medium text-white">{formatDuration(episode.startedAt, episode.endedAt)}</div>
+            <div className="rounded-[20px] border border-amber-400/16 bg-amber-400/8 px-4 py-4">
+              {episode.auditSummary.policyHitCount} policy hits
             </div>
+            <Link
+              href={`/${locale}/audit?episodeId=${episode.id}`}
+              className="mt-2 inline-flex rounded-full border border-white/10 bg-white/6 px-4 py-2 font-medium text-cyan-100"
+            >
+              {dict.common.viewAudit}
+            </Link>
           </div>
-        </div>
+        </Panel>
       </section>
 
       <div className="grid gap-6 xl:grid-cols-[1.6fr_0.9fr]">
@@ -77,31 +220,55 @@ export default async function EpisodeReviewPage({
                 policyHitReason: string | null;
                 permissionDeniedReason: string | null;
               }) => (
-                <div key={item.id} className="rounded-[24px] border border-slate-200 bg-slate-50 px-5 py-5">
+                <div key={item.id} className="rounded-[24px] border border-white/10 bg-white/5 px-5 py-5">
                   <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
                     <div>
                       <div className="mb-2 flex items-center gap-3">
-                        <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
+                        <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
                           Step {item.stepIndex}
                         </div>
                         <StatusBadge label={dict.statuses[item.status]} raw={item.status} />
                       </div>
-                      <h2 className="text-lg font-semibold text-slate-950">{item.stepTitle}</h2>
-                      <p className="mt-2 text-sm leading-6 text-slate-600">{item.shortResult}</p>
+                      <h2 className="text-lg font-semibold text-white">{item.stepTitle}</h2>
+                      <p className="mt-2 text-sm leading-7 text-slate-300">{item.shortResult}</p>
                     </div>
-                    <div className="min-w-[220px] text-sm text-slate-600">
+                    <div className="min-w-[220px] text-sm text-slate-300">
                       <div>{item.actor}</div>
                       <div>{formatDate(item.eventTime, locale)}</div>
                       {item.toolName ? <div>{item.toolName}</div> : null}
                     </div>
                   </div>
-                  <div className="mt-4 grid gap-3 text-sm text-slate-700 lg:grid-cols-2">
-                    {item.inputSummary ? <div><span className="font-medium">Input:</span> {item.inputSummary}</div> : null}
-                    {item.decisionSummary ? <div><span className="font-medium">Decision:</span> {item.decisionSummary}</div> : null}
-                    {item.resultSummary ? <div><span className="font-medium">Result:</span> {item.resultSummary}</div> : null}
-                    {item.errorSummary ? <div className="text-rose-700"><span className="font-medium">Error:</span> {item.errorSummary}</div> : null}
-                    {item.policyHitReason ? <div className="text-amber-700"><span className="font-medium">Policy:</span> {item.policyHitReason}</div> : null}
-                    {item.permissionDeniedReason ? <div className="text-rose-700"><span className="font-medium">Denied:</span> {item.permissionDeniedReason}</div> : null}
+                  <div className="mt-4 grid gap-3 text-sm text-slate-300 lg:grid-cols-2">
+                    {item.inputSummary ? (
+                      <div>
+                        <span className="font-medium text-white">Input:</span> {item.inputSummary}
+                      </div>
+                    ) : null}
+                    {item.decisionSummary ? (
+                      <div>
+                        <span className="font-medium text-white">Decision:</span> {item.decisionSummary}
+                      </div>
+                    ) : null}
+                    {item.resultSummary ? (
+                      <div>
+                        <span className="font-medium text-white">Result:</span> {item.resultSummary}
+                      </div>
+                    ) : null}
+                    {item.errorSummary ? (
+                      <div className="text-rose-300">
+                        <span className="font-medium">Error:</span> {item.errorSummary}
+                      </div>
+                    ) : null}
+                    {item.policyHitReason ? (
+                      <div className="text-amber-200">
+                        <span className="font-medium">Policy:</span> {item.policyHitReason}
+                      </div>
+                    ) : null}
+                    {item.permissionDeniedReason ? (
+                      <div className="text-rose-300">
+                        <span className="font-medium">Denied:</span> {item.permissionDeniedReason}
+                      </div>
+                    ) : null}
                   </div>
                 </div>
               ))}
@@ -142,7 +309,7 @@ export default async function EpisodeReviewPage({
                   meta: `${artifact.type} · v${artifact.version}`
                 }))}
               />
-              <div className="grid gap-3 text-sm text-slate-700">
+              <div className="grid gap-3 text-sm text-slate-300">
                 {episode.relationships.map((edge: {
                   id: string;
                   edgeType: string;
@@ -151,11 +318,11 @@ export default async function EpisodeReviewPage({
                   toNodeType: string;
                   toNodeId: string;
                 }) => (
-                  <div key={edge.id} className="rounded-2xl border border-slate-200 bg-white px-4 py-3">
-                    <span className="font-medium text-slate-900">{edge.edgeType}</span>
-                    <span className="mx-2 text-slate-400">·</span>
+                  <div key={edge.id} className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+                    <span className="font-medium text-white">{edge.edgeType}</span>
+                    <span className="mx-2 text-slate-500">·</span>
                     <span>{edge.fromNodeType}:{edge.fromNodeId.slice(-6)}</span>
-                    <span className="mx-2 text-slate-400">→</span>
+                    <span className="mx-2 text-slate-500">→</span>
                     <span>{edge.toNodeType}:{edge.toNodeId.slice(-6)}</span>
                   </div>
                 ))}
@@ -183,14 +350,14 @@ export default async function EpisodeReviewPage({
           </Panel>
 
           <Panel title={dict.common.summary} eyebrow={dict.episode.goal}>
-            <div className="space-y-4 text-sm leading-6 text-slate-700">
+            <div className="space-y-4 text-sm leading-7 text-slate-300">
               <div>{episode.goal}</div>
-              <div className="rounded-2xl bg-slate-50 p-4">
-                <div className="mb-2 text-[11px] uppercase tracking-[0.18em] text-slate-400">{dict.episode.finalOutcome}</div>
-                <div>{episode.finalOutcome}</div>
+              <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                <div className="mb-2 text-[11px] uppercase tracking-[0.18em] text-slate-500">{dict.episode.finalOutcome}</div>
+                <div className="text-white">{episode.finalOutcome}</div>
               </div>
               <div>
-                <div className="mb-2 text-[11px] uppercase tracking-[0.18em] text-slate-400">{dict.common.participatingAgents}</div>
+                <div className="mb-2 text-[11px] uppercase tracking-[0.18em] text-slate-500">{dict.common.participatingAgents}</div>
                 <div>{episode.participatingAgents.join(" · ")}</div>
               </div>
             </div>
@@ -206,10 +373,10 @@ export default async function EpisodeReviewPage({
                 sensitivity: string;
                 usedInStepCount: number;
               }) => (
-                <div key={memory.id} className="rounded-2xl border border-slate-200 bg-white px-4 py-4">
-                  <div className="font-medium text-slate-950">{memory.title}</div>
-                  <div className="mt-1 text-sm leading-6 text-slate-600">{memory.content}</div>
-                  <div className="mt-3 text-xs uppercase tracking-[0.16em] text-slate-400">
+                <div key={memory.id} className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4">
+                  <div className="font-medium text-white">{memory.title}</div>
+                  <div className="mt-1 text-sm leading-7 text-slate-300">{memory.content}</div>
+                  <div className="mt-3 text-xs uppercase tracking-[0.16em] text-slate-500">
                     {memory.type} · {memory.sensitivity} · {memory.usedInStepCount} steps
                   </div>
                 </div>
@@ -229,31 +396,19 @@ export default async function EpisodeReviewPage({
                 <Link
                   key={artifact.id}
                   href={`/${locale}/artifacts/${artifact.id}`}
-                  className="block rounded-2xl border border-slate-200 bg-white px-4 py-4 hover:border-slate-900"
+                  className="block rounded-2xl border border-white/10 bg-white/5 px-4 py-4 hover:border-cyan-300/30"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <div className="font-medium text-slate-950">{artifact.title}</div>
-                      <div className="mt-1 text-sm text-slate-600">{artifact.generatedBy}</div>
+                      <div className="font-medium text-white">{artifact.title}</div>
+                      <div className="mt-1 text-sm text-slate-300">{artifact.generatedBy}</div>
                     </div>
-                    <div className="text-right text-xs uppercase tracking-[0.16em] text-slate-400">
+                    <div className="text-right text-xs uppercase tracking-[0.16em] text-slate-500">
                       {artifact.type} v{artifact.version}
                     </div>
                   </div>
                 </Link>
               ))}
-            </div>
-          </Panel>
-
-          <Panel title={dict.episode.auditSummary} eyebrow={dict.common.auditTrail}>
-            <div className="grid gap-3 text-sm text-slate-700">
-              <div>{episode.auditSummary.readCount} reads</div>
-              <div>{episode.auditSummary.writeCount} writes</div>
-              <div>{episode.auditSummary.permissionDeniedCount} denials</div>
-              <div>{episode.auditSummary.policyHitCount} policy hits</div>
-              <Link href={`/${locale}/audit?episodeId=${episode.id}`} className="mt-2 font-medium text-amber-700">
-                {dict.common.viewAudit}
-              </Link>
             </div>
           </Panel>
         </div>

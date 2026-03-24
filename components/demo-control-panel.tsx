@@ -23,17 +23,21 @@ type MemoryOption = {
 };
 
 function fieldClass() {
-  return "w-full rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-slate-900";
+  return "w-full rounded-2xl border border-white/10 bg-slate-950/70 px-3 py-2.5 text-sm text-slate-100 outline-none transition focus:border-cyan-300/40";
 }
 
 function labelClass() {
-  return "mb-1 block text-xs uppercase tracking-[0.14em] text-slate-500";
+  return "mb-1 block text-xs uppercase tracking-[0.14em] text-slate-400";
 }
 
 function messageClass(message: string) {
   return message.toLowerCase().includes("fail") || message.toLowerCase().includes("error")
-    ? "text-rose-600"
-    : "text-emerald-700";
+    ? "text-rose-300"
+    : "text-emerald-300";
+}
+
+function buttonClass() {
+  return "rounded-full border border-cyan-400/30 bg-cyan-400/12 px-4 py-2 text-sm font-medium text-cyan-50 transition hover:border-cyan-300/45 hover:bg-cyan-400/18 disabled:opacity-60";
 }
 
 function normalizeI18n(zh: string, en: string) {
@@ -151,7 +155,7 @@ export function ProjectControlPanel({
           <div className={`text-xs ${message ? messageClass(message) : "text-slate-500"}`}>
             {message || dict.controls.refreshHint}
           </div>
-          <button type="submit" className="rounded-full bg-slate-950 px-4 py-2 text-sm font-medium text-white" disabled={isPending}>
+          <button type="submit" className={buttonClass()} disabled={isPending}>
             {isPending ? dict.controls.creating : dict.controls.submit}
           </button>
         </div>
@@ -339,7 +343,7 @@ export function EpisodeControlPanel({
             <div className={`text-xs ${memoryMessage ? messageClass(memoryMessage) : "text-slate-500"}`}>
               {memoryMessage || dict.controls.refreshHint}
             </div>
-            <button type="submit" className="rounded-full bg-slate-950 px-4 py-2 text-sm font-medium text-white" disabled={isPending}>
+            <button type="submit" className={buttonClass()} disabled={isPending}>
               {isPending ? dict.controls.creating : dict.controls.submit}
             </button>
           </div>
@@ -450,7 +454,7 @@ export function EpisodeControlPanel({
             <label className={labelClass()}>{dict.controls.linkedMemoryIds}</label>
             <div className="grid gap-2 md:grid-cols-2">
               {memories.map((memory) => (
-                <label key={memory.id} className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700">
+                <label key={memory.id} className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-200">
                   <input
                     type="checkbox"
                     checked={traceForm.linkedMemoryIds.includes(memory.id)}
@@ -470,7 +474,7 @@ export function EpisodeControlPanel({
             <div className={`text-xs ${traceMessage ? messageClass(traceMessage) : "text-slate-500"}`}>
               {traceMessage || dict.controls.refreshHint}
             </div>
-            <button type="submit" className="rounded-full bg-slate-950 px-4 py-2 text-sm font-medium text-white" disabled={isPending}>
+            <button type="submit" className={buttonClass()} disabled={isPending}>
               {isPending ? dict.controls.creating : dict.controls.submit}
             </button>
           </div>
@@ -587,7 +591,7 @@ export function EpisodeControlPanel({
             <label className={labelClass()}>{dict.controls.linkedMemoryIds}</label>
             <div className="grid gap-2 md:grid-cols-2">
               {memories.map((memory) => (
-                <label key={memory.id} className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700">
+                <label key={memory.id} className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-200">
                   <input
                     type="checkbox"
                     checked={artifactForm.linkedMemoryIds.includes(memory.id)}
@@ -607,7 +611,7 @@ export function EpisodeControlPanel({
             <div className={`text-xs ${artifactMessage ? messageClass(artifactMessage) : "text-slate-500"}`}>
               {artifactMessage || dict.controls.refreshHint}
             </div>
-            <button type="submit" className="rounded-full bg-slate-950 px-4 py-2 text-sm font-medium text-white" disabled={isPending}>
+            <button type="submit" className={buttonClass()} disabled={isPending}>
               {isPending ? dict.controls.creating : dict.controls.submit}
             </button>
           </div>

@@ -8,15 +8,17 @@ function getTone(value: string): Tone {
 }
 
 const toneClasses: Record<Tone, string> = {
-  neutral: "bg-slate-100 text-slate-700",
-  success: "bg-emerald-100 text-emerald-800",
-  warning: "bg-amber-100 text-amber-900",
-  danger: "bg-rose-100 text-rose-900"
+  neutral: "border border-slate-500/35 bg-slate-400/12 text-slate-200",
+  success: "border border-emerald-400/35 bg-emerald-400/12 text-emerald-200",
+  warning: "border border-amber-400/35 bg-amber-400/12 text-amber-200",
+  danger: "border border-rose-400/35 bg-rose-400/12 text-rose-200"
 };
 
 export function StatusBadge({ label, raw }: { label: string; raw: string }) {
   return (
-    <span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${toneClasses[getTone(raw)]}`}>
+    <span
+      className={`inline-flex rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] ${toneClasses[getTone(raw)]}`}
+    >
       {label}
     </span>
   );

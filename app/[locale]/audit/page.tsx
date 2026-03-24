@@ -24,8 +24,8 @@ export default async function AuditPage({
 
   return (
     <div className="space-y-6">
-      <section className="rounded-[30px] border border-white/60 bg-slate-950 px-6 py-7 text-white shadow-[0_30px_80px_rgba(15,23,42,0.2)]">
-        <div className="text-[11px] uppercase tracking-[0.26em] text-amber-200/80">{dict.audit.title}</div>
+      <section className="rounded-[34px] border border-white/10 bg-[linear-gradient(180deg,rgba(8,15,32,0.92),rgba(2,6,23,0.96))] px-6 py-7 text-white shadow-[0_30px_90px_rgba(2,6,23,0.45)]">
+        <div className="text-[11px] uppercase tracking-[0.26em] text-cyan-200/80">{dict.audit.title}</div>
         <h1 className="mt-3 text-3xl font-semibold">{dict.common.auditTrail}</h1>
         <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-300">{dict.audit.subtitle}</p>
       </section>
@@ -33,7 +33,7 @@ export default async function AuditPage({
       <Panel title={dict.audit.title} eyebrow="Audit">
         <div className="overflow-x-auto">
           <table className="min-w-full border-separate border-spacing-y-3 text-left">
-            <thead className="text-xs uppercase tracking-[0.16em] text-slate-400">
+            <thead className="text-xs uppercase tracking-[0.16em] text-slate-500">
               <tr>
                 <th className="px-3">{dict.common.status}</th>
                 <th className="px-3">{dict.audit.action}</th>
@@ -57,25 +57,25 @@ export default async function AuditPage({
                 policyHitReason: string | null;
                 denyReason: string | null;
               }) => (
-                <tr key={event.id} className="rounded-2xl bg-white">
+                <tr key={event.id} className="rounded-2xl bg-white/5">
                   <td className="rounded-l-2xl px-3 py-4">
                     <div className="space-y-2">
                       <StatusBadge label={event.result} raw={event.result} />
                       <div className="text-xs text-slate-500">{formatDate(event.occurredAt, locale)}</div>
                     </div>
                   </td>
-                  <td className="px-3 py-4 text-sm text-slate-700">{event.action}</td>
-                  <td className="px-3 py-4 text-sm text-slate-700">{event.actorType} · {event.actorId.slice(-6)}</td>
-                  <td className="px-3 py-4 text-sm text-slate-700">{event.targetType} · {event.targetId.slice(-8)}</td>
-                  <td className="px-3 py-4 text-sm text-slate-700">{event.permissionDecision ?? "allow"}</td>
-                  <td className="rounded-r-2xl px-3 py-4 text-sm text-slate-700">
+                  <td className="px-3 py-4 text-sm text-slate-200">{event.action}</td>
+                  <td className="px-3 py-4 text-sm text-slate-200">{event.actorType} · {event.actorId.slice(-6)}</td>
+                  <td className="px-3 py-4 text-sm text-slate-200">{event.targetType} · {event.targetId.slice(-8)}</td>
+                  <td className="px-3 py-4 text-sm text-slate-200">{event.permissionDecision ?? "allow"}</td>
+                  <td className="rounded-r-2xl px-3 py-4 text-sm text-slate-200">
                     {event.policyHitReason || event.denyReason || "—"}
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
-          {events.length === 0 ? <p className="pt-4 text-sm text-slate-600">{dict.audit.noEvents}</p> : null}
+          {events.length === 0 ? <p className="pt-4 text-sm text-slate-400">{dict.audit.noEvents}</p> : null}
         </div>
       </Panel>
     </div>
