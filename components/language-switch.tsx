@@ -11,7 +11,7 @@ export function LanguageSwitch({ locale }: { locale: "zh" | "en" }) {
   return (
     <Link
       href={nextPath || `/${altLocale}/projects`}
-      className="rounded-full border border-slate-300 px-3 py-1 text-sm text-slate-700 transition hover:border-slate-900 hover:text-slate-950"
+      className="rounded-full border border-white/12 bg-white/6 px-3 py-1.5 text-sm text-slate-100 transition hover:border-cyan-300/35 hover:bg-cyan-400/10 hover:text-cyan-50"
     >
       {locale === "zh" ? "EN" : "中文"}
     </Link>
