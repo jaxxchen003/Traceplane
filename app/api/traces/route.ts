@@ -22,7 +22,7 @@ export async function POST(request: Request) {
     typeof body.stepIndex === "number"
       ? body.stepIndex
       : episode.traceEvents.length > 0
-        ? Math.max(...episode.traceEvents.map((item) => item.stepIndex)) + 1
+        ? Math.max(...episode.traceEvents.map((item: { stepIndex: number }) => item.stepIndex)) + 1
         : 1;
 
   const trace = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
