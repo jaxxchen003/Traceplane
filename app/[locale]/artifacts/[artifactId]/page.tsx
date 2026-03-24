@@ -55,7 +55,7 @@ export default async function ArtifactDetailPage({
         <div className="space-y-6">
           <Panel title={dict.common.versionHistory} eyebrow="Versions">
             <div className="space-y-3">
-              {artifact.versions.map((version) => (
+              {artifact.versions.map((version: { id: string; version: number; generatedBy: string; createdAt: Date }) => (
                 <div key={version.id} className="rounded-2xl border border-slate-200 bg-white px-4 py-4 text-sm text-slate-700">
                   <div className="font-medium text-slate-950">v{version.version}</div>
                   <div className="mt-1">{version.generatedBy}</div>
@@ -74,7 +74,7 @@ export default async function ArtifactDetailPage({
               <div>
                 <div className="mb-1 text-[11px] uppercase tracking-[0.18em] text-slate-400">Trace</div>
                 <div className="space-y-2">
-                  {artifact.sourceTraces.map((trace) => (
+                  {artifact.sourceTraces.map((trace: { id: string; stepIndex: number; title: string }) => (
                     <div key={trace.id} className="rounded-xl bg-slate-50 px-3 py-2">
                       Step {trace.stepIndex} · {trace.title}
                     </div>
@@ -84,7 +84,7 @@ export default async function ArtifactDetailPage({
               <div>
                 <div className="mb-1 text-[11px] uppercase tracking-[0.18em] text-slate-400">{dict.common.memories}</div>
                 <div className="space-y-2">
-                  {artifact.sourceMemories.map((memory) => (
+                  {artifact.sourceMemories.map((memory: { id: string; title: string }) => (
                     <div key={memory.id} className="rounded-xl bg-slate-50 px-3 py-2">
                       {memory.title}
                     </div>
