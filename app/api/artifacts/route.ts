@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import { NextResponse } from "next/server";
 
 import { prisma } from "@/lib/prisma";
@@ -24,7 +25,7 @@ export async function POST(request: Request) {
 
   const nextVersion = latest ? latest.version + 1 : 1;
 
-  const artifact = await prisma.$transaction(async (tx) => {
+  const artifact = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     const created = await tx.artifact.create({
       data: {
         episodeId: body.episodeId,

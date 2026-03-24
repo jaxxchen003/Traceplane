@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import { NextResponse } from "next/server";
 
 import { prisma } from "@/lib/prisma";
@@ -24,7 +25,7 @@ export async function POST(request: Request) {
         ? Math.max(...episode.traceEvents.map((item) => item.stepIndex)) + 1
         : 1;
 
-  const trace = await prisma.$transaction(async (tx) => {
+  const trace = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     const created = await tx.traceEvent.create({
       data: {
         episodeId: body.episodeId,
