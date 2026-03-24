@@ -64,7 +64,13 @@ export default async function ProjectOverviewPage({
       <div className="grid gap-6 lg:grid-cols-[1.2fr_1fr]">
         <Panel title={dict.projectOverview.agents} eyebrow="Agents">
           <div className="grid gap-3">
-            {project.agents.map((agent) => (
+            {project.agents.map((agent: {
+              id: string;
+              name: string;
+              role: string;
+              episodesInvolvedCount: number;
+              artifactsGeneratedCount: number;
+            }) => (
               <div key={agent.id} className="rounded-[22px] border border-slate-200 bg-slate-50 px-4 py-4">
                 <div className="flex items-center justify-between gap-3">
                   <div>
@@ -83,7 +89,13 @@ export default async function ProjectOverviewPage({
 
         <Panel title={dict.common.recentArtifacts} eyebrow={dict.common.artifacts}>
           <div className="grid gap-3">
-            {project.artifacts.map((artifact) => (
+            {project.artifacts.map((artifact: {
+              id: string;
+              title: string;
+              type: string;
+              generatedByAgent: string;
+              episodeTitle: string;
+            }) => (
               <Link key={artifact.id} href={`/${locale}/artifacts/${artifact.id}`} className="rounded-[20px] border border-slate-200 bg-white px-4 py-4 hover:border-slate-900">
                 <div className="font-medium text-slate-950">{artifact.title}</div>
                 <div className="mt-1 text-sm text-slate-600">
@@ -103,7 +115,16 @@ export default async function ProjectOverviewPage({
           <p className="text-sm text-slate-600">{dict.projectOverview.noEpisodes}</p>
         ) : (
           <div className="grid gap-4">
-            {project.episodes.map((episode) => (
+            {project.episodes.map((episode: {
+              id: string;
+              title: string;
+              status: string;
+              summary: string;
+              primaryAgent: string;
+              updatedAt: Date;
+              artifactCount: number;
+              riskFlag: boolean;
+            }) => (
               <Link
                 key={episode.id}
                 href={`/${locale}/projects/${project.id}/episodes/${episode.id}`}

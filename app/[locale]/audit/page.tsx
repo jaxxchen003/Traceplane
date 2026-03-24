@@ -44,7 +44,19 @@ export default async function AuditPage({
               </tr>
             </thead>
             <tbody>
-              {events.map((event) => (
+              {events.map((event: {
+                id: string;
+                occurredAt: Date;
+                result: string;
+                action: string;
+                actorType: string;
+                actorId: string;
+                targetType: string;
+                targetId: string;
+                permissionDecision: string | null;
+                policyHitReason: string | null;
+                denyReason: string | null;
+              }) => (
                 <tr key={event.id} className="rounded-2xl bg-white">
                   <td className="rounded-l-2xl px-3 py-4">
                     <div className="space-y-2">

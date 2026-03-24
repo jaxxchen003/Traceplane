@@ -36,7 +36,18 @@ export default async function ProjectsPage({
 
       <Panel title={dict.common.allProjects} eyebrow={dict.common.project}>
         <div className="grid gap-4">
-          {projects.map((project) => (
+          {projects.map((project: {
+            id: string;
+            name: string;
+            status: string;
+            description: string;
+            activePolicyVersion: string;
+            lastActiveAt: Date;
+            agentCount: number;
+            episodeCount: number;
+            artifactCount: number;
+            riskEventCount: number;
+          }) => (
             <Link
               key={project.id}
               href={`/${locale}/projects/${project.id}`}

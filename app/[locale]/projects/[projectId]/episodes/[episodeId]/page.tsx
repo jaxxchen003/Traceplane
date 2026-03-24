@@ -61,7 +61,22 @@ export default async function EpisodeReviewPage({
         <div className="space-y-6">
           <Panel title={dict.common.timeline} eyebrow={dict.episode.title}>
             <div className="space-y-4">
-              {episode.timeline.map((item) => (
+              {episode.timeline.map((item: {
+                id: string;
+                stepIndex: number;
+                status: string;
+                stepTitle: string;
+                shortResult: string;
+                actor: string;
+                eventTime: Date;
+                toolName: string | null;
+                inputSummary: string | null;
+                decisionSummary: string | null;
+                resultSummary: string | null;
+                errorSummary: string | null;
+                policyHitReason: string | null;
+                permissionDeniedReason: string | null;
+              }) => (
                 <div key={item.id} className="rounded-[24px] border border-slate-200 bg-slate-50 px-5 py-5">
                   <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
                     <div>
@@ -96,24 +111,46 @@ export default async function EpisodeReviewPage({
           <Panel title={dict.episode.relationshipMap} eyebrow="Edges">
             <div className="space-y-4">
               <RelationshipFlow
-                memories={episode.memories.map((memory) => ({
+                memories={episode.memories.map((memory: {
+                  id: string;
+                  title: string;
+                  type: string;
+                  sensitivity: string;
+                }) => ({
                   id: memory.id,
                   label: memory.title,
                   meta: `${memory.type} · ${memory.sensitivity}`
                 }))}
-                traces={episode.timeline.map((trace) => ({
+                traces={episode.timeline.map((trace: {
+                  id: string;
+                  stepIndex: number;
+                  stepTitle: string;
+                  actor: string;
+                }) => ({
                   id: trace.id,
                   label: `Step ${trace.stepIndex} · ${trace.stepTitle}`,
                   meta: trace.actor
                 }))}
-                artifacts={episode.artifacts.map((artifact) => ({
+                artifacts={episode.artifacts.map((artifact: {
+                  id: string;
+                  title: string;
+                  type: string;
+                  version: number;
+                }) => ({
                   id: artifact.id,
                   label: artifact.title,
                   meta: `${artifact.type} · v${artifact.version}`
                 }))}
               />
               <div className="grid gap-3 text-sm text-slate-700">
-                {episode.relationships.map((edge) => (
+                {episode.relationships.map((edge: {
+                  id: string;
+                  edgeType: string;
+                  fromNodeType: string;
+                  fromNodeId: string;
+                  toNodeType: string;
+                  toNodeId: string;
+                }) => (
                   <div key={edge.id} className="rounded-2xl border border-slate-200 bg-white px-4 py-3">
                     <span className="font-medium text-slate-900">{edge.edgeType}</span>
                     <span className="mx-2 text-slate-400">·</span>
@@ -134,11 +171,11 @@ export default async function EpisodeReviewPage({
               episodeId={episode.id}
               projectId={projectId}
               agents={agents}
-              traces={episode.timeline.map((item) => ({
+              traces={episode.timeline.map((item: { id: string; stepIndex: number; stepTitle: string }) => ({
                 id: item.id,
                 label: `Step ${item.stepIndex} · ${item.stepTitle}`
               }))}
-              memories={episode.memories.map((item) => ({
+              memories={episode.memories.map((item: { id: string; title: string }) => ({
                 id: item.id,
                 label: item.title
               }))}
@@ -161,7 +198,14 @@ export default async function EpisodeReviewPage({
 
           <Panel title={dict.common.memories} eyebrow="Memory">
             <div className="space-y-3">
-              {episode.memories.map((memory) => (
+              {episode.memories.map((memory: {
+                id: string;
+                title: string;
+                content: string;
+                type: string;
+                sensitivity: string;
+                usedInStepCount: number;
+              }) => (
                 <div key={memory.id} className="rounded-2xl border border-slate-200 bg-white px-4 py-4">
                   <div className="font-medium text-slate-950">{memory.title}</div>
                   <div className="mt-1 text-sm leading-6 text-slate-600">{memory.content}</div>
@@ -175,7 +219,13 @@ export default async function EpisodeReviewPage({
 
           <Panel title={dict.common.artifacts} eyebrow="Outputs">
             <div className="space-y-3">
-              {episode.artifacts.map((artifact) => (
+              {episode.artifacts.map((artifact: {
+                id: string;
+                title: string;
+                generatedBy: string;
+                type: string;
+                version: number;
+              }) => (
                 <Link
                   key={artifact.id}
                   href={`/${locale}/artifacts/${artifact.id}`}
