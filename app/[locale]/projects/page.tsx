@@ -26,10 +26,23 @@ export default async function ProjectsPage({
           <h1 className="mt-3 text-3xl font-semibold">{workspace?.name}</h1>
           <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-300">{dict.projectList.subtitle}</p>
         </div>
-        <Panel title={`${projects.filter((item) => item.riskEventCount > 0).length}`} eyebrow={dict.projectList.riskProjects}>
+        <Panel
+          title={`${
+            projects.filter((item: { riskEventCount: number }) => item.riskEventCount > 0).length
+          }`}
+          eyebrow={dict.projectList.riskProjects}
+        >
           <div className="text-sm leading-6 text-slate-600">{locale === "zh" ? "存在权限拒绝、策略命中或待审批事件。" : "Projects with denials, policy hits, or pending approvals."}</div>
         </Panel>
-        <Panel title={`${projects.reduce((sum, item) => sum + item.artifactCount, 0)}`} eyebrow={dict.projectList.recentArtifacts}>
+        <Panel
+          title={`${
+            projects.reduce(
+              (sum: number, item: { artifactCount: number }) => sum + item.artifactCount,
+              0
+            )
+          }`}
+          eyebrow={dict.projectList.recentArtifacts}
+        >
           <div className="text-sm leading-6 text-slate-600">{locale === "zh" ? "跨项目累计产物数。" : "Total artifact count across projects."}</div>
         </Panel>
       </section>
