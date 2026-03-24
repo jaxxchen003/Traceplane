@@ -1,6 +1,84 @@
+import { Prisma } from "@prisma/client";
+
 import { prisma } from "@/lib/prisma";
 import { localize } from "@/lib/format";
 import type { Locale } from "@/lib/i18n";
+
+type ProjectListRecord = Prisma.ProjectGetPayload<{
+  include: {
+    projectAgents: true;
+    episodes: {
+      include: {
+        artifacts: true;
+      };
+    };
+    auditEvents: true;
+  };
+}>;
+
+type ProjectOverviewRecord = Prisma.ProjectGetPayload<{
+  include: {
+    projectAgents: {
+      include: {
+        agent: true;
+      };
+    };
+    episodes: {
+      include: {
+        primaryAgent: true;
+        artifacts: true;
+      };
+    };
+    auditEvents: true;
+  };
+}>;
+
+type EpisodeReviewRecord = Prisma.EpisodeGetPayload<{
+  include: {
+    project: true;
+    primaryAgent: true;
+    episodeAgents: {
+      include: {
+        agent: true;
+      };
+    };
+    memoryItems: true;
+    traceEvents: {
+      include: {
+        actorAgent: true;
+      };
+    };
+    artifacts: {
+      include: {
+        createdByAgent: true;
+      };
+    };
+    auditEvents: true;
+  };
+}>;
+
+type ArtifactDetailRecord = Prisma.ArtifactGetPayload<{
+  include: {
+    episode: {
+      include: {
+        project: true;
+      };
+    };
+    createdByAgent: true;
+    sourceTraceEvent: true;
+  };
+}>;
+
+type ArtifactVersionRecord = Prisma.ArtifactGetPayload<{
+  include: {
+    createdByAgent: true;
+  };
+}>;
+
+type EdgeRecord = Prisma.NodeEdgeGetPayload<Record<string, never>>;
+type TraceRecord = Prisma.TraceEventGetPayload<Record<string, never>>;
+type MemoryRecord = Prisma.MemoryItemGetPayload<Record<string, never>>;
+type AuditRecord = Prisma.AuditEventGetPayload<Record<string, never>>;
 
 function statusWeight(status: string) {
   return status === "denied" ? 2 : status === "warning" ? 1 : 0;
@@ -25,8 +103,8 @@ export async function getProjects(locale: Locale) {
     orderBy: { updatedAt: "desc" }
   });
 
-  return projects.map((project) => {
-    const riskEvents = project.auditEvents.filter((event) => event.result !== "success");
+  return projects.map((project: ProjectListRecord) => {
+    const riskEvents = project.auditEvents.filter((event: AuditRecord) => event.result !== "success");
     return {
       id: project.id,
       slug: project.slug,
@@ -36,7 +114,10 @@ export async function getProjects(locale: Locale) {
       lastActiveAt: project.updatedAt,
       agentCount: project.projectAgents.length,
       episodeCount: project.episodes.length,
-      artifactCount: project.episodes.reduce((sum, episode) => sum + episode.artifacts.length, 0),
+      artifactCount: project.episodes.reduce(
+        (sum: number, episode: ProjectListRecord["episodes"][number]) => sum + episode.artifacts.length,
+        0
+      ),
       riskEventCount: riskEvents.length,
       activePolicyVersion: project.activePolicyVersion
     };
@@ -65,7 +146,7 @@ export async function getProjectOverview(projectId: string, locale: Locale) {
 
   const flattenedArtifacts = project.episodes
     .flatMap((episode) =>
-      episode.artifacts.map((artifact) => ({
+      episode.artifacts.map((artifact: ProjectOverviewRecord["episodes"][number]["artifacts"][number]) => ({
         id: artifact.id,
         title: localize(artifact.titleI18n, locale),
         type: artifact.fileType,
@@ -84,18 +165,25 @@ export async function getProjectOverview(projectId: string, locale: Locale) {
     status: project.status,
     createdAt: project.createdAt,
     activePolicyVersion: project.activePolicyVersion,
-    agents: project.projectAgents.map(({ agent }) => ({
+    agents: project.projectAgents.map(({ agent }: ProjectOverviewRecord["projectAgents"][number]) => ({
       id: agent.id,
       name: agent.name,
       role: localize(agent.roleI18n, locale),
       lastActiveAt: agent.lastActiveAt,
-      episodesInvolvedCount: project.episodes.filter((episode) => episode.primaryAgentId === agent.id).length,
+      episodesInvolvedCount: project.episodes.filter(
+        (episode: ProjectOverviewRecord["episodes"][number]) => episode.primaryAgentId === agent.id
+      ).length,
       artifactsGeneratedCount: project.episodes.reduce(
-        (sum, episode) => sum + episode.artifacts.filter((artifact) => artifact.createdByAgentId === agent.id).length,
+        (sum: number, episode: ProjectOverviewRecord["episodes"][number]) =>
+          sum +
+          episode.artifacts.filter(
+            (artifact: ProjectOverviewRecord["episodes"][number]["artifacts"][number]) =>
+              artifact.createdByAgentId === agent.id
+          ).length,
         0
       )
     })),
-    episodes: project.episodes.map((episode) => ({
+    episodes: project.episodes.map((episode: ProjectOverviewRecord["episodes"][number]) => ({
       id: episode.id,
       title: localize(episode.titleI18n, locale),
       status: episode.status,
@@ -103,17 +191,23 @@ export async function getProjectOverview(projectId: string, locale: Locale) {
       updatedAt: episode.updatedAt,
       artifactCount: episode.artifacts.length,
       riskFlag: project.auditEvents.some(
-        (event) => event.episodeId === episode.id && event.result !== "success"
+        (event: AuditRecord) => event.episodeId === episode.id && event.result !== "success"
       ),
       summary: localize(episode.summaryI18n, locale)
     })),
     artifacts: flattenedArtifacts.slice(0, 4),
     riskSummary: {
-      permissionDeniedCount: project.auditEvents.filter((event) => event.permissionDecision === "deny")
+      permissionDeniedCount: project.auditEvents.filter(
+        (event: AuditRecord) => event.permissionDecision === "deny"
+      )
         .length,
-      policyHitCount: project.auditEvents.filter((event) => event.policyHitReasonI18n).length,
-      failedEpisodeCount: project.episodes.filter((episode) => episode.status === "FAILED").length,
-      pendingApprovalCount: project.episodes.filter((episode) => episode.status === "PENDING_REVIEW").length
+      policyHitCount: project.auditEvents.filter((event: AuditRecord) => event.policyHitReasonI18n).length,
+      failedEpisodeCount: project.episodes.filter(
+        (episode: ProjectOverviewRecord["episodes"][number]) => episode.status === "FAILED"
+      ).length,
+      pendingApprovalCount: project.episodes.filter(
+        (episode: ProjectOverviewRecord["episodes"][number]) => episode.status === "PENDING_REVIEW"
+      ).length
     }
   };
 }
@@ -130,7 +224,7 @@ export async function getProjectAgents(projectId: string, locale: Locale) {
 
   if (!project) return [];
 
-  return project.projectAgents.map(({ agent }) => ({
+  return project.projectAgents.map(({ agent }: { agent: { id: string; name: string; roleI18n: Prisma.JsonValue } }) => ({
     id: agent.id,
     name: agent.name,
     role: localize(agent.roleI18n, locale)
@@ -158,12 +252,12 @@ export async function getEpisodeReview(episodeId: string, locale: Locale) {
       OR: [
         { fromNodeId: episodeId },
         { toNodeId: episodeId },
-        { fromNodeId: { in: episode.traceEvents.map((item) => item.id) } },
-        { toNodeId: { in: episode.traceEvents.map((item) => item.id) } },
-        { fromNodeId: { in: episode.memoryItems.map((item) => item.id) } },
-        { toNodeId: { in: episode.memoryItems.map((item) => item.id) } },
-        { fromNodeId: { in: episode.artifacts.map((item) => item.id) } },
-        { toNodeId: { in: episode.artifacts.map((item) => item.id) } }
+        { fromNodeId: { in: episode.traceEvents.map((item: EpisodeReviewRecord["traceEvents"][number]) => item.id) } },
+        { toNodeId: { in: episode.traceEvents.map((item: EpisodeReviewRecord["traceEvents"][number]) => item.id) } },
+        { fromNodeId: { in: episode.memoryItems.map((item: EpisodeReviewRecord["memoryItems"][number]) => item.id) } },
+        { toNodeId: { in: episode.memoryItems.map((item: EpisodeReviewRecord["memoryItems"][number]) => item.id) } },
+        { fromNodeId: { in: episode.artifacts.map((item: EpisodeReviewRecord["artifacts"][number]) => item.id) } },
+        { toNodeId: { in: episode.artifacts.map((item: EpisodeReviewRecord["artifacts"][number]) => item.id) } }
       ]
     }
   });
@@ -180,13 +274,13 @@ export async function getEpisodeReview(episodeId: string, locale: Locale) {
     goal: localize(episode.goalI18n, locale),
     finalOutcome: localize(episode.finalOutcomeI18n, locale),
     primaryAgent: episode.primaryAgent.name,
-    participatingAgents: episode.episodeAgents.map((item) => item.agent.name),
+    participatingAgents: episode.episodeAgents.map((item: EpisodeReviewRecord["episodeAgents"][number]) => item.agent.name),
     policyVersion: episode.policyVersion,
     riskSummary: {
-      denied: episode.auditEvents.filter((event) => event.permissionDecision === "deny").length,
-      policyHits: episode.auditEvents.filter((event) => event.policyHitReasonI18n).length
+      denied: episode.auditEvents.filter((event: AuditRecord) => event.permissionDecision === "deny").length,
+      policyHits: episode.auditEvents.filter((event: AuditRecord) => event.policyHitReasonI18n).length
     },
-    timeline: episode.traceEvents.map((event) => ({
+    timeline: episode.traceEvents.map((event: EpisodeReviewRecord["traceEvents"][number]) => ({
       id: event.id,
       stepIndex: event.stepIndex,
       eventTime: event.eventTime,
@@ -204,16 +298,19 @@ export async function getEpisodeReview(episodeId: string, locale: Locale) {
       policyHitReason: localize(event.policyHitReasonI18n, locale),
       permissionDeniedReason: localize(event.permissionDeniedI18n, locale),
       linkedMemoryIds: edges
-        .filter((edge) => edge.toNodeId === event.id && edge.toNodeType === "trace" && edge.fromNodeType === "memory")
-        .map((edge) => edge.fromNodeId),
+        .filter(
+          (edge: EdgeRecord) =>
+            edge.toNodeId === event.id && edge.toNodeType === "trace" && edge.fromNodeType === "memory"
+        )
+        .map((edge: EdgeRecord) => edge.fromNodeId),
       linkedArtifactIds: edges
-        .filter((edge) =>
+        .filter((edge: EdgeRecord) =>
           (edge.fromNodeId === event.id && edge.fromNodeType === "trace" && edge.toNodeType === "artifact") ||
           (edge.toNodeId === event.id && edge.toNodeType === "trace" && edge.fromNodeType === "artifact")
         )
-        .map((edge) => (edge.fromNodeType === "artifact" ? edge.fromNodeId : edge.toNodeId))
+        .map((edge: EdgeRecord) => (edge.fromNodeType === "artifact" ? edge.fromNodeId : edge.toNodeId))
     })),
-    memories: episode.memoryItems.map((memory) => ({
+    memories: episode.memoryItems.map((memory: EpisodeReviewRecord["memoryItems"][number]) => ({
       id: memory.id,
       title: localize(memory.titleI18n, locale),
       content: localize(memory.contentI18n, locale),
@@ -222,9 +319,11 @@ export async function getEpisodeReview(episodeId: string, locale: Locale) {
       importance: memory.importance,
       sensitivity: memory.sensitivity,
       ttlDays: memory.ttlDays,
-      usedInStepCount: edges.filter((edge) => edge.fromNodeId === memory.id && edge.edgeType === "USED_IN").length
+      usedInStepCount: edges.filter(
+        (edge: EdgeRecord) => edge.fromNodeId === memory.id && edge.edgeType === "USED_IN"
+      ).length
     })),
-    artifacts: episode.artifacts.map((artifact) => ({
+    artifacts: episode.artifacts.map((artifact: EpisodeReviewRecord["artifacts"][number]) => ({
       id: artifact.id,
       artifactKey: artifact.artifactKey,
       title: localize(artifact.titleI18n, locale),
@@ -238,11 +337,15 @@ export async function getEpisodeReview(episodeId: string, locale: Locale) {
       uri: artifact.uri
     })),
     auditSummary: {
-      readCount: episode.auditEvents.filter((event) => event.action.startsWith("read")).length,
-      writeCount: episode.auditEvents.filter((event) => event.action.startsWith("append") || event.action.startsWith("create")).length,
-      permissionDeniedCount: episode.auditEvents.filter((event) => event.permissionDecision === "deny").length,
-      policyHitCount: episode.auditEvents.filter((event) => event.policyHitReasonI18n).length,
-      approvalEventCount: episode.auditEvents.filter((event) => statusWeight(event.result) > 0).length
+      readCount: episode.auditEvents.filter((event: AuditRecord) => event.action.startsWith("read")).length,
+      writeCount: episode.auditEvents.filter(
+        (event: AuditRecord) => event.action.startsWith("append") || event.action.startsWith("create")
+      ).length,
+      permissionDeniedCount: episode.auditEvents.filter(
+        (event: AuditRecord) => event.permissionDecision === "deny"
+      ).length,
+      policyHitCount: episode.auditEvents.filter((event: AuditRecord) => event.policyHitReasonI18n).length,
+      approvalEventCount: episode.auditEvents.filter((event: AuditRecord) => statusWeight(event.result) > 0).length
     },
     relationships: edges
   };
@@ -272,13 +375,15 @@ export async function getArtifactDetail(artifactId: string, locale: Locale) {
     }
   });
 
-  const memoryIds = edges.filter((edge) => edge.toNodeId === artifact.id && edge.fromNodeType === "memory").map((edge) => edge.fromNodeId);
+  const memoryIds = edges
+    .filter((edge: EdgeRecord) => edge.toNodeId === artifact.id && edge.fromNodeType === "memory")
+    .map((edge: EdgeRecord) => edge.fromNodeId);
   const traceIds = edges
-    .filter((edge) =>
+    .filter((edge: EdgeRecord) =>
       (edge.toNodeId === artifact.id && edge.fromNodeType === "trace") ||
       (edge.fromNodeId === artifact.id && edge.toNodeType === "trace")
     )
-    .map((edge) => (edge.fromNodeType === "trace" ? edge.fromNodeId : edge.toNodeId));
+    .map((edge: EdgeRecord) => (edge.fromNodeType === "trace" ? edge.fromNodeId : edge.toNodeId));
 
   const memories = memoryIds.length
     ? await prisma.memoryItem.findMany({ where: { id: { in: memoryIds } } })
@@ -302,24 +407,24 @@ export async function getArtifactDetail(artifactId: string, locale: Locale) {
     sensitivity: artifact.sensitivity,
     shareScope: artifact.shareScope,
     uri: artifact.uri,
-    versions: versions.map((version) => ({
+    versions: versions.map((version: ArtifactVersionRecord) => ({
       id: version.id,
       version: version.version,
       createdAt: version.createdAt,
       generatedBy: version.createdByAgent.name
     })),
-    sourceTraces: traces.map((trace) => ({
+    sourceTraces: traces.map((trace: TraceRecord) => ({
       id: trace.id,
       stepIndex: trace.stepIndex,
       title: localize(trace.stepTitleI18n, locale)
     })),
-    sourceMemories: memories.map((memory) => ({
+    sourceMemories: memories.map((memory: MemoryRecord) => ({
       id: memory.id,
       title: localize(memory.titleI18n, locale)
     })),
     consumedByAgents: edges
-      .filter((edge) => edge.fromNodeId === artifact.id && edge.toNodeType === "agent")
-      .map((edge) => edge.toNodeId)
+      .filter((edge: EdgeRecord) => edge.fromNodeId === artifact.id && edge.toNodeType === "agent")
+      .map((edge: EdgeRecord) => edge.toNodeId)
   };
 }
 
@@ -340,7 +445,7 @@ export async function getAuditEvents({
     orderBy: { occurredAt: "desc" }
   });
 
-  return events.map((event) => ({
+  return events.map((event: AuditRecord) => ({
     id: event.id,
     occurredAt: event.occurredAt,
     actorType: event.actorType,
@@ -364,9 +469,9 @@ export async function buildEpisodeGraph(episodeId: string, locale: Locale) {
   if (!episode) return null;
 
   const nodes = [
-    ...episode.memories.map((memory) => ({ id: memory.id, type: "memory", label: memory.title })),
-    ...episode.timeline.map((trace) => ({ id: trace.id, type: "trace", label: trace.stepTitle })),
-    ...episode.artifacts.map((artifact) => ({ id: artifact.id, type: "artifact", label: artifact.title }))
+    ...episode.memories.map((memory: { id: string; title: string }) => ({ id: memory.id, type: "memory", label: memory.title })),
+    ...episode.timeline.map((trace: { id: string; stepTitle: string }) => ({ id: trace.id, type: "trace", label: trace.stepTitle })),
+    ...episode.artifacts.map((artifact: { id: string; title: string }) => ({ id: artifact.id, type: "artifact", label: artifact.title }))
   ];
 
   return {
