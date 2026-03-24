@@ -73,6 +73,7 @@ async function main() {
   const runtimeEnv = await ensureDatabaseReady();
 
   const port = process.env.PORT ?? "3000";
+  const host = "0.0.0.0";
   const commandArgs = existsSync(standaloneServer)
     ? [standaloneServer]
     : [nextCli, "start", "--hostname", "0.0.0.0", "--port", port];
@@ -82,7 +83,8 @@ async function main() {
     env: {
       ...runtimeEnv,
       PORT: port,
-      HOSTNAME: process.env.HOSTNAME ?? "0.0.0.0"
+      HOST: host,
+      HOSTNAME: host
     },
     stdio: "inherit"
   });
