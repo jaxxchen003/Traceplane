@@ -131,7 +131,7 @@ export async function getProjectOverview(projectId: string, locale: Locale) {
   if (!project) return null;
 
   const flattenedArtifacts = project.episodes
-    .flatMap((episode) =>
+    .flatMap((episode: ProjectOverviewRecord["episodes"][number]) =>
       episode.artifacts.map((artifact: ProjectOverviewRecord["episodes"][number]["artifacts"][number]) => ({
         id: artifact.id,
         title: localize(artifact.titleI18n, locale),
