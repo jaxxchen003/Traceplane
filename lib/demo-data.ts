@@ -141,7 +141,12 @@ export async function getProjectOverview(projectId: string, locale: Locale) {
         updatedAt: artifact.updatedAt
       }))
     )
-    .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
+    .sort(
+      (
+        a: { updatedAt: Date },
+        b: { updatedAt: Date }
+      ) => b.updatedAt.getTime() - a.updatedAt.getTime()
+    );
 
   return {
     id: project.id,
