@@ -1,8 +1,8 @@
 type Tone = "neutral" | "success" | "warning" | "danger";
 
 function getTone(value: string): Tone {
-  if (["ACTIVE", "RUNNING", "COMPLETED", "SUCCESS"].includes(value)) return "success";
-  if (["AT_RISK", "PENDING_REVIEW", "WARNING"].includes(value)) return "warning";
+  if (["ACTIVE", "IN_PROGRESS", "COMPLETED", "SUCCESS"].includes(value)) return "success";
+  if (["AT_RISK", "PLANNED", "BLOCKED", "IN_REVIEW", "WARNING"].includes(value)) return "warning";
   if (["FAILED", "denied"].includes(value)) return "danger";
   return "neutral";
 }

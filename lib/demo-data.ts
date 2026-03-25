@@ -197,7 +197,7 @@ export async function getProjectOverview(projectId: string, locale: Locale) {
         (episode: ProjectOverviewRecord["episodes"][number]) => episode.status === "FAILED"
       ).length,
       pendingApprovalCount: project.episodes.filter(
-        (episode: ProjectOverviewRecord["episodes"][number]) => episode.status === "PENDING_REVIEW"
+        (episode: ProjectOverviewRecord["episodes"][number]) => episode.status === "IN_REVIEW"
       ).length
     }
   };
@@ -245,7 +245,10 @@ export async function getEpisodeReview(episodeId: string, locale: Locale) {
     endedAt: episode.endedAt,
     summary: localize(episode.summaryI18n, locale),
     goal: localize(episode.goalI18n, locale),
+    successCriteria: localize(episode.successCriteriaI18n, locale),
     finalOutcome: localize(episode.finalOutcomeI18n, locale),
+    workType: episode.workType,
+    primaryActor: episode.primaryActor ?? episode.primaryAgent.name,
     primaryAgent: episode.primaryAgent.name,
     participatingAgents: episode.episodeAgents.map((item: EpisodeReviewRecord["episodeAgents"][number]) => item.agent.name),
     policyVersion: episode.policyVersion,
@@ -445,6 +448,7 @@ export async function buildEpisodeGraph(episodeId: string, locale: Locale) {
     },
     summary: {
       goal: episode.goal,
+      successCriteria: episode.successCriteria,
       finalOutcome: episode.finalOutcome,
       riskSummary: episode.riskSummary
     },

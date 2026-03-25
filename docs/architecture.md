@@ -3,9 +3,11 @@
 ## 1. 架构原则
 - 图谱优先，不是存储桶优先
 - `Episode` 优先，不是会话优先
+- `Episode-first` 视角优先，不是 `Project-first` 首页优先
 - Agent 原生写入与查询优先，不是人工文档编辑优先
 - 数据平面与控制平面分离
 - 敏感数据分层处理
+- 先做外部控制平面，再考虑自有 runtime
 
 ## 2. 系统视角
 
@@ -33,7 +35,7 @@
 | Workspace | 企业或团队边界 | `workspace_id`, `name`, `owner_id` |
 | Project | 业务项目边界 | `project_id`, `workspace_id`, `policy_set_id` |
 | Agent | 受管理的 Agent 实体 | `agent_id`, `role`, `owner`, `capabilities` |
-| Episode | 一次完整任务链路 | `episode_id`, `project_id`, `agent_id`, `status` |
+| Episode | 一次最小业务闭环 | `episode_id`, `project_id`, `goal`, `work_type`, `status` |
 | MemoryItem | 输入型上下文 | `memory_id`, `episode_id`, `type`, `importance`, `ttl` |
 | TraceEvent | 过程型节点 | `event_id`, `episode_id`, `step`, `tool`, `decision`, `result` |
 | Artifact | 输出型产物 | `artifact_id`, `episode_id`, `file_type`, `uri`, `version` |
@@ -55,7 +57,23 @@
 - `supersedes`
 - `references`
 
-### 4.2 关键约束
+### 4.2 Episode 关系
+- `depends_on`
+- `reviews`
+- `supersedes`
+- `continues`
+- `splits_from`
+- `references`
+
+### 4.3 关系自动化默认值
+- `depends_on = auto`
+- `reviews = assisted`
+- `supersedes = assisted`
+- `continues = manual`
+- `splits_from = manual`
+- `references = manual`
+
+### 4.4 关键约束
 - 所有 Memory / Trace / Artifact 必须归属于 `episode`
 - Artifact 必须至少能回链到一个 TraceEvent
 - 任何受控读取都应能回链到 Policy 和 AccessGrant
@@ -129,7 +147,31 @@ MVP 不必一开始上图数据库。
 - Postgres 负责基础图查询
 - 复杂图分析留到后续阶段
 
-## 8. 数据分层安全
+## 8. 接入抽象
+
+### 8.1 当前接入顺序
+- `MCP`
+- `hooks / plugins / telemetry adapters`
+- `API-native integrations`
+
+### 8.2 当前产品角色
+系统不应该被定义成某一家 Agent 的插件。
+
+更准确的定位是：
+
+- 外部控制平面
+- 统一工作图谱
+- Agent 工作的 system of record
+
+### 8.3 Skill 的角色
+`Skill` 不是主接入层，而是最佳实践层。
+
+推荐分工：
+
+- `MCP`：负责系统能力和标准调用
+- `Skill`：负责 onboarding、角色模板和使用约束
+
+## 9. 数据分层安全
 
 | 层级 | 内容 | 默认策略 |
 | --- | --- | --- |
@@ -138,31 +180,32 @@ MVP 不必一开始上图数据库。
 | Internal | 运行日志、状态快照、工具结果 | 云端标准加密，团队内受控共享 |
 | Public | 公共模板、已发布报告、知识卡片 | 可共享访问，保留审计 |
 
-## 9. API / Tool 抽象
+## 10. API / Tool 抽象
 
-MVP 先暴露 8 个核心动作：
+当前推荐第一版 MCP / API 动作：
 
 - `create_episode`
+- `update_episode_status`
+- `link_episode`
 - `write_memory`
-- `query_memory`
 - `append_trace`
 - `create_artifact`
-- `list_episode_graph`
-- `grant_access`
-- `read_audit_events`
+- `query_context`
+- `get_episode_brief`
 
-### 9.1 差异化接口
-`list_episode_graph` 不是简单列表接口，而应返回：
+### 10.1 差异化接口
+`get_episode_brief` 和 `query_context` 不应只是原始数据列表，而应返回可直接被 Agent 和 manager 消费的工作摘要。
 
-- episode 基础信息
-- 相关 memory 节点
-- trace 时间线
-- artifact 节点
-- 节点间边关系
-- 生效策略版本
-- 访问与审批摘要
+### 10.2 意图前置，证据后置
+关系和状态判断不应只靠运行后猜测。
 
-## 10. 最重要的 schema 约束
+推荐原则：
+
+- 创建 Episode 时前置声明工作意图
+- 运行过程中补充证据和验证关系
+- 最终由系统和 policy 共同完成状态、关系和有效版本确认
+
+## 11. 最重要的 schema 约束
 
 以下字段建议成为跨对象保底字段：
 
@@ -175,7 +218,18 @@ MVP 先暴露 8 个核心动作：
 - `created_at`
 - `created_by`
 
-## 11. 工程建议
+Episode 级关键字段建议包括：
+
+- `goal`
+- `work_type`
+- `primary_actor`
+- `success_criteria`
+- `relation_intent`
+- `blocked_reason`
+- `failure_reason`
+- `review_outcome`
+
+## 12. 工程建议
 
 ### 11.1 实现顺序
 1. Schema + migration
@@ -184,14 +238,15 @@ MVP 先暴露 8 个核心动作：
 4. Episode graph 查询
 5. MCP / CLI 接入
 
-### 11.2 先不优化的地方
+### 12.2 先不优化的地方
 - 不先做复杂可视化图谱 UI
 - 不先做大而全权限后台
 - 不先做高度抽象的 policy DSL
 - 不先做全自动记忆蒸馏流水线
+- 不先做完整自有 Agent runtime
 
-## 12. 架构上的最小证明
-只要能证明下面这条链是可回放、可查询、可审计的，MVP 就成立：
+## 13. 架构上的最小证明
+只要能证明下面这条链是可回放、可查询、可审计、可跨 Agent 复用的，MVP 就成立：
 
 `memory -> trace -> artifact -> audit`
 

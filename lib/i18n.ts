@@ -102,11 +102,14 @@ type Dictionary = {
     summaryEn: string;
     goalZh: string;
     goalEn: string;
+    successCriteriaZh: string;
+    successCriteriaEn: string;
     contentZh: string;
     contentEn: string;
     primaryAgent: string;
     actorAgent: string;
     type: string;
+    workType: string;
     source: string;
     importance: string;
     sensitivity: string;
@@ -222,11 +225,14 @@ export const dictionary: Record<Locale, Dictionary> = {
       summaryEn: "英文摘要",
       goalZh: "中文目标",
       goalEn: "英文目标",
+      successCriteriaZh: "中文完成标准",
+      successCriteriaEn: "英文完成标准",
       contentZh: "中文内容",
       contentEn: "英文内容",
       primaryAgent: "主 Agent",
       actorAgent: "执行 Agent",
       type: "类型",
+      workType: "工作类型",
       source: "来源",
       importance: "重要度",
       sensitivity: "敏感级别",
@@ -252,10 +258,12 @@ export const dictionary: Record<Locale, Dictionary> = {
       ACTIVE: "进行中",
       AT_RISK: "有风险",
       PILOT: "试点中",
-      RUNNING: "运行中",
+      PLANNED: "已规划",
+      IN_PROGRESS: "进行中",
+      BLOCKED: "已阻塞",
+      IN_REVIEW: "审核中",
       COMPLETED: "已完成",
       FAILED: "失败",
-      PENDING_REVIEW: "待审核",
       SUCCESS: "成功",
       WARNING: "警告"
     },
@@ -355,11 +363,14 @@ export const dictionary: Record<Locale, Dictionary> = {
       summaryEn: "English summary",
       goalZh: "Chinese goal",
       goalEn: "English goal",
+      successCriteriaZh: "Chinese success criteria",
+      successCriteriaEn: "English success criteria",
       contentZh: "Chinese content",
       contentEn: "English content",
       primaryAgent: "Primary agent",
       actorAgent: "Actor agent",
       type: "Type",
+      workType: "Work type",
       source: "Source",
       importance: "Importance",
       sensitivity: "Sensitivity",
@@ -385,10 +396,12 @@ export const dictionary: Record<Locale, Dictionary> = {
       ACTIVE: "Active",
       AT_RISK: "At risk",
       PILOT: "Pilot",
-      RUNNING: "Running",
+      PLANNED: "Planned",
+      IN_PROGRESS: "In progress",
+      BLOCKED: "Blocked",
+      IN_REVIEW: "In review",
       COMPLETED: "Completed",
       FAILED: "Failed",
-      PENDING_REVIEW: "Pending review",
       SUCCESS: "Success",
       WARNING: "Warning"
     },

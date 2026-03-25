@@ -134,8 +134,12 @@ async function main() {
         "The research agent synthesized customer signals into a research brief, then the writer agent turned it into a manager-facing weekly report."
       ),
       goalI18n: zhEn("在同一条任务主线上完成研究结论和管理周报交付。", "Produce a research brief and manager report on the same work graph."),
+      successCriteriaI18n: zhEn("输出研究简报和管理周报，且来源与过程可回链。", "Produce a research brief and manager report with traceable provenance."),
       finalOutcomeI18n: zhEn("已生成研究简报与管理周报，且全链路可回放。", "A research brief and manager report were generated with full traceability."),
+      primaryActor: "Research Agent",
+      workType: "GENERATE",
       status: "COMPLETED",
+      reviewOutcome: "APPROVED",
       policyVersion: "policy.project.customer.v0.4",
       startedAt: new Date("2026-03-23T05:50:00.000Z"),
       endedAt: new Date("2026-03-23T06:28:00.000Z")
@@ -149,8 +153,12 @@ async function main() {
       titleI18n: zhEn("敏感文档访问审批检查", "Sensitive Document Approval Check"),
       summaryI18n: zhEn("合规 Agent 尝试访问受限资料时触发了审批等待和权限拒绝。", "The compliance agent triggered an approval hold and a permission denial while attempting to read restricted files."),
       goalI18n: zhEn("验证高风险读操作是否保留完整证据链。", "Verify that high-risk reads leave a complete evidence trail."),
+      successCriteriaI18n: zhEn("给出通过/拒绝结论并保留审批证据。", "Return an approval decision with a preserved evidence trail."),
       finalOutcomeI18n: zhEn("任务暂停，等待人工审批。", "Task paused pending manual approval."),
-      status: "PENDING_REVIEW",
+      primaryActor: "Compliance Agent",
+      workType: "REVIEW",
+      status: "IN_REVIEW",
+      reviewOutcome: "PENDING",
       policyVersion: "policy.project.compliance.v0.2",
       startedAt: new Date("2026-03-22T10:40:00.000Z"),
       endedAt: null
@@ -333,7 +341,7 @@ async function main() {
       titleI18n: zhEn("审批状态快照", "Approval Status Snapshot"),
       contentI18n: zhEn(
         "{\n  \"status\": \"pending_review\",\n  \"reason\": \"restricted_document_access\"\n}",
-        "{\n  \"status\": \"pending_review\",\n  \"reason\": \"restricted_document_access\"\n}"
+        "{\n  \"status\": \"in_review\",\n  \"reason\": \"restricted_document_access\"\n}"
       ),
       fileType: "JSON",
       version: 1,

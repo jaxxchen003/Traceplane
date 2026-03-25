@@ -14,10 +14,27 @@ enum ProjectStatus {
 }
 
 enum EpisodeStatus {
-  RUNNING
+  PLANNED
+  IN_PROGRESS
+  BLOCKED
+  IN_REVIEW
   COMPLETED
   FAILED
-  PENDING_REVIEW
+}
+
+enum WorkType {
+  RESEARCH
+  GENERATE
+  REVIEW
+  REVISE
+  APPROVE
+  SUMMARIZE
+}
+
+enum ReviewOutcome {
+  PENDING
+  APPROVED
+  REJECTED
 }
 
 enum MemoryType {
@@ -44,6 +61,10 @@ enum EdgeType {
   USED_IN
   GENERATED_FROM
   APPROVED_BY
+  DEPENDS_ON
+  REVIEWS
+  CONTINUES
+  SPLITS_FROM
   RESTRICTED_BY
   SHARED_WITH
   SUPERSEDES
@@ -117,8 +138,15 @@ model Episode {
   titleI18n        Json
   summaryI18n      Json?
   goalI18n         Json?
+  successCriteriaI18n Json?
   finalOutcomeI18n Json?
+  primaryActor     String?
+  workType         WorkType       @default(GENERATE)
+  relationIntent   EdgeType?
   status           EpisodeStatus
+  blockedReasonI18n Json?
+  failureReasonI18n Json?
+  reviewOutcome    ReviewOutcome?
   policyVersion    String
   startedAt        DateTime
   endedAt          DateTime?

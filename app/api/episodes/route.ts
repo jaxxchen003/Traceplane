@@ -5,8 +5,19 @@ import { prisma } from "@/lib/prisma";
 
 export async function POST(request: Request) {
   const body = await request.json();
-  if (!body.projectId || !body.primaryAgentId || !body.titleI18n?.zh) {
-    return NextResponse.json({ error: "projectId, primaryAgentId, and titleI18n.zh are required" }, { status: 400 });
+  if (!body.projectId || !body.primaryAgentId) {
+    return NextResponse.json({ error: "projectId and primaryAgentId are required" }, { status: 400 });
+  }
+
+  const titleI18n = body.titleI18n ?? body.goalI18n ?? null;
+  const goalI18n = body.goalI18n ?? body.titleI18n ?? null;
+  const successCriteriaI18n = body.successCriteriaI18n ?? goalI18n ?? null;
+
+  if (!titleI18n?.zh || !goalI18n?.zh || !successCriteriaI18n?.zh) {
+    return NextResponse.json(
+      { error: "titleI18n.zh or goalI18n.zh, plus successCriteriaI18n.zh, are required" },
+      { status: 400 }
+    );
   }
 
   const project = await prisma.project.findUnique({
@@ -23,11 +34,15 @@ export async function POST(request: Request) {
       data: {
         projectId: body.projectId,
         primaryAgentId: body.primaryAgentId,
-        titleI18n: body.titleI18n,
+        titleI18n,
         summaryI18n: body.summaryI18n ?? null,
-        goalI18n: body.goalI18n ?? null,
+        goalI18n,
+        successCriteriaI18n,
         finalOutcomeI18n: body.finalOutcomeI18n ?? null,
-        status: body.status ?? "RUNNING",
+        primaryActor: body.primaryActor ?? null,
+        workType: body.workType ?? "GENERATE",
+        relationIntent: body.relationIntent ?? null,
+        status: body.status ?? "PLANNED",
         policyVersion: body.policyVersion ?? project.activePolicyVersion,
         startedAt: new Date()
       }
@@ -56,6 +71,18 @@ export async function POST(request: Request) {
         permissionDecision: "allow"
       }
     });
+
+    if (body.targetEpisodeId && body.relationIntent) {
+      await tx.nodeEdge.create({
+        data: {
+          fromNodeType: "episode",
+          fromNodeId: created.id,
+          toNodeType: "episode",
+          toNodeId: body.targetEpisodeId,
+          edgeType: body.relationIntent
+        }
+      });
+    }
 
     return created;
   });

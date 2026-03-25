@@ -18,6 +18,7 @@
 - 企业买的不是“更强记忆”，而是“可管理的 Agent 工作体系”。
 - Memory、Trace、Artifact 必须挂在同一条任务主线上，否则只是三个存储桶。
 - `Episode` 是系统主索引，不是附件字段。
+- 默认产品视角应该是 `Episode-first`，`Project` 负责价值归属与汇报。
 - Policy、Permission、Audit 是产品主能力，不是后补治理层。
 
 ## MVP 聚焦
@@ -40,6 +41,19 @@ MVP 只做一件事：跑通企业多 Agent 共享工作资产中心的最小闭
 - 一套可演示的 seeded demo 数据
 - 项目页与 Episode 页内嵌交互式写入控制面
 
+当前代码仍然是 demo runtime：
+
+- `Next.js`
+- `Prisma`
+- `SQLite`
+
+目标生产架构则是：
+
+- `Postgres`
+- `Object Storage`
+- `Vector Layer`
+- `Queue / Workers`
+
 ## 本地运行
 ```bash
 npm install
@@ -61,10 +75,14 @@ npm run dev
 
 ## 当前 MVP API
 - `POST /api/episodes`
+- `POST /api/episodes/status`
+- `POST /api/episodes/link`
+- `GET /api/episodes/brief?episodeId=...&locale=zh|en`
 - `POST /api/memory`
 - `GET /api/memory`
 - `POST /api/traces`
 - `POST /api/artifacts`
+- `POST /api/context`
 - `GET /api/graph?episodeId=...&locale=zh|en`
 - `POST /api/access`
 - `GET /api/audit?projectId=...&episodeId=...&locale=zh|en`
@@ -119,6 +137,10 @@ docker run --rm -p 3000:3000 --env-file .env enterprise-agent-work-graph
 ## 仓库结构
 - `docs/product-spec.md`: 产品定义、场景、范围、验收标准
 - `docs/architecture.md`: 对象模型、关系模型、数据流、存储抽象、API
+- `docs/episode-model.md`: `Project` / `Episode` 分工、Episode 边界、状态、创建字段
+- `docs/episode-relations.md`: Episode 关系类型、推断原则、自动化默认策略
+- `docs/agent-integration-strategy.md`: 主流 Agent 接入策略、MCP-first 路线、BYO Agent 到 managed runtime 的演进
+- `docs/mcp-spec-v1.md`: 第一版 MCP 工具范围与字段定义
 - `docs/platform-architecture-v1.md`: 平台级底层架构判断，明确为什么默认自建而不是直接押注 db9
 - `docs/storage-runtime-interface.md`: 存储运行时接口边界，定义未来如何支持可替换 backend
 - `docs/mvp-plan.md`: MVP 的实现逻辑、范围、路线图和最终产品形态
@@ -139,6 +161,14 @@ docker run --rm -p 3000:3000 --env-file .env enterprise-agent-work-graph
 - 借鉴对象：吸收 `db9` 在 `table + files + agent-native runtime` 上的设计优点
 - 当前不做：把 `db9` 作为唯一核心底层引擎
 - 未来预留：通过 runtime adapter 支持 `db9` 这类 backend
+
+## 当前接入判断
+- 第一阶段：`BYO Agent`
+- 第一优先级：`MCP`
+- 第二优先级：`hooks / plugins / telemetry adapters`
+- 第三优先级：`API-native integrations`
+- 当前不做：完整自有 Agent runtime
+- 未来路线：先占住 system of record，再考虑成为 system of execution
 
 ## 现在最重要的不是
 不是先做炫 UI，不是先做全能平台，不是先接很多协议。

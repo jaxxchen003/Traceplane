@@ -24,6 +24,11 @@ A shared data plane and control plane for enterprise AI agents, unifying memory,
 - 对一线使用者：多个 Agent 共享上下文和产物，减少重复输入和重复劳动。
 - 对平台团队：把 memory、logs、artifacts、policies、permissions 收敛到同一个抽象下。
 
+### 1.4 当前产品视角
+- 默认主视角是 `Episode`
+- `Project` 提供价值归属、汇报语义和长期上下文
+- `Episode` 提供执行主线、监督主线和复盘主线
+
 ## 2. 问题定义
 
 ### 2.1 现有方案缺口
@@ -42,6 +47,7 @@ A shared data plane and control plane for enterprise AI agents, unifying memory,
 - 企业真正需要的是“可管理的 Agent 工作体系”。
 - Episode 必须是系统里的第一主索引。
 - 权限和审计需要挂在节点与关系上，而不是只挂在文件夹上。
+- 第一阶段最值得验证的不是自有 runtime，而是跨 Agent 的工作证据链。
 
 ## 3. 目标用户
 
@@ -75,10 +81,14 @@ A shared data plane and control plane for enterprise AI agents, unifying memory,
 ### 场景 C：管理者视角
 管理者不进入每个 Agent 的对话框，而是在控制面看见项目进度、异常事件、关键决策、输出文件和访问记录，并能注入规则或要求审批。
 
+### 场景 D：Bring Your Own Agent
+团队继续使用已有 Agent，如 Claude Code、Codex、Gemini CLI、OpenCode。它们通过 MCP 或 adapter 把工作沉淀进统一的 Episode 体系，而不是迁移到全新 runtime。
+
 ## 6. MVP 范围
 
 ### 6.1 必做能力
 - Workspace / Project / Agent / Episode 基础建模
+- Episode 创建字段、状态和关系模型
 - Memory 写入与检索
 - Trace 持续追加与时间线回放
 - Artifact 创建、版本记录与回链
@@ -86,13 +96,15 @@ A shared data plane and control plane for enterprise AI agents, unifying memory,
 - Permission 授权
 - Audit 读写留痕
 - Episode 图谱查询
+- MCP v1 接入
 
 ### 6.2 MVP 闭环
 1. Agent 通过 API 或 MCP 创建 `episode`
-2. 写入初始 `memory_item`
-3. 运行过程写入 `trace_event`
+2. 调用 `query_context` 获取当前工作上下文
+3. 运行过程写入 `trace_event` 和关键 `memory_item`
 4. 生成 `artifact`
-5. 控制面可查看 episode 时间线、引用上下文、产物来源和审计记录
+5. 推进 `episode status`
+6. 控制面可查看 episode 时间线、引用上下文、产物来源和审计记录
 
 ### 6.3 明确不做
 - 不做完整 Web 办公套件
@@ -101,6 +113,7 @@ A shared data plane and control plane for enterprise AI agents, unifying memory,
 - 不做复杂 BI 分析平台
 - 不在 MVP 阶段追求完整私有化部署产品
 - 不在 MVP 阶段做全量端到端加密
+- 不在 MVP 阶段做完整自有 Agent runtime
 
 ## 7. 功能需求
 
@@ -116,6 +129,18 @@ A shared data plane and control plane for enterprise AI agents, unifying memory,
 - 每个事件可回链到 Memory、Artifact、Policy。
 - 支持 episode 级 timeline 回放。
 - 支持异常聚合：失败重试、权限拒绝、越权访问、策略命中、审批等待。
+
+### 7.2.1 Episode 状态
+第一版主状态收敛为：
+
+- `planned`
+- `in_progress`
+- `blocked`
+- `in_review`
+- `completed`
+- `failed`
+
+并通过 `blocked_reason`、`failure_reason`、`review_outcome` 补充细粒度事实。
 
 ### 7.3 Artifact
 - 支持 Markdown、JSON、CSV、HTML、SVG、PDF、脚本、图片。
@@ -134,6 +159,12 @@ A shared data plane and control plane for enterprise AI agents, unifying memory,
 - 支持按角色、Agent、标签、敏感级别控制访问。
 - 所有读取、写入、删除、导出、分享都生成审计事件。
 - 审计日志默认不可变更、可检索、可导出。
+
+### 7.6 主流 Agent 接入
+- 第一阶段产品定义为 `BYO Agent`
+- 对主流 Agent 的标准接入方式优先为 `MCP`
+- 在具备条件时补充 `hooks / plugins / telemetry adapters`
+- 对 API-native agent stack 提供更深的 integration
 
 ## 8. 非功能需求
 - 可追溯性：任一产物能追溯到来源记忆、关键轨迹和策略版本。
@@ -168,3 +199,9 @@ A shared data plane and control plane for enterprise AI agents, unifying memory,
 
 真正的壁垒是：
 把上下文连续性、执行过程、输出产物和治理约束组织成同一个“可操作、可审计、可复盘”的工作图谱。
+
+## 11. 当前阶段战略判断
+- 先做 `system of record`
+- 再决定是否做 `system of execution`
+- 先做 `MCP-first`
+- 再补 `skill` 作为 onboarding 和最佳实践层

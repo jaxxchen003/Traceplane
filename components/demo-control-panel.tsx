@@ -64,12 +64,15 @@ export function ProjectControlPanel({
   const [message, setMessage] = useState("");
   const [form, setForm] = useState({
     primaryAgentId: agents[0]?.id ?? "",
+    workType: "GENERATE",
     titleZh: "",
     titleEn: "",
     summaryZh: "",
     summaryEn: "",
     goalZh: "",
-    goalEn: ""
+    goalEn: "",
+    successCriteriaZh: "",
+    successCriteriaEn: ""
   });
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -78,10 +81,15 @@ export function ProjectControlPanel({
     const payload = {
       projectId,
       primaryAgentId: form.primaryAgentId,
+      workType: form.workType,
       titleI18n: normalizeI18n(form.titleZh, form.titleEn),
       summaryI18n: form.summaryZh ? normalizeI18n(form.summaryZh, form.summaryEn) : null,
       goalI18n: form.goalZh ? normalizeI18n(form.goalZh, form.goalEn) : null,
-      status: "RUNNING",
+      successCriteriaI18n: normalizeI18n(
+        form.successCriteriaZh || form.goalZh || form.titleZh,
+        form.successCriteriaEn || form.goalEn || form.titleEn
+      ),
+      status: "PLANNED",
       policyVersion
     };
 
@@ -121,6 +129,21 @@ export function ProjectControlPanel({
             ))}
           </select>
         </div>
+        <div>
+          <label className={labelClass()}>{dict.controls.workType}</label>
+          <select
+            className={fieldClass()}
+            value={form.workType}
+            onChange={(event) => setForm((current) => ({ ...current, workType: event.target.value }))}
+          >
+            <option value="RESEARCH">RESEARCH</option>
+            <option value="GENERATE">GENERATE</option>
+            <option value="REVIEW">REVIEW</option>
+            <option value="REVISE">REVISE</option>
+            <option value="APPROVE">APPROVE</option>
+            <option value="SUMMARIZE">SUMMARIZE</option>
+          </select>
+        </div>
         <div className="grid gap-3 md:grid-cols-2">
           <div>
             <label className={labelClass()}>{dict.controls.titleZh}</label>
@@ -149,6 +172,24 @@ export function ProjectControlPanel({
           <div>
             <label className={labelClass()}>{dict.controls.goalEn}</label>
             <textarea className={`${fieldClass()} min-h-24`} value={form.goalEn} onChange={(event) => setForm((current) => ({ ...current, goalEn: event.target.value }))} />
+          </div>
+        </div>
+        <div className="grid gap-3 md:grid-cols-2">
+          <div>
+            <label className={labelClass()}>{dict.controls.successCriteriaZh}</label>
+            <textarea
+              className={`${fieldClass()} min-h-24`}
+              value={form.successCriteriaZh}
+              onChange={(event) => setForm((current) => ({ ...current, successCriteriaZh: event.target.value }))}
+            />
+          </div>
+          <div>
+            <label className={labelClass()}>{dict.controls.successCriteriaEn}</label>
+            <textarea
+              className={`${fieldClass()} min-h-24`}
+              value={form.successCriteriaEn}
+              onChange={(event) => setForm((current) => ({ ...current, successCriteriaEn: event.target.value }))}
+            />
           </div>
         </div>
         <div className="flex items-center justify-between gap-3 pt-1">
