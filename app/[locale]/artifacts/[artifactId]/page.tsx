@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 
 import { ArtifactPreview } from "@/components/artifact-preview";
 import { Panel } from "@/components/panel";
+import { StatusBadge } from "@/components/status-badge";
 import { formatDate } from "@/lib/format";
 import { getArtifactDetail } from "@/lib/demo-data";
 import { getDictionary, isLocale } from "@/lib/i18n";
@@ -53,6 +54,68 @@ export default async function ArtifactDetailPage({
         </Panel>
 
         <div className="space-y-6">
+          <Panel
+            title={locale === "zh" ? "Artifact Runtime State" : "Artifact Runtime State"}
+            eyebrow={locale === "zh" ? "Storage + Provenance" : "Storage + Provenance"}
+          >
+            <div className="space-y-4">
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div className="rounded-[24px] border border-cyan-400/16 bg-cyan-400/8 px-4 py-4">
+                  <div className="text-[11px] uppercase tracking-[0.18em] text-cyan-100/70">
+                    {locale === "zh" ? "Storage Mode" : "Storage Mode"}
+                  </div>
+                  <div className="mt-2 text-lg font-semibold text-cyan-50">{artifact.runtimeSummary.storageMode}</div>
+                  <div className="mt-2 text-sm text-cyan-100/70">
+                    {artifact.runtimeSummary.databaseProvider} · {artifact.runtimeSummary.objectStorageProvider}
+                  </div>
+                </div>
+                <div className="rounded-[24px] border border-amber-400/16 bg-amber-400/8 px-4 py-4">
+                  <div className="text-[11px] uppercase tracking-[0.18em] text-amber-100/70">
+                    {locale === "zh" ? "Provenance Mode" : "Provenance Mode"}
+                  </div>
+                  <div className="mt-2 text-lg font-semibold text-amber-50">{artifact.provenanceSummary.mode}</div>
+                  <div className="mt-2 text-sm text-amber-100/70">{artifact.provenanceSummary.host}</div>
+                </div>
+              </div>
+
+              <div className="rounded-[24px] border border-white/10 bg-white/5 px-4 py-4 text-sm text-slate-300">
+                <div className="mb-3 flex items-center justify-between gap-3">
+                  <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
+                    {locale === "zh" ? "Projection Surface" : "Projection Surface"}
+                  </div>
+                  <StatusBadge
+                    label={artifact.runtimeSummary.projectionExists ? "Projected" : "Pending"}
+                    raw={artifact.runtimeSummary.projectionExists ? "COMPLETED" : "PLANNED"}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <div>
+                    <span className="font-medium text-white">{locale === "zh" ? "Cloud Mode:" : "Cloud Mode:"}</span>{" "}
+                    {artifact.runtimeSummary.cloudMode}
+                  </div>
+                  <div>
+                    <span className="font-medium text-white">{locale === "zh" ? "Projection Root:" : "Projection Root:"}</span>{" "}
+                    <span className="break-all text-slate-200">{artifact.runtimeSummary.projectionRoot}</span>
+                  </div>
+                  <div className="grid gap-3 pt-2 sm:grid-cols-2">
+                    <div className="rounded-2xl border border-white/8 bg-black/20 px-3 py-3">
+                      <div className="text-[11px] uppercase tracking-[0.14em] text-slate-500">
+                        {locale === "zh" ? "Source Traces" : "Source Traces"}
+                      </div>
+                      <div className="mt-2 text-lg font-semibold text-white">{artifact.provenanceSummary.traceCount}</div>
+                    </div>
+                    <div className="rounded-2xl border border-white/8 bg-black/20 px-3 py-3">
+                      <div className="text-[11px] uppercase tracking-[0.14em] text-slate-500">
+                        {locale === "zh" ? "Source Memories" : "Source Memories"}
+                      </div>
+                      <div className="mt-2 text-lg font-semibold text-white">{artifact.provenanceSummary.memoryCount}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Panel>
+
           <Panel title={dict.common.versionHistory} eyebrow="Versions">
             <div className="space-y-3">
               {artifact.versions.map((version: { id: string; version: number; generatedBy: string; createdAt: Date }) => (
@@ -95,8 +158,28 @@ export default async function ArtifactDetailPage({
           </Panel>
 
           <Panel title={dict.common.reuse} eyebrow={dict.artifact.consumedBy}>
-            <div className="text-sm text-slate-300">
-              {artifact.consumedByAgents.length > 0 ? artifact.consumedByAgents.length : 0} downstream agent references
+            <div className="space-y-3 text-sm text-slate-300">
+              <div>
+                {artifact.consumedByAgents.length > 0 ? artifact.consumedByAgents.length : 0} downstream agent references
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div className="rounded-2xl border border-white/10 bg-white/5 px-3 py-3">
+                  <div className="text-[11px] uppercase tracking-[0.14em] text-slate-500">
+                    Hook Capture
+                  </div>
+                  <div className="mt-2 text-lg font-semibold text-white">
+                    {artifact.provenanceSummary.hasHookCapture ? "Yes" : "No"}
+                  </div>
+                </div>
+                <div className="rounded-2xl border border-white/10 bg-white/5 px-3 py-3">
+                  <div className="text-[11px] uppercase tracking-[0.14em] text-slate-500">
+                    Imported
+                  </div>
+                  <div className="mt-2 text-lg font-semibold text-white">
+                    {artifact.provenanceSummary.isImported ? "Yes" : "No"}
+                  </div>
+                </div>
+              </div>
             </div>
           </Panel>
         </div>

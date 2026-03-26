@@ -89,7 +89,7 @@ async function findArtifactForDetail(artifactId: string) {
   return prisma.artifact.findUnique({
     where: { id: artifactId },
     include: {
-      episode: { include: { project: true } },
+      episode: { include: { project: { include: { workspace: true } } } },
       createdByAgent: true,
       sourceTraceEvent: true
     }
@@ -727,6 +727,39 @@ export async function getArtifactDetail(artifactId: string, locale: Locale) {
     ? await prisma.traceEvent.findMany({ where: { id: { in: traceIds } }, orderBy: { stepIndex: "asc" } })
     : [];
   const resolvedContent = await resolveArtifactLocalizedContent(artifact, locale);
+  const runtime = getRuntimeConfig();
+  const syncRoot = expandHomePath(runtime.syncRootPath);
+  const localizedEpisodeTitle = localize(artifact.episode.titleI18n, locale);
+  const episodeDirName = `${slugify(localizedEpisodeTitle)}--${artifact.episode.id.slice(-6)}`;
+  const projectionRoot = path.join(
+    syncRoot,
+    artifact.episode.project.workspace.slug,
+    artifact.episode.project.slug,
+    episodeDirName
+  );
+
+  let projectionExists = false;
+  try {
+    const stat = await fs.stat(projectionRoot);
+    projectionExists = stat.isDirectory();
+  } catch {
+    projectionExists = false;
+  }
+
+  const hasHookCapture = traces.some((trace) =>
+    ["UserPromptSubmit", "PreToolUse", "PostToolUse", "Stop"].includes(trace.eventType)
+  );
+  const isImported = artifact.episode.policyVersion.includes("import");
+  const provenanceMode = isImported
+    ? "transcript-import"
+    : hasHookCapture
+      ? "hook-capture"
+      : "local-ui";
+  const provenanceHost = isImported
+    ? "OpenCode / import pipeline"
+    : hasHookCapture
+      ? "Claude Code"
+      : "Traceplane local control panel";
 
   return {
     id: artifact.id,
@@ -744,6 +777,22 @@ export async function getArtifactDetail(artifactId: string, locale: Locale) {
     sensitivity: artifact.sensitivity,
     shareScope: artifact.shareScope,
     uri: artifact.uri,
+    runtimeSummary: {
+      cloudMode: runtime.cloud.mode,
+      databaseProvider: runtime.database.provider,
+      objectStorageProvider: runtime.objectStorage.provider,
+      storageMode: resolvedContent.storageMode,
+      projectionRoot,
+      projectionExists
+    },
+    provenanceSummary: {
+      mode: provenanceMode,
+      host: provenanceHost,
+      traceCount: traces.length,
+      memoryCount: memories.length,
+      isImported,
+      hasHookCapture
+    },
     versions: versions.map((version: ArtifactVersionRecord) => ({
       id: version.id,
       version: version.version,
@@ -782,23 +831,44 @@ export async function getAuditEvents({
     orderBy: { occurredAt: "desc" }
   });
 
-  return events.map((event: AuditRecord) => ({
-    id: event.id,
-    occurredAt: event.occurredAt,
-    actorType: event.actorType,
-    actorId: event.actorId,
-    action: event.action,
-    targetType: event.targetType,
-    targetId: event.targetId,
-    result: event.result,
-    policyVersion: event.policyVersion,
-    policyHitReason: localize(event.policyHitReasonI18n, locale),
-    permissionDecision: event.permissionDecision,
-    denyReason: localize(event.denyReasonI18n, locale),
-    projectId: event.projectId,
-    episodeId: event.episodeId,
-    artifactId: event.artifactId
-  }));
+  const runtime = getRuntimeConfig();
+  const successCount = events.filter((event) => event.result === "success").length;
+  const warningCount = events.filter((event) => event.result === "warning").length;
+  const deniedCount = events.filter((event) => event.permissionDecision === "deny").length;
+  const policyHitCount = events.filter((event) => event.policyHitReasonI18n).length;
+
+  return {
+    runtimeSummary: {
+      cloudMode: runtime.cloud.mode,
+      databaseProvider: runtime.database.provider,
+      objectStorageProvider: runtime.objectStorage.provider,
+      syncRoot: runtime.syncRootPath
+    },
+    summary: {
+      totalEvents: events.length,
+      successCount,
+      warningCount,
+      deniedCount,
+      policyHitCount
+    },
+    events: events.map((event: AuditRecord) => ({
+      id: event.id,
+      occurredAt: event.occurredAt,
+      actorType: event.actorType,
+      actorId: event.actorId,
+      action: event.action,
+      targetType: event.targetType,
+      targetId: event.targetId,
+      result: event.result,
+      policyVersion: event.policyVersion,
+      policyHitReason: localize(event.policyHitReasonI18n, locale),
+      permissionDecision: event.permissionDecision,
+      denyReason: localize(event.denyReasonI18n, locale),
+      projectId: event.projectId,
+      episodeId: event.episodeId,
+      artifactId: event.artifactId
+    }))
+  };
 }
 
 export async function buildEpisodeGraph(episodeId: string, locale: Locale) {
