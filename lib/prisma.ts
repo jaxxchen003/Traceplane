@@ -37,7 +37,15 @@ function getCloudPrisma() {
   const cloudClientModule = require("../generated/prisma-cloud/index.js") as {
     PrismaClient: typeof PrismaClient;
   };
+  const cloudDatabaseUrl = resolveCloudDatabaseUrl(process.env);
   const cloudPrisma = new cloudClientModule.PrismaClient({
+    datasources: cloudDatabaseUrl
+      ? {
+          db: {
+            url: cloudDatabaseUrl
+          }
+        }
+      : undefined,
     log: process.env.NODE_ENV === "development" ? ["warn", "error"] : ["error"]
   });
 
