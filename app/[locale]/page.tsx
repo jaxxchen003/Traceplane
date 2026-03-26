@@ -214,9 +214,9 @@ export default async function LocaleHome({
         <Panel title={locale === "zh" ? "Work Plane Status" : "Work Plane Status"} eyebrow="Runtime">
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             <RuntimeSignal
-              label={locale === "zh" ? "运行模式" : "Runtime mode"}
-              value={runtimeSurface.runtime.cloud.mode}
-              tone={runtimeSurface.runtime.cloud.mode === "cloud-ready" ? "good" : "warn"}
+              label={locale === "zh" ? "部署阶段" : "Deployment stage"}
+              value={runtimeSurface.runtime.cloud.deploymentStage}
+              tone={runtimeSurface.runtime.cloud.deploymentStage === "cloud-active" ? "good" : "warn"}
             />
             <RuntimeSignal
               label={locale === "zh" ? "数据库" : "Database"}
@@ -262,6 +262,23 @@ export default async function LocaleHome({
                 ? "正式产品的权威状态在云端工作平面中，本地目录只是同步投影和 agent 友好的 working copy。首页必须把这层运行时状态显式展示出来。"
                 : "The source of truth lives in the cloud work plane. Local files are projections and agent-friendly working copies, so the home surface must make that runtime posture explicit."}
             </p>
+
+            <div className="mt-4 rounded-[20px] border border-white/10 bg-black/20 px-4 py-4 text-sm leading-7 text-slate-300">
+              <span className="font-medium text-white">
+                {locale === "zh" ? "当前判定：" : "Current verdict:"}
+              </span>{" "}
+              {runtimeSurface.runtime.cloud.deploymentStage === "cloud-active"
+                ? locale === "zh"
+                  ? "云端工作平面已经生效，数据库和对象存储都在远端运行。"
+                  : "The cloud work plane is active. Both database and object storage are running remotely."
+                : runtimeSurface.runtime.cloud.deploymentStage === "cloud-configured"
+                  ? locale === "zh"
+                    ? "云端凭证已经配置，但当前运行时还没有完全切到云端数据库 / 对象存储。"
+                    : "Cloud credentials are configured, but the active runtime has not fully cut over to cloud database / object storage yet."
+                  : locale === "zh"
+                    ? "当前仍是 demo-local，运行主线还在本地。"
+                    : "The app is still running in demo-local mode, with the active spine stored locally."}
+            </div>
 
             {runtimeSurface.runtime.cloud.readiness.blockers.length > 0 ? (
               <div className="mt-4 rounded-[20px] border border-amber-400/20 bg-amber-400/10 px-4 py-4 text-sm text-amber-50">

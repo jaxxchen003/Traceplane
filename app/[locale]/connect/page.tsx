@@ -144,9 +144,11 @@ export default async function ConnectPage({
             <div className="grid gap-3 md:grid-cols-2">
               <div className="rounded-[22px] border border-cyan-400/18 bg-cyan-400/8 px-4 py-4">
                 <div className="text-[11px] uppercase tracking-[0.18em] text-cyan-200/80">
-                  {locale === "zh" ? "工作平面模式" : "Work plane mode"}
+                  {locale === "zh" ? "部署阶段" : "Deployment stage"}
                 </div>
-                <div className="mt-2 text-base font-medium text-white">{connectSurface.runtimeSurface.runtime.cloud.mode}</div>
+                <div className="mt-2 text-base font-medium text-white">
+                  {connectSurface.runtimeSurface.runtime.cloud.deploymentStage}
+                </div>
               </div>
               <div className="rounded-[22px] border border-emerald-400/18 bg-emerald-400/8 px-4 py-4">
                 <div className="text-[11px] uppercase tracking-[0.18em] text-emerald-200/80">
@@ -173,6 +175,15 @@ export default async function ConnectPage({
               {locale === "zh"
                 ? `同步目录：${connectSurface.runtimeSurface.localProjection.rootPath} · ${connectSurface.runtimeSurface.localProjection.rootExists ? "已检测到本地投影" : "尚未检测到本地投影"}`
                 : `Sync root: ${connectSurface.runtimeSurface.localProjection.rootPath} · ${connectSurface.runtimeSurface.localProjection.rootExists ? "projection detected" : "projection not detected"}`}
+            </div>
+            <div className="rounded-[22px] border border-white/10 bg-black/20 px-4 py-4 text-sm leading-7 text-slate-300">
+              {connectSurface.runtimeSurface.runtime.cloud.deploymentStage === "cloud-active"
+                ? locale === "zh"
+                  ? "当前 host 接入已经写入云端工作平面，可把 MCP、capture 和 import 视为正式路径。"
+                  : "Current host integrations are writing into the active cloud work plane, so MCP, capture, and import can be treated as production paths."
+                : locale === "zh"
+                  ? "当前 host 路线已经 ready / prepared，但仍需要云端 cutover 才会变成正式的 work plane ingestion。"
+                  : "Host paths are ready / prepared, but a cloud cutover is still required before they become the formal work plane ingestion path."}
             </div>
           </div>
         </Panel>

@@ -71,6 +71,26 @@ function assessCloudReadiness(env: NodeJS.ProcessEnv): CloudReadiness {
   };
 }
 
+function detectDeploymentStage({
+  cloudReady,
+  databaseProvider,
+  objectStorageProvider
+}: {
+  cloudReady: boolean;
+  databaseProvider: string;
+  objectStorageProvider: string;
+}) {
+  if (cloudReady && databaseProvider === "postgres" && objectStorageProvider === "r2") {
+    return "cloud-active";
+  }
+
+  if (cloudReady) {
+    return "cloud-configured";
+  }
+
+  return "demo-local";
+}
+
 export function getRuntimeConfig() {
   const databaseUrl = process.env.DATABASE_URL || process.env.SUPABASE_DB_URL || "";
   const databaseSource = hasValue(process.env.DATABASE_URL)
@@ -85,13 +105,20 @@ export function getRuntimeConfig() {
     hasValue(process.env.R2_ENDPOINT) &&
     hasValue(process.env.R2_ACCESS_KEY_ID) &&
     hasValue(process.env.R2_SECRET_ACCESS_KEY);
+  const databaseProvider = detectDatabaseProvider(databaseUrl);
+  const objectStorageProvider = objectStorageConfigured ? "r2" : "none";
+  const deploymentStage = detectDeploymentStage({
+    cloudReady: cloud.ready,
+    databaseProvider,
+    objectStorageProvider
+  });
 
   return {
     service: "traceplane",
     productDefinition: "Enterprise Agent Work Graph",
     database: {
       urlConfigured: hasValue(databaseUrl),
-      provider: detectDatabaseProvider(databaseUrl),
+      provider: databaseProvider,
       source: databaseSource
     },
     supabase: {
@@ -102,12 +129,13 @@ export function getRuntimeConfig() {
       projectUrlConfigured: hasValue(process.env.SUPABASE_PROJECT_URL)
     },
     objectStorage: {
-      provider: objectStorageConfigured ? "r2" : "none",
+      provider: objectStorageProvider,
       configured: objectStorageConfigured,
       bucket: process.env.R2_BUCKET || null
     },
     cloud: {
       mode: cloud.ready ? "cloud-ready" : "demo-local",
+      deploymentStage,
       readiness: cloud
     },
     appBaseUrl,
