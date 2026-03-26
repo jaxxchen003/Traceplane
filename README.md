@@ -134,6 +134,16 @@ npm run mcp:host -- gemini .gemini/settings.json
 npm run import:transcript -- examples/imports/normalized-episode.json
 ```
 
+把 OpenCode export 转成标准化 transcript：
+
+```bash
+npm run normalize:opencode -- \
+  examples/imports/opencode-export.json \
+  q2-customer-pulse \
+  research-agent \
+  .tmp/opencode-normalized.json
+```
+
 ## 环境变量
 - `DATABASE_URL`: Prisma 数据库连接。默认本地示例为 `file:./dev.db`
 - `NEXT_PUBLIC_DEFAULT_LOCALE`: 默认语言，当前示例为 `zh`

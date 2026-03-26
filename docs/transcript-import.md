@@ -114,3 +114,45 @@ node scripts/import-transcript.mjs <path-to-json>
 - `gemini telemetry/checkpoint -> normalized transcript`
 
 这样每个 host 只需要解决“怎么转”，而不是重新定义数据库写入逻辑。
+
+## 7. 当前已实现的 host-specific normalizer
+
+### OpenCode
+
+仓库现在已经包含：
+
+```bash
+node scripts/normalize-opencode-export.mjs \
+  <input.json> \
+  <project-slug> \
+  <primary-agent-slug> \
+  [output.json]
+```
+
+它负责把 OpenCode 的 session export 转成统一的 episode package。
+
+推荐链路：
+
+```bash
+npm run normalize:opencode -- \
+  examples/imports/opencode-export.json \
+  q2-customer-pulse \
+  research-agent \
+  .tmp/opencode-normalized.json
+
+npm run import:transcript -- .tmp/opencode-normalized.json
+```
+
+### 当前映射策略
+
+- user text -> `memory_items`
+- assistant text / reasoning -> `trace_events`
+- tool state -> `trace_events`
+- patch / file parts -> `artifacts`
+
+这还是第一版映射，但已经足够跑通：
+
+- 工作目标
+- 关键过程
+- 最终产物
+- 基础审计

@@ -78,6 +78,11 @@ MCP 是接入方式，不是产品定义。
 4. Codex
 5. OpenClaw
 
+当前已经具备的 host-specific 资产：
+
+- `OpenCode export -> normalized transcript -> import`
+- `Claude Code / OpenCode / Gemini` 的 MCP host config generator
+
 ## 5. 长期演进路线
 
 ### Phase 1：Bring Your Own Agent

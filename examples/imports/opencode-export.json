@@ -1,0 +1,74 @@
+{
+  "info": {
+    "id": "session_opencode_demo_001",
+    "title": "Summarize customer feedback into a weekly research note",
+    "createdAt": 1774489200000,
+    "updatedAt": 1774490100000
+  },
+  "messages": [
+    {
+      "info": {
+        "id": "msg_user_1",
+        "role": "user",
+        "time": {
+          "created": 1774489200000
+        }
+      },
+      "parts": [
+        {
+          "type": "text",
+          "text": "Review the latest customer feedback snippets and prepare a concise weekly research note for the management team."
+        }
+      ]
+    },
+    {
+      "info": {
+        "id": "msg_assistant_1",
+        "role": "assistant",
+        "time": {
+          "created": 1774489260000
+        }
+      },
+      "parts": [
+        {
+          "type": "reasoning",
+          "text": "I should inspect the feedback notes first, then synthesize the top concerns and capture them as a short deliverable."
+        },
+        {
+          "type": "tool",
+          "tool": "read",
+          "state": {
+            "status": "completed",
+            "title": "Read feedback notes",
+            "input": {
+              "filePath": "data/customer-feedback-weekly.md"
+            },
+            "output": "Loaded 18 feedback snippets covering approval workflows, pricing clarity, and dashboard visibility."
+          }
+        },
+        {
+          "type": "tool",
+          "tool": "write",
+          "state": {
+            "status": "completed",
+            "title": "Write weekly research note",
+            "input": {
+              "filePath": "reports/weekly-research-note.md"
+            },
+            "output": "Saved management-facing weekly research note."
+          }
+        },
+        {
+          "type": "patch",
+          "files": [
+            "reports/weekly-research-note.md"
+          ]
+        },
+        {
+          "type": "text",
+          "text": "I reviewed the latest snippets and wrote a weekly research note. The two dominant themes were approval visibility and pricing clarity."
+        }
+      ]
+    }
+  ]
+}
