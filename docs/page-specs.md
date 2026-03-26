@@ -33,6 +33,20 @@
 ### 1.3 字段优先于视觉
 先定义信息密度和交互路径，再决定 UI 风格。
 
+### 1.4 正式产品要显示 runtime 状态
+当前不只是做“任务页面”，而是逐步进入“云端工作平面 + 本地投影”的正式产品阶段。
+
+所以接下来的页面规格必须逐步开始承载：
+
+- runtime mode
+- database provider / source
+- object storage status
+- host integration status
+- local projection status
+
+详细扩展见：
+- [frontend-runtime-surfaces.md](/Users/jaxxchen/projects/enterprise-agent-work-graph/docs/frontend-runtime-surfaces.md)
+
 ## 2. Page 1: Episode Command Center
 
 ### 2.1 页面目标
