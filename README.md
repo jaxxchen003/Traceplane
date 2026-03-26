@@ -167,6 +167,18 @@ npm run claude:setup -- q2-customer-pulse research-agent
 npm run claude:verify
 ```
 
+一键生成 OpenCode 项目配置：
+
+```bash
+npm run opencode:setup
+```
+
+验证 OpenCode 配置：
+
+```bash
+npm run opencode:verify
+```
+
 Claude Code hooks 示例配置：
 
 - [examples/hooks/claude/settings.json](/Users/jaxxchen/projects/enterprise-agent-work-graph/examples/hooks/claude/settings.json)
@@ -226,6 +238,7 @@ docker run --rm -p 3000:3000 --env-file .env enterprise-agent-work-graph
 - `docs/mcp-spec-v1.md`: 第一版 MCP 工具范围与字段定义
 - `docs/mcp-host-setup.md`: Claude Code、OpenCode、Gemini CLI 的 MCP 接入模板
 - `docs/claude-quickstart.md`: Claude Code 的最小试跑路径和首条 Episode 验证标准
+- `docs/opencode-quickstart.md`: OpenCode 的最小试跑路径，以及 export/import 双路径说明
 - `examples/hooks/claude/`: Claude Code hooks 示例配置
 - `docs/onboarding-skill.md`: onboarding skill 的职责、结构和边界
 - `docs/demo-workflow.md`: 对外演示用的最小多 Agent 工作链路
@@ -244,6 +257,7 @@ docker run --rm -p 3000:3000 --env-file .env enterprise-agent-work-graph
 - `examples/skills/`: host-agnostic skill 模板
 - `examples/playbooks/`: Research / Writer / Reviewer 等角色 playbook
 - `examples/playbooks/claude-first-episode.md`: Claude Code 的第一条 Episode 试跑剧本
+- `examples/playbooks/opencode-first-episode.md`: OpenCode 的第一条 Episode 试跑剧本
 
 ## 当前命名
 - 英文工作名：`Enterprise Agent Work Graph`
