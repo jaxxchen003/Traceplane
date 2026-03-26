@@ -99,6 +99,8 @@ async function ensureDatabaseReady() {
     process.env.TRACEPLANE_CLOUD_DB_ACTIVE === "true" &&
     Boolean(process.env.SUPABASE_DB_URL);
 
+  console.log(`[traceplane] cloud db active flag: ${cloudDbActive ? "on" : "off"}`);
+
   if (cloudDbActive) {
     return ensureCloudDatabaseReady();
   }
