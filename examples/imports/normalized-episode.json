@@ -1,0 +1,115 @@
+{
+  "project_slug": "q2-customer-pulse",
+  "primary_agent_slug": "research-agent",
+  "title": {
+    "zh": "导入示例：季度客户反馈补充研究",
+    "en": "Import Example: Supplemental Quarterly Customer Feedback Research"
+  },
+  "summary": {
+    "zh": "把一个外部 host 导出的任务记录标准化后导入为 Episode。",
+    "en": "A task exported from an external host and normalized into an Episode package."
+  },
+  "goal": {
+    "zh": "基于新增客户反馈生成一份补充研究结论。",
+    "en": "Generate a supplemental research summary based on newly collected customer feedback."
+  },
+  "success_criteria": {
+    "zh": "形成一条可复盘的 Episode，并导入核心记忆、关键步骤和最终产物。",
+    "en": "Create a replayable episode with core memories, key steps, and final artifacts imported."
+  },
+  "final_outcome": {
+    "zh": "已形成补充研究摘要。",
+    "en": "A supplemental research summary was produced."
+  },
+  "primary_actor": "Research Agent",
+  "work_type": "RESEARCH",
+  "status": "COMPLETED",
+  "review_outcome": "APPROVED",
+  "policy_version": "policy.import.v1",
+  "started_at": "2026-03-26T02:00:00.000Z",
+  "ended_at": "2026-03-26T02:18:00.000Z",
+  "episode_agent_slugs": ["research-agent", "writer-agent"],
+  "memories": [
+    {
+      "title": {
+        "zh": "新增反馈样本摘要",
+        "en": "New feedback sample summary"
+      },
+      "content": {
+        "zh": "新增样本里，用户对审批可见性和价格透明度的担忧进一步增强。",
+        "en": "New samples strengthened concern around approval visibility and pricing transparency."
+      },
+      "type": "SEMANTIC",
+      "source": "host_export",
+      "importance": 8,
+      "sensitivity": "Internal",
+      "agent_slug": "research-agent"
+    }
+  ],
+  "traces": [
+    {
+      "step_index": 1,
+      "event_type": "TASK_STARTED",
+      "title": {
+        "zh": "读取导出任务上下文",
+        "en": "Read exported task context"
+      },
+      "status": "SUCCESS",
+      "short_result": {
+        "zh": "已建立研究范围。",
+        "en": "Research scope established."
+      },
+      "input_summary": {
+        "zh": "读取新增客户反馈片段和上周结论。",
+        "en": "Read newly collected customer feedback excerpts and last week's conclusions."
+      },
+      "result_summary": {
+        "zh": "进入补充研究阶段。",
+        "en": "Moved into supplemental research."
+      },
+      "event_time": "2026-03-26T02:02:00.000Z",
+      "actor_agent_slug": "research-agent"
+    },
+    {
+      "step_index": 2,
+      "event_type": "SYNTHESIS",
+      "title": {
+        "zh": "输出补充研究摘要",
+        "en": "Produce supplemental research summary"
+      },
+      "status": "SUCCESS",
+      "short_result": {
+        "zh": "形成一份补充结论。",
+        "en": "Produced a supplemental conclusion."
+      },
+      "decision_summary": {
+        "zh": "将审批可见性定义为新增重点问题。",
+        "en": "Framed approval visibility as the newly elevated concern."
+      },
+      "result_summary": {
+        "zh": "输出补充研究稿。",
+        "en": "Generated the supplemental research draft."
+      },
+      "event_time": "2026-03-26T02:12:00.000Z",
+      "actor_agent_slug": "research-agent"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_key": "supplemental-quarterly-research",
+      "title": {
+        "zh": "补充研究摘要",
+        "en": "Supplemental Research Summary"
+      },
+      "content": {
+        "zh": "# 补充研究摘要\n\n- 审批可见性成为新增重点问题\n- 价格透明度风险继续上升",
+        "en": "# Supplemental Research Summary\n\n- Approval visibility emerged as a new top concern\n- Pricing transparency risk continued to rise"
+      },
+      "file_type": "MARKDOWN",
+      "version": 1,
+      "created_by_agent_slug": "research-agent",
+      "source_trace_index": 2
+    }
+  ],
+  "links": []
+}

@@ -128,6 +128,12 @@ npm run mcp:host -- claude-code .mcp.json
 npm run mcp:host -- gemini .gemini/settings.json
 ```
 
+导入标准化 transcript：
+
+```bash
+npm run import:transcript -- examples/imports/normalized-episode.json
+```
+
 ## 环境变量
 - `DATABASE_URL`: Prisma 数据库连接。默认本地示例为 `file:./dev.db`
 - `NEXT_PUBLIC_DEFAULT_LOCALE`: 默认语言，当前示例为 `zh`
@@ -184,6 +190,7 @@ docker run --rm -p 3000:3000 --env-file .env enterprise-agent-work-graph
 - `docs/mcp-host-setup.md`: Claude Code、OpenCode、Gemini CLI 的 MCP 接入模板
 - `docs/onboarding-skill.md`: onboarding skill 的职责、结构和边界
 - `docs/demo-workflow.md`: 对外演示用的最小多 Agent 工作链路
+- `docs/transcript-import.md`: 标准化 transcript / session 导入层，定义 host export 如何落成统一 episode package
 - `docs/platform-architecture-v1.md`: 平台级底层架构判断，明确为什么默认自建而不是直接押注 db9
 - `docs/storage-runtime-interface.md`: 存储运行时接口边界，定义未来如何支持可替换 backend
 - `docs/mvp-plan.md`: MVP 的实现逻辑、范围、路线图和最终产品形态
@@ -194,6 +201,7 @@ docker run --rm -p 3000:3000 --env-file .env enterprise-agent-work-graph
 - `AGENTS.md`: 实现约束与工程规则
 - `.agent/PLANS.md`: 分阶段执行计划
 - `examples/mcp/`: 主流 Agent host 的 MCP 配置模板
+- `examples/imports/`: 标准化 transcript 导入样例
 - `examples/skills/`: host-agnostic skill 模板
 - `examples/playbooks/`: Research / Writer / Reviewer 等角色 playbook
 

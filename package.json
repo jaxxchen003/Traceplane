@@ -13,6 +13,7 @@
     "mcp:start": "node scripts/mcp-server.mjs",
     "mcp:test": "node scripts/test-mcp.mjs",
     "mcp:host": "node scripts/setup-mcp-host.mjs",
+    "import:transcript": "node scripts/import-transcript.mjs",
     "lint": "eslint .",
     "ci": "npm run lint && npm run build",
     "db:generate": "prisma generate",

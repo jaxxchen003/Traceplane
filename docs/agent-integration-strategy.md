@@ -15,6 +15,7 @@
 - `MCP`
 - `hooks / plugins / telemetry adapters`
 - `API-native integrations`
+- `session export / transcript import`
 
 一句话：
 
@@ -57,6 +58,11 @@ MCP 是接入方式，不是产品定义。
 - 工具调用
 - 权限请求
 - 错误和状态变化
+
+### Level 2.5：Session Export / Transcript Import
+
+当 host 还没有稳定的实时 hook，或者企业想先导入历史工作记录时，
+使用标准化 transcript package 先把工作沉淀成 episode。
 
 ### Level 3：API-native integration
 
