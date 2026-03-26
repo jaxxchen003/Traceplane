@@ -64,7 +64,9 @@ async function ensureDatabaseReady() {
   };
 
   if (isSqlite) {
+    console.log(`[traceplane] ensuring sqlite schema at ${normalizedDatabaseUrl}`);
     await runNodeScript(prismaCli, ["db", "push"], runtimeEnv);
+    console.log("[traceplane] sqlite schema push complete");
   }
 
   if (!forceReset && databaseExists) {
