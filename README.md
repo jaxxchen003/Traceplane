@@ -36,8 +36,8 @@ MVP 只做一件事：跑通企业多 Agent 共享工作资产中心的最小闭
 - Next.js 全栈应用
 - Prisma + SQLite 本地数据层
 - 中英文切换
-- 5 个核心页面
-- 9 个基础 API 路由
+- 6 个核心页面
+- 13 个基础 API 路由
 - 一套可演示的 seeded demo 数据
 - 项目页与 Episode 页内嵌交互式写入控制面
 
@@ -63,10 +63,11 @@ npm run dev
 ```
 
 默认入口：
-- `http://localhost:3000/zh/projects`
-- `http://localhost:3000/en/projects`
+- `http://localhost:3000/zh`
+- `http://localhost:3000/en`
 
 ## 当前 MVP 页面
+- `/{locale}`: Episode Command Center
 - `/{locale}/projects`: 项目列表
 - `/{locale}/projects/{projectId}`: 项目总览
 - `/{locale}/projects/{projectId}/episodes/{episodeId}`: Episode 复盘

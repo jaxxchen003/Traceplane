@@ -12,6 +12,7 @@ export function normalizeLocale(value: string): Locale {
 
 type Dictionary = {
   nav: {
+    dashboard: string;
     projects: string;
     audit: string;
   };
@@ -57,6 +58,17 @@ type Dictionary = {
     riskProjects: string;
     activeProjects: string;
     recentArtifacts: string;
+  };
+  dashboard: {
+    title: string;
+    subtitle: string;
+    needsAttention: string;
+    blockedRisk: string;
+    activeWork: string;
+    recentActivity: string;
+    openEpisode: string;
+    openProject: string;
+    noItems: string;
   };
   projectOverview: {
     agents: string;
@@ -137,7 +149,7 @@ type Dictionary = {
 
 export const dictionary: Record<Locale, Dictionary> = {
   zh: {
-    nav: { projects: "项目", audit: "审计" },
+    nav: { dashboard: "总览", projects: "项目", audit: "审计" },
     common: {
       workspace: "工作区",
       search: "搜索",
@@ -180,6 +192,17 @@ export const dictionary: Record<Locale, Dictionary> = {
       riskProjects: "高风险项目",
       activeProjects: "活跃项目",
       recentArtifacts: "最近生成产物"
+    },
+    dashboard: {
+      title: "Episode Command Center",
+      subtitle: "先看需要处理的工作，再看异常、活跃执行与最近变化。首页不是任务列表，而是注意力分发系统。",
+      needsAttention: "待处理",
+      blockedRisk: "异常与阻塞",
+      activeWork: "活跃工作",
+      recentActivity: "最近活动",
+      openEpisode: "打开 Episode",
+      openProject: "查看项目",
+      noItems: "当前没有需要关注的 Episode。"
     },
     projectOverview: {
       agents: "项目 Agent",
@@ -275,7 +298,7 @@ export const dictionary: Record<Locale, Dictionary> = {
     }
   },
   en: {
-    nav: { projects: "Projects", audit: "Audit" },
+    nav: { dashboard: "Overview", projects: "Projects", audit: "Audit" },
     common: {
       workspace: "Workspace",
       search: "Search",
@@ -318,6 +341,18 @@ export const dictionary: Record<Locale, Dictionary> = {
       riskProjects: "Projects at risk",
       activeProjects: "Active projects",
       recentArtifacts: "Recently generated artifacts"
+    },
+    dashboard: {
+      title: "Episode Command Center",
+      subtitle:
+        "Look at what needs attention first, then blocked work, active execution, and recent movement. The home surface is an attention router, not a task dump.",
+      needsAttention: "Needs Attention",
+      blockedRisk: "Blocked & Risk",
+      activeWork: "Active Work",
+      recentActivity: "Recent Activity",
+      openEpisode: "Open episode",
+      openProject: "Open project",
+      noItems: "There are no episodes in this section right now."
     },
     projectOverview: {
       agents: "Project agents",

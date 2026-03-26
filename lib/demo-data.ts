@@ -36,6 +36,18 @@ async function findProjectForOverview(projectId: string) {
   });
 }
 
+async function findEpisodesForCommandCenter() {
+  return prisma.episode.findMany({
+    include: {
+      project: true,
+      primaryAgent: true,
+      artifacts: true,
+      auditEvents: true
+    },
+    orderBy: { updatedAt: "desc" }
+  });
+}
+
 async function findProjectAgentList(projectId: string) {
   return prisma.project.findUnique({
     where: { id: projectId },
@@ -87,6 +99,7 @@ type ProjectAgentsRecord = NonNullable<Awaited<ReturnType<typeof findProjectAgen
 type EpisodeReviewRecord = NonNullable<Awaited<ReturnType<typeof findEpisodeForReview>>>;
 type ArtifactDetailRecord = NonNullable<Awaited<ReturnType<typeof findArtifactForDetail>>>;
 type ArtifactVersionRecord = Awaited<ReturnType<typeof findArtifactVersions>>[number];
+type CommandCenterEpisodeRecord = Awaited<ReturnType<typeof findEpisodesForCommandCenter>>[number];
 type EdgeRecord = Awaited<ReturnType<typeof prisma.nodeEdge.findMany>>[number];
 type TraceRecord = Awaited<ReturnType<typeof prisma.traceEvent.findMany>>[number];
 type MemoryRecord = Awaited<ReturnType<typeof prisma.memoryItem.findMany>>[number];
@@ -99,6 +112,128 @@ function statusWeight(status: string) {
 export async function getWorkspaceSummary() {
   const workspace = await prisma.workspace.findFirst();
   return workspace;
+}
+
+function summarizeEpisodeForCommandCenter(
+  episode: CommandCenterEpisodeRecord,
+  locale: Locale
+) {
+  const permissionDeniedCount = episode.auditEvents.filter((event: AuditRecord) => event.permissionDecision === "deny").length;
+  const policyHitCount = episode.auditEvents.filter((event: AuditRecord) => event.policyHitReasonI18n).length;
+
+  return {
+    id: episode.id,
+    title: localize(episode.titleI18n, locale),
+    goal: localize(episode.goalI18n, locale),
+    summary: localize(episode.summaryI18n, locale),
+    successCriteria: localize(episode.successCriteriaI18n, locale),
+    status: episode.status,
+    workType: episode.workType,
+    primaryActor: episode.primaryActor ?? episode.primaryAgent.name,
+    primaryAgent: episode.primaryAgent.name,
+    projectId: episode.projectId,
+    projectName: localize(episode.project.nameI18n, locale),
+    updatedAt: episode.updatedAt,
+    startedAt: episode.startedAt,
+    reviewOutcome: episode.reviewOutcome,
+    artifactCount: episode.artifacts.length,
+    permissionDeniedCount,
+    policyHitCount
+  };
+}
+
+function attentionScore(episode: ReturnType<typeof summarizeEpisodeForCommandCenter>) {
+  let score = 0;
+  if (episode.status === "IN_REVIEW") score += 60;
+  if (episode.status === "BLOCKED") score += 55;
+  if (episode.reviewOutcome === "PENDING") score += 35;
+  score += episode.permissionDeniedCount * 10;
+  score += episode.policyHitCount * 6;
+  return score;
+}
+
+export async function getEpisodeCommandCenter(locale: Locale) {
+  const episodes = await findEpisodesForCommandCenter();
+  const summarized = episodes.map((episode) => summarizeEpisodeForCommandCenter(episode, locale));
+
+  const needsAttention = summarized
+    .filter(
+      (episode) =>
+        episode.status === "IN_REVIEW" ||
+        episode.status === "BLOCKED" ||
+        episode.reviewOutcome === "PENDING"
+    )
+    .sort((a, b) => attentionScore(b) - attentionScore(a) || b.updatedAt.getTime() - a.updatedAt.getTime());
+
+  const blockedRisk = summarized
+    .filter(
+      (episode) =>
+        episode.status === "BLOCKED" ||
+        episode.status === "FAILED" ||
+        episode.permissionDeniedCount > 0 ||
+        episode.policyHitCount > 0
+    )
+    .sort(
+      (a, b) =>
+        b.permissionDeniedCount + b.policyHitCount - (a.permissionDeniedCount + a.policyHitCount) ||
+        b.updatedAt.getTime() - a.updatedAt.getTime()
+    );
+
+  const activeWork = summarized
+    .filter((episode) => episode.status === "IN_PROGRESS" || episode.status === "PLANNED")
+    .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
+
+  const recentActivity = [...summarized]
+    .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())
+    .slice(0, 6);
+
+  const graphNodes = summarized.slice(0, 5).flatMap((episode, index) => [
+    {
+      id: `${episode.id}-episode`,
+      label: episode.title,
+      meta:
+        locale === "zh"
+          ? `${episode.projectName} · ${episode.workType}`
+          : `${episode.projectName} · ${episode.workType}`,
+      x: [24, 53, 77, 35, 68][index] ?? 50,
+      y: [24, 38, 30, 67, 72][index] ?? 50,
+      z: 0.96 - index * 0.08,
+      tone: "agent" as const
+    },
+    {
+      id: `${episode.id}-artifact`,
+      label: locale === "zh" ? "Output Layer" : "Output Layer",
+      meta:
+        locale === "zh"
+          ? `${episode.artifactCount} 个产物`
+          : `${episode.artifactCount} artifacts`,
+      x: [16, 44, 84, 28, 72][index] ?? 50,
+      y: [48, 60, 54, 86, 88][index] ?? 68,
+      z: 0.58 - index * 0.04,
+      tone: "artifact" as const
+    }
+  ]);
+
+  const graphEdges = summarized.slice(0, 5).map((episode) => ({
+    from: `${episode.id}-episode`,
+    to: `${episode.id}-artifact`,
+    emphasis: episode.artifactCount > 0 ? ("strong" as const) : ("soft" as const)
+  }));
+
+  return {
+    stats: {
+      needsAttention: needsAttention.length,
+      blockedRisk: blockedRisk.length,
+      activeWork: activeWork.length,
+      recentActivity: recentActivity.length
+    },
+    needsAttention,
+    blockedRisk,
+    activeWork,
+    recentActivity,
+    graphNodes,
+    graphEdges
+  };
 }
 
 export async function getProjects(locale: Locale) {

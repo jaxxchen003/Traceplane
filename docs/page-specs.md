@@ -14,30 +14,97 @@
 ## 1. 设计原则
 
 ### 1.1 页面数量最少化
-第一版只围绕 5 个页面展开：
+第一版只围绕 6 个页面展开：
 
-1. Project List
-2. Project Overview
-3. Episode Review
-4. Artifact Detail
-5. Audit View
+1. Episode Command Center
+2. Project List
+3. Project Overview
+4. Episode Review
+5. Artifact Detail
+6. Audit View
 
 ### 1.2 页面围绕 `Project` 和 `Episode`
 第一版不要围绕文件树，也不要围绕聊天窗口。
 
 主导航逻辑应该是：
 
-`Project -> Episode -> Artifact / Audit`
+`Episode Command Center -> Project -> Episode -> Artifact / Audit`
 
 ### 1.3 字段优先于视觉
 先定义信息密度和交互路径，再决定 UI 风格。
 
-## 2. Page 1: Project List
+## 2. Page 1: Episode Command Center
 
 ### 2.1 页面目标
-给 manager / lead 一个项目入口，快速判断哪些项目值得进入。
+给执行管理者一个默认首页，优先看到需要介入、异常阻塞和关键运行中的 Episode。
 
 ### 2.2 页面区块
+
+#### 顶部主舞台
+字段：
+- `workspace_name`
+- `attention_stats`
+- `graph_nodes`
+- `graph_edges`
+
+操作：
+- 查看首页图谱主线
+- 快速理解当前工作网络热点
+
+#### Needs Attention 区
+每个 episode card / row 显示：
+- `episode_title`
+- `episode_status`
+- `project_name`
+- `primary_actor`
+- `updated_at`
+- `artifact_count`
+- `permission_denied_count`
+- `policy_hit_count`
+
+操作：
+- 进入 Episode Review
+- 跳转所属 Project
+
+#### Blocked / Risk 区
+支持：
+- `blocked`
+- `failed`
+- `permission_denied`
+- `policy_hit`
+
+#### Active Work 区
+支持：
+- `in_progress`
+- `planned`
+
+#### Recent Activity 区
+支持：
+- 最近更新
+- 最近切换状态
+- 最近产出结果
+
+### 2.3 空状态
+- 当前没有需要关注的 Episode
+- 建议文案：接入第一个 Agent，创建第一条 episode
+
+### 2.4 最低数据依赖
+- `episodes`
+- `projects`
+- `agents`
+- `artifacts` 聚合计数
+- `audit_events` 风险计数
+
+### 2.5 关键跳转
+- `Episode Command Center -> Episode Review`
+- `Episode Command Center -> Project Overview`
+
+## 3. Page 2: Project List
+
+### 3.1 页面目标
+给 manager / lead 一个项目入口，快速判断哪些项目值得进入。
+
+### 3.2 页面区块
 
 #### 顶部栏
 字段：
@@ -71,11 +138,11 @@
 - 有待审批
 - 最近 7 天有 artifact
 
-### 2.3 空状态
+### 3.3 空状态
 - 暂无项目
 - 建议文案：先创建一个项目并接入至少一个 Agent
 
-### 2.4 最低数据依赖
+### 3.4 最低数据依赖
 - `projects`
 - `agents` 聚合计数
 - `episodes` 聚合计数
@@ -83,15 +150,15 @@
 - `audit_events` 风险计数
 - `policies` 当前版本摘要
 
-### 2.5 关键跳转
+### 3.5 关键跳转
 - `Project List -> Project Overview`
 
-## 3. Page 2: Project Overview
+## 4. Page 3: Project Overview
 
-### 3.1 页面目标
+### 4.1 页面目标
 给 manager / lead 看项目级总览，不直接掉进原始事件流。
 
-### 3.2 页面区块
+### 4.2 页面区块
 
 #### 顶部摘要区
 字段：
@@ -151,11 +218,11 @@
 操作：
 - 跳转 Audit View 并带过滤条件
 
-### 3.3 空状态
+### 4.3 空状态
 - 项目已创建但还没有 episode
 - 建议文案：接入第一个 Agent，创建第一条 episode
 
-### 3.4 最低数据依赖
+### 4.4 最低数据依赖
 - `projects`
 - `agents`
 - `episodes`
@@ -163,19 +230,19 @@
 - `audit_events`
 - `policies`
 
-### 3.5 关键跳转
+### 4.5 关键跳转
 - `Project Overview -> Episode Review`
 - `Project Overview -> Artifact Detail`
 - `Project Overview -> Audit View`
 
-## 4. Page 3: Episode Review
+## 5. Page 4: Episode Review
 
 这是第一版最关键的页面。
 
-### 4.1 页面目标
+### 5.1 页面目标
 给 manager / lead / operator 复盘一条完整任务主线。
 
-### 4.2 页面区块
+### 5.2 页面区块
 
 #### 顶部摘要区
 字段：
@@ -270,7 +337,7 @@
 操作：
 - 点击关系节点跳转对应 artifact / episode
 
-### 4.3 展开单个 Trace Event 时的字段
+### 5.3 展开单个 Trace Event 时的字段
 - `event_id`
 - `step_index`
 - `actor`
@@ -284,11 +351,11 @@
 - `linked_policy_hits`
 - `linked_audit_events`
 
-### 4.4 空状态
+### 5.4 空状态
 - episode 已创建但还没有 trace
 - 建议文案：等待 Agent 写入执行过程
 
-### 4.5 最低数据依赖
+### 5.5 最低数据依赖
 - `episodes`
 - `trace_events`
 - `memory_items`
@@ -297,17 +364,17 @@
 - `audit_events`
 - `policies`
 
-### 4.6 关键跳转
+### 5.6 关键跳转
 - `Episode Review -> Artifact Detail`
 - `Episode Review -> Audit View`
 - `Episode Review -> Project Overview`
 
-## 5. Page 4: Artifact Detail
+## 6. Page 5: Artifact Detail
 
-### 5.1 页面目标
+### 6.1 页面目标
 查看单个产物的当前版本、历史版本和来源链路。
 
-### 5.2 页面区块
+### 6.2 页面区块
 
 #### 顶部摘要区
 字段：
@@ -361,27 +428,27 @@
 - `referenced_in_episodes`
 - `share_scope`
 
-### 5.3 空状态
+### 6.3 空状态
 - 产物元数据存在，但文件预览不可用
 - 建议文案：显示 metadata，不阻塞来源回链
 
-### 5.4 最低数据依赖
+### 6.4 最低数据依赖
 - `artifacts`
 - `episodes`
 - `trace_events`
 - `memory_items`
 - `node_edges`
 
-### 5.5 关键跳转
+### 6.5 关键跳转
 - `Artifact Detail -> Episode Review`
 - `Artifact Detail -> Audit View`
 
-## 6. Page 5: Audit View
+## 7. Page 6: Audit View
 
-### 6.1 页面目标
+### 7.1 页面目标
 给 manager / security / auditor 一个可过滤的证据视图。
 
-### 6.2 页面区块
+### 7.2 页面区块
 
 #### 顶部过滤栏
 过滤字段：
@@ -428,27 +495,28 @@
 - `hit_reason`
 - `deny_reason`
 
-### 6.3 默认视图
+### 7.3 默认视图
 建议默认打开“最近 7 天 + 当前项目”的视图，避免第一屏信息过载。
 
-### 6.4 空状态
+### 7.4 空状态
 - 当前过滤条件下无审计记录
 
-### 6.5 最低数据依赖
+### 7.5 最低数据依赖
 - `audit_events`
 - `episodes`
 - `projects`
 - `agents`
 - `artifacts`
 
-### 6.6 关键跳转
+### 7.6 关键跳转
 - `Audit View -> Episode Review`
 - `Audit View -> Artifact Detail`
 
-## 7. 最小导航结构
+## 8. 最小导航结构
 
 建议第一版导航非常克制：
 
+- `Home`
 - `Projects`
 - `Audit`
 
@@ -465,12 +533,12 @@
 
 这些都不是第一版核心。
 
-## 8. 关键跨页链路
+## 9. 关键跨页链路
 
 第一版最重要的不是单页完整，而是链路完整。
 
 ### 8.1 管理者复盘链路
-`Project List -> Project Overview -> Episode Review -> Artifact Detail -> Audit View`
+`Episode Command Center -> Project Overview -> Episode Review -> Artifact Detail -> Audit View`
 
 ### 8.2 产物回链链路
 `Artifact Detail -> Episode Review -> Trace Event -> Memory`
@@ -478,11 +546,11 @@
 ### 8.3 风险定位链路
 `Project Overview Risk Summary -> Audit View -> Episode Review`
 
-## 9. 最低可做版
+## 10. 最低可做版
 
 如果资源不足，可以把第一版压成 3 个页面：
 
-1. `Project Overview`
+1. `Episode Command Center`
 2. `Episode Review`
 3. `Audit View`
 
@@ -490,7 +558,7 @@
 - Artifact Detail 变成 Episode Review 内的 drawer
 - Project List 用 mock 或简单列表替代
 
-## 10. 一句话总结
+## 11. 一句话总结
 
 这套页面规格的目的不是做复杂产品，而是确保第一版用户始终沿着同一条路径理解系统：
 
