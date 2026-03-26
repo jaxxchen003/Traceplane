@@ -3,37 +3,8 @@ import { notFound } from "next/navigation";
 import { GraphTheater } from "@/components/graph-theater";
 import { Panel } from "@/components/panel";
 import { brand } from "@/lib/brand";
+import { getConnectSurfaceSummary } from "@/lib/demo-data";
 import { getDictionary, isLocale } from "@/lib/i18n";
-
-const hostCards = [
-  {
-    id: "claude",
-    name: "Claude Code",
-    level: ["MCP", "Setup", "Capture"],
-    setup: "npm run claude:setup -- q2-customer-pulse research-agent",
-    verify: "npm run claude:verify",
-    quickstart: "docs/claude-quickstart.md",
-    tone: "agent" as const
-  },
-  {
-    id: "opencode",
-    name: "OpenCode",
-    level: ["MCP", "Setup", "Import"],
-    setup: "npm run opencode:setup",
-    verify: "npm run opencode:verify",
-    quickstart: "docs/opencode-quickstart.md",
-    tone: "artifact" as const
-  },
-  {
-    id: "gemini",
-    name: "Gemini CLI",
-    level: ["MCP", "Setup"],
-    setup: "npm run gemini:setup",
-    verify: "npm run gemini:verify",
-    quickstart: "docs/gemini-quickstart.md",
-    tone: "trace" as const
-  }
-];
 
 export default async function ConnectPage({
   params
@@ -44,6 +15,36 @@ export default async function ConnectPage({
   if (!isLocale(locale)) notFound();
 
   const dict = getDictionary(locale);
+  const connectSurface = await getConnectSurfaceSummary();
+  const hostCards = [
+    {
+      id: "claude",
+      name: "Claude Code",
+      level: ["MCP", "Setup", "Capture"],
+      setup: "npm run claude:setup -- q2-customer-pulse research-agent",
+      verify: "npm run claude:verify",
+      quickstart: "docs/claude-quickstart.md",
+      tone: "agent" as const
+    },
+    {
+      id: "opencode",
+      name: "OpenCode",
+      level: ["MCP", "Setup", "Import"],
+      setup: "npm run opencode:setup",
+      verify: "npm run opencode:verify",
+      quickstart: "docs/opencode-quickstart.md",
+      tone: "artifact" as const
+    },
+    {
+      id: "gemini",
+      name: "Gemini CLI",
+      level: ["MCP", "Setup"],
+      setup: "npm run gemini:setup",
+      verify: "npm run gemini:verify",
+      quickstart: "docs/gemini-quickstart.md",
+      tone: "trace" as const
+    }
+  ];
   const nodes = [
     {
       id: "traceplane-core",
@@ -110,13 +111,13 @@ export default async function ConnectPage({
         nodes={nodes}
         edges={edges}
         stats={[
-          { label: locale === "zh" ? "优先 Host" : "Priority hosts", value: "3" },
-          { label: locale === "zh" ? "已具备 Setup" : "Hosts with setup", value: "3" },
-          { label: locale === "zh" ? "已具备 Capture/Import" : "Capture / import ready", value: "2" }
+          { label: locale === "zh" ? "Host 数量" : "Hosts", value: `${connectSurface.hosts.length}` },
+          { label: locale === "zh" ? "Episode 总数" : "Episodes", value: `${connectSurface.totals.episodeCount}` },
+          { label: locale === "zh" ? "Capture / Import 信号" : "Capture / import signals", value: `${connectSurface.totals.capturedEvents + connectSurface.totals.importedEpisodes}` }
         ]}
       />
 
-      <section className="grid gap-4 xl:grid-cols-[1.15fr_0.85fr]">
+      <section className="grid gap-4 xl:grid-cols-[1.05fr_0.95fr]">
         <Panel
           title={locale === "zh" ? "接入原则" : "Connection Principle"}
           eyebrow="BYO Agent"
@@ -136,26 +137,42 @@ export default async function ConnectPage({
         </Panel>
 
         <Panel
-          title={locale === "zh" ? "当前默认优先级" : "Current Default Priority"}
-          eyebrow="Adoption"
+          title={locale === "zh" ? "Host Runtime Console" : "Host Runtime Console"}
+          eyebrow="Signals"
         >
-          <div className="space-y-3 text-sm text-slate-300">
-            <div className="rounded-[22px] border border-cyan-400/18 bg-cyan-400/8 px-4 py-4">
-              <div className="text-[11px] uppercase tracking-[0.18em] text-cyan-200/80">
-                {locale === "zh" ? "第一优先" : "Tier 1"}
+          <div className="space-y-4 text-sm text-slate-300">
+            <div className="grid gap-3 md:grid-cols-2">
+              <div className="rounded-[22px] border border-cyan-400/18 bg-cyan-400/8 px-4 py-4">
+                <div className="text-[11px] uppercase tracking-[0.18em] text-cyan-200/80">
+                  {locale === "zh" ? "工作平面模式" : "Work plane mode"}
+                </div>
+                <div className="mt-2 text-base font-medium text-white">{connectSurface.runtimeSurface.runtime.cloud.mode}</div>
               </div>
-              <div className="mt-2 text-base font-medium text-white">Claude Code · OpenCode</div>
+              <div className="rounded-[22px] border border-emerald-400/18 bg-emerald-400/8 px-4 py-4">
+                <div className="text-[11px] uppercase tracking-[0.18em] text-emerald-200/80">
+                  {locale === "zh" ? "对象存储" : "Object storage"}
+                </div>
+                <div className="mt-2 text-base font-medium text-white">{connectSurface.runtimeSurface.runtime.objectStorage.provider}</div>
+              </div>
             </div>
-            <div className="rounded-[22px] border border-amber-400/18 bg-amber-400/8 px-4 py-4">
-              <div className="text-[11px] uppercase tracking-[0.18em] text-amber-200/80">
-                {locale === "zh" ? "第二优先" : "Tier 2"}
+            <div className="grid gap-3 md:grid-cols-2">
+              <div className="rounded-[22px] border border-white/10 bg-white/5 px-4 py-4">
+                <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
+                  {locale === "zh" ? "最近 Capture 事件" : "Captured events"}
+                </div>
+                <div className="mt-2 text-2xl font-semibold text-white">{connectSurface.totals.capturedEvents}</div>
               </div>
-              <div className="mt-2 text-base font-medium text-white">Gemini CLI</div>
+              <div className="rounded-[22px] border border-white/10 bg-white/5 px-4 py-4">
+                <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
+                  {locale === "zh" ? "导入 Episode" : "Imported episodes"}
+                </div>
+                <div className="mt-2 text-2xl font-semibold text-white">{connectSurface.totals.importedEpisodes}</div>
+              </div>
             </div>
             <div className="rounded-[22px] border border-white/10 bg-white/5 px-4 py-4 text-slate-300">
               {locale === "zh"
-                ? "Codex 和 OpenClaw 继续保留在策略层，但当前先不承诺同等深度的 host 级接入。"
-                : "Keep Codex and OpenClaw in strategy scope, but do not promise the same host-level depth yet."}
+                ? `同步目录：${connectSurface.runtimeSurface.localProjection.rootPath} · ${connectSurface.runtimeSurface.localProjection.rootExists ? "已检测到本地投影" : "尚未检测到本地投影"}`
+                : `Sync root: ${connectSurface.runtimeSurface.localProjection.rootPath} · ${connectSurface.runtimeSurface.localProjection.rootExists ? "projection detected" : "projection not detected"}`}
             </div>
           </div>
         </Panel>
@@ -185,6 +202,14 @@ export default async function ConnectPage({
               </div>
 
               <div className="mt-5 space-y-4 text-sm text-slate-300">
+                <div className="rounded-[20px] border border-white/10 bg-white/6 px-4 py-4">
+                  <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
+                    {locale === "zh" ? "最新信号" : "Latest signal"}
+                  </div>
+                  <div className="mt-2 text-sm leading-6 text-white">
+                    {connectSurface.hosts.find((item) => item.id === host.id)?.latestSignal ?? "—"}
+                  </div>
+                </div>
                 <div>
                   <div className="mb-2 text-[11px] uppercase tracking-[0.18em] text-slate-500">
                     {locale === "zh" ? "Setup" : "Setup"}

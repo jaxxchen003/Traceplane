@@ -209,6 +209,81 @@ export default async function ProjectOverviewPage({
         </Panel>
       </section>
 
+      <section className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
+        <Panel title={locale === "zh" ? "Project Runtime Posture" : "Project Runtime Posture"} eyebrow="Runtime">
+          <div className="grid gap-3 md:grid-cols-2">
+            <div className="rounded-[20px] border border-cyan-400/16 bg-cyan-400/8 px-4 py-4">
+              <div className="text-[11px] uppercase tracking-[0.18em] text-cyan-200/80">
+                {locale === "zh" ? "云端模式" : "Cloud mode"}
+              </div>
+              <div className="mt-2 text-base font-medium text-white">{project.runtimeSummary.cloudMode}</div>
+            </div>
+            <div className="rounded-[20px] border border-emerald-400/16 bg-emerald-400/8 px-4 py-4">
+              <div className="text-[11px] uppercase tracking-[0.18em] text-emerald-200/80">
+                {locale === "zh" ? "对象存储" : "Object storage"}
+              </div>
+              <div className="mt-2 text-base font-medium text-white">{project.runtimeSummary.objectStorageProvider}</div>
+            </div>
+            <div className="rounded-[20px] border border-white/10 bg-white/5 px-4 py-4">
+              <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
+                {locale === "zh" ? "R2 覆盖" : "R2 coverage"}
+              </div>
+              <div className="mt-2 text-2xl font-semibold text-white">
+                {project.runtimeSummary.r2ArtifactCount}
+              </div>
+              <div className="mt-1 text-sm text-slate-400">
+                {locale === "zh"
+                  ? `其余 ${project.runtimeSummary.inlineArtifactCount} 个产物仍以内联方式存在`
+                  : `${project.runtimeSummary.inlineArtifactCount} artifacts still remain inline`}
+              </div>
+            </div>
+            <div className="rounded-[20px] border border-white/10 bg-white/5 px-4 py-4">
+              <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
+                {locale === "zh" ? "本地投影" : "Local projection"}
+              </div>
+              <div className="mt-2 text-base font-medium text-white">
+                {project.runtimeSummary.projectionExists
+                  ? locale === "zh"
+                    ? "已检测到项目本地投影"
+                    : "Project projection detected"
+                  : locale === "zh"
+                    ? "尚未检测到项目本地投影"
+                    : "Project projection not detected"}
+              </div>
+              <div className="mt-1 text-sm text-slate-400">{project.runtimeSummary.projectionRoot}</div>
+            </div>
+          </div>
+        </Panel>
+
+        <Panel title={locale === "zh" ? "Continuity Summary" : "Continuity Summary"} eyebrow="Episode Network">
+          <div className="grid gap-3 text-sm text-slate-300">
+            <div className="rounded-[20px] border border-cyan-400/16 bg-cyan-400/8 px-4 py-4">
+              <div className="text-[11px] uppercase tracking-[0.18em] text-cyan-200/80">
+                {locale === "zh" ? "关系更新" : "Relationship updates"}
+              </div>
+              <div className="mt-2 text-2xl font-semibold text-white">{project.continuitySummary.dependsOnCount}</div>
+            </div>
+            <div className="rounded-[20px] border border-amber-400/16 bg-amber-400/8 px-4 py-4">
+              <div className="text-[11px] uppercase tracking-[0.18em] text-amber-200/80">
+                {locale === "zh" ? "Review 压力" : "Review pressure"}
+              </div>
+              <div className="mt-2 text-2xl font-semibold text-white">{project.continuitySummary.reviewPressureCount}</div>
+            </div>
+            <div className="rounded-[20px] border border-rose-400/16 bg-rose-400/8 px-4 py-4">
+              <div className="text-[11px] uppercase tracking-[0.18em] text-rose-200/80">
+                {locale === "zh" ? "失败链路" : "Failed spines"}
+              </div>
+              <div className="mt-2 text-2xl font-semibold text-white">{project.continuitySummary.failedEpisodesCount}</div>
+            </div>
+            <div className="rounded-[20px] border border-white/10 bg-white/5 px-4 py-4 text-slate-300">
+              {locale === "zh"
+                ? "Project 不再只是项目详情，它要把 host 接入、存储覆盖率、review 压力和 episode 连续性都压缩成一个可判断的总览面。"
+                : "Project Overview should compress host adoption, storage coverage, review pressure, and episode continuity into one management surface."}
+            </div>
+          </div>
+        </Panel>
+      </section>
+
       <div className="grid gap-6 lg:grid-cols-[1.2fr_1fr]">
         <Panel title={dict.projectOverview.agents} eyebrow="Agents">
           <div className="grid gap-3">

@@ -27,6 +27,7 @@ async function findProjectForOverview(projectId: string) {
   return prisma.project.findUnique({
     where: { id: projectId },
     include: {
+      workspace: true,
       projectAgents: {
         include: { agent: true }
       },
@@ -302,6 +303,66 @@ export async function getRuntimeSurfaceSummary() {
   };
 }
 
+export async function getConnectSurfaceSummary() {
+  const runtimeSurface = await getRuntimeSurfaceSummary();
+  const [episodeCount, artifactCount, importedEpisodes, capturedEpisodes] = await Promise.all([
+    prisma.episode.count(),
+    prisma.artifact.count(),
+    prisma.episode.count({
+      where: {
+        policyVersion: {
+          contains: "import"
+        }
+      }
+    }),
+    prisma.traceEvent.count({
+      where: {
+        eventType: {
+          in: ["UserPromptSubmit", "PreToolUse", "PostToolUse", "Stop"]
+        }
+      }
+    })
+  ]);
+
+  return {
+    runtimeSurface,
+    totals: {
+      episodeCount,
+      artifactCount,
+      importedEpisodes,
+      capturedEvents: capturedEpisodes
+    },
+    hosts: [
+      {
+        id: "claude",
+        name: "Claude Code",
+        stage: "Capture",
+        status: "ready",
+        levels: ["MCP", "Setup", "Hooks"],
+        latestSignal:
+          capturedEpisodes > 0 ? "Hook capture available" : "Hook bridge ready, awaiting live events"
+      },
+      {
+        id: "opencode",
+        name: "OpenCode",
+        stage: "Import+MCP",
+        status: "ready",
+        levels: ["MCP", "Setup", "Import"],
+        latestSignal:
+          importedEpisodes > 0 ? "Normalized import path verified" : "Import pipeline prepared"
+      },
+      {
+        id: "gemini",
+        name: "Gemini CLI",
+        stage: "Setup",
+        status: "prepared",
+        levels: ["MCP", "Verify"],
+        latestSignal: "Setup and verification commands available"
+      }
+    ]
+  };
+}
+
 export async function getProjects(locale: Locale) {
   const projects = await findProjectsForList();
 
@@ -349,6 +410,31 @@ export async function getProjectOverview(projectId: string, locale: Locale) {
       ) => b.updatedAt.getTime() - a.updatedAt.getTime()
     );
 
+  const runtime = getRuntimeConfig();
+  const syncRoot = expandHomePath(runtime.syncRootPath);
+  let projectionExists = false;
+
+  try {
+    const stat = await fs.stat(path.join(syncRoot, project.workspace?.slug ?? "", project.slug));
+    projectionExists = stat.isDirectory();
+  } catch {
+    projectionExists = false;
+  }
+
+  const artifactUris = project.episodes.flatMap((episode) => episode.artifacts.map((artifact) => artifact.uri));
+  const r2ArtifactCount = artifactUris.filter((uri) => typeof uri === "string" && uri.startsWith("r2://")).length;
+  const totalArtifactCount = project.episodes.reduce(
+    (sum, episode) => sum + episode.artifacts.length,
+    0
+  );
+  const inlineArtifactCount = totalArtifactCount - r2ArtifactCount;
+
+  const continuitySummary = {
+    dependsOnCount: project.auditEvents.filter((event) => event.action === "link_episode").length,
+    reviewPressureCount: project.episodes.filter((episode) => episode.status === "IN_REVIEW").length,
+    failedEpisodesCount: project.episodes.filter((episode) => episode.status === "FAILED").length
+  };
+
   return {
     id: project.id,
     name: localize(project.nameI18n, locale),
@@ -388,6 +474,16 @@ export async function getProjectOverview(projectId: string, locale: Locale) {
       summary: localize(episode.summaryI18n, locale)
     })),
     artifacts: flattenedArtifacts.slice(0, 4),
+    runtimeSummary: {
+      cloudMode: runtime.cloud.mode,
+      databaseProvider: runtime.database.provider,
+      objectStorageProvider: runtime.objectStorage.provider,
+      projectionRoot: runtime.syncRootPath,
+      projectionExists,
+      r2ArtifactCount,
+      inlineArtifactCount
+    },
+    continuitySummary,
     riskSummary: {
       permissionDeniedCount: project.auditEvents.filter(
         (event: AuditRecord) => event.permissionDecision === "deny"
