@@ -204,6 +204,57 @@ export default async function ConnectPage({
         </Panel>
       </section>
 
+      <Panel
+        title={locale === "zh" ? "First Handoff Path" : "First Handoff Path"}
+        eyebrow="How a new user should start"
+      >
+        <div className="grid gap-4 xl:grid-cols-4">
+          {[
+            {
+              step: "01",
+              title: locale === "zh" ? "运行 setup" : "Run setup",
+              detail:
+                locale === "zh"
+                  ? "先选一个 host，生成 MCP 配置并完成 verify。"
+                  : "Pick one host first, generate MCP config, and run verify."
+            },
+            {
+              step: "02",
+              title: locale === "zh" ? "开始正常工作" : "Work normally",
+              detail:
+                locale === "zh"
+                  ? "继续在熟悉的 Agent 里工作，不要求切换到新 runtime。"
+                  : "Keep working inside the agent you already know. No runtime migration is required."
+            },
+            {
+              step: "03",
+              title: locale === "zh" ? "让 Traceplane 形成 brief" : "Let Traceplane form the brief",
+              detail:
+                locale === "zh"
+                  ? "系统把目标、关键步骤、最新产物和注意事项压成 handoff brief。"
+                  : "Traceplane compresses the goal, key steps, latest artifact, and cautions into a handoff brief."
+            },
+            {
+              step: "04",
+              title: locale === "zh" ? "换另一个 Agent 接着做" : "Switch to the next agent",
+              detail:
+                locale === "zh"
+                  ? "把 brief 交给下一个 Agent，让它直接继续，而不是重新解释。"
+                  : "Give the brief to the next agent so it can continue directly instead of asking for the context again."
+            }
+          ].map((item) => (
+            <div
+              key={item.step}
+              className="rounded-[24px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02))] px-5 py-5"
+            >
+              <div className="text-[11px] uppercase tracking-[0.22em] text-amber-200/80">{item.step}</div>
+              <h3 className="mt-3 text-lg font-semibold text-white">{item.title}</h3>
+              <p className="mt-3 text-sm leading-7 text-slate-300">{item.detail}</p>
+            </div>
+          ))}
+        </div>
+      </Panel>
+
       <Panel title={locale === "zh" ? "Host Setup Matrix" : "Host Setup Matrix"} eyebrow={dict.nav.connect}>
         <div className="grid gap-4 xl:grid-cols-3">
           {hostCards.map((host) => (

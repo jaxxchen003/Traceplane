@@ -425,6 +425,57 @@ export default async function LocaleHome({
         </Panel>
       </section>
 
+      <Panel
+        title={locale === "zh" ? "First Continuity Loop" : "First Continuity Loop"}
+        eyebrow="Connect -> Work -> Brief -> Continue"
+      >
+        <div className="grid gap-4 xl:grid-cols-4">
+          {[
+            {
+              step: "01",
+              title: locale === "zh" ? "接入一个 Agent" : "Connect one agent",
+              body:
+                locale === "zh"
+                  ? "先从 Claude Code、OpenCode 或 Gemini CLI 开始，不要求迁移现有工作方式。"
+                  : "Start with Claude Code, OpenCode, or Gemini CLI without changing how you already work."
+            },
+            {
+              step: "02",
+              title: locale === "zh" ? "自动沉淀 Episode" : "Auto-capture an episode",
+              body:
+                locale === "zh"
+                  ? "目标、关键步骤、产物和状态自动沉淀成同一条工作主线。"
+                  : "Goals, key steps, artifacts, and status are captured into one work spine."
+            },
+            {
+              step: "03",
+              title: locale === "zh" ? "生成交接 brief" : "Generate a handoff brief",
+              body:
+                locale === "zh"
+                  ? "系统告诉下一位 Agent：做到哪一步、最新产物是什么、下一步该做什么。"
+                  : "The system tells the next agent where the work stopped, what the latest artifact is, and what to do next."
+            },
+            {
+              step: "04",
+              title: locale === "zh" ? "继续而不是重来" : "Continue instead of restarting",
+              body:
+                locale === "zh"
+                  ? "换一个 Agent 继续工作，不再重新解释背景，也不再从零开始。"
+                  : "Switch to another agent and continue the work without re-explaining the context or starting from scratch."
+            }
+          ].map((item) => (
+            <div
+              key={item.step}
+              className="rounded-[24px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02))] px-5 py-5"
+            >
+              <div className="text-[11px] uppercase tracking-[0.22em] text-cyan-200/80">{item.step}</div>
+              <h3 className="mt-3 text-lg font-semibold text-white">{item.title}</h3>
+              <p className="mt-3 text-sm leading-7 text-slate-300">{item.body}</p>
+            </div>
+          ))}
+        </div>
+      </Panel>
+
       <EpisodeList
         locale={locale}
         title={dict.dashboard.needsAttention}
