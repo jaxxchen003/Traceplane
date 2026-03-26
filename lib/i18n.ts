@@ -195,8 +195,8 @@ export const dictionary: Record<Locale, Dictionary> = {
       recentArtifacts: "最近生成产物"
     },
     dashboard: {
-      title: "Episode Command Center",
-      subtitle: "先看需要处理的工作，再看异常、活跃执行与最近变化。首页不是任务列表，而是注意力分发系统。",
+      title: "Multi-Agent Continuity Home",
+      subtitle: "先看哪些工作可以继续、交接和回放，再看异常、活跃执行与最近变化。首页不是任务列表，而是多 Agent continuity 的主屏。",
       needsAttention: "待处理",
       blockedRisk: "异常与阻塞",
       activeWork: "活跃工作",
@@ -344,9 +344,9 @@ export const dictionary: Record<Locale, Dictionary> = {
       recentArtifacts: "Recently generated artifacts"
     },
     dashboard: {
-      title: "Episode Command Center",
+      title: "Multi-Agent Continuity Home",
       subtitle:
-        "Look at what needs attention first, then blocked work, active execution, and recent movement. The home surface is an attention router, not a task dump.",
+        "Start with the work that can be continued, handed off, and replayed, then move through blocked/risk, active execution, and recent changes.",
       needsAttention: "Needs Attention",
       blockedRisk: "Blocked & Risk",
       activeWork: "Active Work",

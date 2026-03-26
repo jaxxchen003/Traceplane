@@ -1,36 +1,34 @@
 # Traceplane
 
-> Enterprise Agent Work Graph
+> Multi-Agent Continuity Layer
 
 ## 项目一句话
-面向企业多 Agent 协作场景的共享数据中枢，统一承载 memory、trace、artifact，并通过 policy、permission、audit 形成可管理、可复用、可追溯的工作图谱。
+让多个 Agent 的工作接成一条不断档、可回看、可交接的工作主线。
 
 ## 这是什么
-这不是单点 Agent memory，也不是企业网盘或通用 workspace。
+这不是单点 Agent memory，也不是网盘、聊天前端或通用 workspace。
 
-它要解决的是企业在 Agent 进入生产后出现的核心问题：
+它当前第一层要解决的是多 Agent 实践者最常遇到的三个问题：
 
-- Agent 记住了什么
-- Agent 做了什么
-- Agent 产出了什么
-- Agent 依据什么规则访问了哪些数据
-- 出问题时如何追溯、审计与归责
+- 同样的背景信息，要反复讲给不同 Agent
+- 一个 Agent 做到一半，另一个 Agent 很难无缝接上
+- 做过的工作散落在聊天、日志和文件里，回看很痛苦
 
 ## 核心判断
-- 企业买的不是“更强记忆”，而是“可管理的 Agent 工作体系”。
+- 第一层先卖 continuity，不先卖治理。
 - Memory、Trace、Artifact 必须挂在同一条任务主线上，否则只是三个存储桶。
 - `Episode` 是系统主索引，不是附件字段。
-- 默认产品视角应该是 `Episode-first`，`Project` 负责价值归属与汇报。
-- Policy、Permission、Audit 是产品主能力，不是后补治理层。
+- 默认产品视角应该是 `Episode-first`，`Project` 负责归属和汇总。
+- 第一层最重要的产物不是图谱，而是 handoff brief。
 
 ## MVP 聚焦
-MVP 只做一件事：跑通企业多 Agent 共享工作资产中心的最小闭环。
+MVP 第一层只做一件事：跑通多 Agent continuity 的最小闭环。
 
 1. Agent 创建 `episode`
-2. 写入 `memory`
-3. 持续追加 `trace`
-4. 生成 `artifact`
-5. 管理者查看 episode 全链路和访问审计
+2. 自动沉淀关键 `memory / trace / artifact`
+3. 生成可交接的 `episode brief`
+4. 下一个 Agent 直接基于 brief 和上下文继续工作
+5. 用户可以回看这条工作主线，而不是重新解释
 
 ## 当前交付
 当前仓库已经包含一个可本地运行的 MVP：
@@ -69,7 +67,7 @@ npm run dev
 - `http://localhost:3000/en`
 
 ## 当前 MVP 页面
-- `/{locale}`: Episode Command Center
+- `/{locale}`: Episode Continuity Home
 - `/{locale}/projects`: 项目列表
 - `/{locale}/projects/{projectId}`: 项目总览
 - `/{locale}/projects/{projectId}/episodes/{episodeId}`: Episode 复盘
@@ -92,7 +90,7 @@ npm run dev
 - `GET /api/health`
 
 ## 当前 MCP Server
-仓库现在已经包含一个可运行的 stdio MCP server，暴露 8 个 v1 工具：
+仓库现在已经包含一个可运行的 stdio MCP server，暴露 8 个 v1 工具，目标是让主流 Agent 在不改变工作方式的前提下把工作主线沉淀进 Traceplane：
 
 - `create_episode`
 - `update_episode_status`
@@ -299,11 +297,11 @@ docker run --rm -p 3000:3000 --env-file .env enterprise-agent-work-graph
 
 ## 产品边界
 做：
-- 多 Agent 共享上下文
+- 多 Agent continuity / handoff
+- 自动 Episode brief
 - Episode 级任务链路追踪
 - Artifact 来源可回链
-- Policy 注入
-- Permission + Audit 治理
+- 本地工作区投影
 
 不做：
 - 完整 Web 办公套件
@@ -319,6 +317,7 @@ docker run --rm -p 3000:3000 --env-file .env enterprise-agent-work-graph
 - `docs/episode-relations.md`: Episode 关系类型、推断原则、自动化默认策略
 - `docs/agent-integration-strategy.md`: 主流 Agent 接入策略、MCP-first 路线、BYO Agent 到 managed runtime 的演进
 - `docs/mcp-spec-v1.md`: 第一版 MCP 工具范围与字段定义
+- `docs/continuity-tier.md`: 第一层 continuity 产品的核心价值、边界、北极星和升级钩子
 - `docs/mcp-host-setup.md`: Claude Code、OpenCode、Gemini CLI 的 MCP 接入模板
 - `docs/claude-quickstart.md`: Claude Code 的最小试跑路径和首条 Episode 验证标准
 - `docs/opencode-quickstart.md`: OpenCode 的最小试跑路径，以及 export/import 双路径说明
@@ -345,8 +344,8 @@ docker run --rm -p 3000:3000 --env-file .env enterprise-agent-work-graph
 
 ## 当前命名
 - 推荐对外名：`Traceplane`
-- 对外描述：`Enterprise Agent Work Graph`
-- 中文描述：`Agent 工作控制平面`
+- 对外描述：`Multi-Agent Continuity Layer`
+- 中文描述：`多 Agent 工作连续层`
 - 仓库目录名：`enterprise-agent-work-graph`
 
 ## 当前平台判断
@@ -367,4 +366,4 @@ docker run --rm -p 3000:3000 --env-file .env enterprise-agent-work-graph
 不是先做炫 UI，不是先做全能平台，不是先接很多协议。
 
 最重要的是先证明一件事：
-一个项目内，至少两个 Agent 能围绕同一条 `episode` 主线共享上下文、产物和治理约束，并且管理者能完整复盘。
+一个项目内，至少两个 Agent 能围绕同一条 `episode` 主线共享上下文、产物和执行证据，并且下一个 Agent 能直接接上工作。

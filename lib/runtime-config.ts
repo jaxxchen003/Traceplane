@@ -155,7 +155,7 @@ export function getRuntimeConfig() {
 
   return {
     service: "traceplane",
-    productDefinition: "Enterprise Agent Work Graph",
+    productDefinition: "Multi-Agent Continuity Layer",
     database: {
       urlConfigured: hasValue(databaseUrl),
       provider: databaseProvider,

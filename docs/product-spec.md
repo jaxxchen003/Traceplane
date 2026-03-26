@@ -3,31 +3,37 @@
 ## 1. 产品定义
 
 ### 1.1 One-liner
-A shared data plane and control plane for enterprise AI agents, unifying memory, traces, and artifacts into a connected, auditable work graph.
+A continuity layer for multi-agent work, turning scattered sessions into one connected, replayable work spine.
 
 ### 1.2 产品定位
-本产品是企业级 Agent 工作图谱，不是单点记忆层，不是聊天前端，也不是网盘替代品。
+本产品当前第一层是多 Agent 工作连续层，不是单点记忆层，不是聊天前端，也不是网盘替代品。
 
-它面向企业多 Agent 协作场景，统一组织三类内容：
+它先面向已经开始同时使用多个 Agent 工作的个人用户和小团队，统一组织三类内容：
 
 - 输入：Memory
 - 过程：Trace
 - 输出：Artifact
 
-并在其上增加两类治理能力：
+并为后续团队治理预留两类能力：
 
 - 控制：Policy Injection
 - 治理：Permission + Audit
 
 ### 1.3 核心价值
-- 对管理者：看见输入、过程、输出，能审、能管、能复盘。
-- 对一线使用者：多个 Agent 共享上下文和产物，减少重复输入和重复劳动。
-- 对平台团队：把 memory、logs、artifacts、policies、permissions 收敛到同一个抽象下。
+- 对个人操作者：多个 Agent 共享同一条工作主线，减少重复解释和重复劳动。
+- 对重度使用者：每次任务都有 brief、trace、artifact，可以回看、复用、继续交接。
+- 对后续团队版：为 review、audit、permission 和 policy 留出统一主线。
 
 ### 1.4 当前产品视角
 - 默认主视角是 `Episode`
-- `Project` 提供价值归属、汇报语义和长期上下文
-- `Episode` 提供执行主线、监督主线和复盘主线
+- `Project` 提供归属、汇总语义和长期上下文
+- `Episode` 提供执行主线、handoff 主线和复盘主线
+
+### 1.5 当前阶段判断
+- 第一层先把 continuity 做深做透
+- 第一层先服务单人多 Agent 操作者和 10 人以下小团队
+- 第一层先验证 handoff、brief、replay 是否成立
+- 治理、审批、权限仍然重要，但不是第一层主叙事
 
 ## 2. 问题定义
 
@@ -52,13 +58,13 @@ A shared data plane and control plane for enterprise AI agents, unifying memory,
 ## 3. 目标用户
 
 ### 3.1 第一优先
-已经在企业内部使用多个 Agent / Copilot / 自动化工作流的 AI 原生团队。
+已经在日常工作里同时使用多个 Agent 的个人操作者和 AI native builder。
 
 ### 3.2 第二优先
-需要对 Agent 进行项目化管理的产品、运营、研究、客服、销售支持团队。
+用多个 Agent 做研究、创作、开发、分析的小团队。
 
 ### 3.3 第三优先
-构建企业 Agent 平台的数据与治理团队。
+准备把 Agent 工作纳入团队协作和 review 流程的试点团队。
 
 ## 4. 用户角色
 
@@ -73,16 +79,19 @@ A shared data plane and control plane for enterprise AI agents, unifying memory,
 ## 5. 核心场景
 
 ### 场景 A：单人管理多个 Agent
-一个用户同时使用研究 Agent、写作 Agent、数据 Agent、汇报 Agent。它们不需要共享同一聊天窗口，但要共享同一项目上下文和部分产物。
+一个用户同时使用研究 Agent、写作 Agent、数据 Agent、汇报 Agent。它们不需要共享同一聊天窗口，但需要共享同一条工作主线和可交接的上下文摘要。
 
 ### 场景 B：项目级协作
 多个 Agent 围绕同一项目目标分工协作。研究结果、关键结论、工具调用记录和输出文件能沿着同一 episode 主线串起来。
 
 ### 场景 C：管理者视角
-管理者不进入每个 Agent 的对话框，而是在控制面看见项目进度、异常事件、关键决策、输出文件和访问记录，并能注入规则或要求审批。
+当一个人或小团队已经积累了很多 episode 时，需要从更高层回看项目进度、异常、关键决策和输出文件。
 
 ### 场景 D：Bring Your Own Agent
 团队继续使用已有 Agent，如 Claude Code、Codex、Gemini CLI、OpenCode。它们通过 MCP 或 adapter 把工作沉淀进统一的 Episode 体系，而不是迁移到全新 runtime。
+
+### 场景 E：Session Resume / Handoff
+昨天在 Claude 做到一半，今天换到 OpenCode 或 Gemini 继续做，不需要重新解释背景。Traceplane 会把当前目标、最近产物和关键步骤组织成可继续工作的 handoff brief。
 
 ## 6. MVP 范围
 
@@ -92,9 +101,7 @@ A shared data plane and control plane for enterprise AI agents, unifying memory,
 - Memory 写入与检索
 - Trace 持续追加与时间线回放
 - Artifact 创建、版本记录与回链
-- Policy 注入记录
-- Permission 授权
-- Audit 读写留痕
+- 自动 handoff brief
 - Episode 图谱查询
 - MCP v1 接入
 
@@ -103,8 +110,8 @@ A shared data plane and control plane for enterprise AI agents, unifying memory,
 2. 调用 `query_context` 获取当前工作上下文
 3. 运行过程写入 `trace_event` 和关键 `memory_item`
 4. 生成 `artifact`
-5. 推进 `episode status`
-6. 控制面可查看 episode 时间线、引用上下文、产物来源和审计记录
+5. 自动形成可交接的 `episode brief`
+6. 下一个 Agent 可以直接继续这条工作主线
 
 ### 6.3 明确不做
 - 不做完整 Web 办公套件
@@ -160,6 +167,9 @@ A shared data plane and control plane for enterprise AI agents, unifying memory,
 - 所有读取、写入、删除、导出、分享都生成审计事件。
 - 审计日志默认不可变更、可检索、可导出。
 
+### 7.5.1 第一层范围收敛
+虽然 schema 和系统层保留 Permission / Audit / Policy，但第一层对外主价值不以治理为入口，而以 continuity、handoff、replay 为入口。
+
 ### 7.6 主流 Agent 接入
 - 第一阶段产品定义为 `BYO Agent`
 - 对主流 Agent 的标准接入方式优先为 `MCP`
@@ -178,7 +188,7 @@ A shared data plane and control plane for enterprise AI agents, unifying memory,
 ## 9. 成功标准
 
 ### 9.1 北极星指标
-每个活跃项目中，平均有多少 Agent 在共享同一条数据主线工作。
+有多少次工作不是从零开始，而是沿着已有 Episode 继续推进。
 
 ### 9.2 过程指标
 - 每个 episode 的记忆复用次数
@@ -190,9 +200,9 @@ A shared data plane and control plane for enterprise AI agents, unifying memory,
 
 ### 9.3 MVP 验收
 - 一个项目内至少 2 个 Agent 能共享上下文工作
+- 下一个 Agent 能基于 brief 和上下文直接接上工作
 - 同一个输出文件可追溯到来源记忆和关键过程
-- 管理者能看到统一 episode 视图而不是多个孤立界面
-- 风险动作、访问行为和审批记录有完整证据链
+- 用户能回看统一 episode 视图而不是多个孤立界面
 
 ## 10. 产品策略上的一句硬判断
 如果这个系统最后只能把 memory 做得更强，那它不会形成企业级产品壁垒。
@@ -205,3 +215,5 @@ A shared data plane and control plane for enterprise AI agents, unifying memory,
 - 再决定是否做 `system of execution`
 - 先做 `MCP-first`
 - 再补 `skill` 作为 onboarding 和最佳实践层
+- 先做 `continuity-first`
+- 再逐步打开 `review / governance / managed runtime`

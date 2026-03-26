@@ -176,8 +176,8 @@ export default async function EpisodeReviewPage({
       tone: "audit" as const,
       detail:
         locale === "zh"
-          ? `这一层把 ${episode.auditSummary.permissionDeniedCount} 个 denial 和 ${episode.auditSummary.policyHitCount} 个 policy hit 组织成企业可读的治理证据链。`
-          : `This layer organizes ${episode.auditSummary.permissionDeniedCount} denials and ${episode.auditSummary.policyHitCount} policy hits into a governance-readable evidence chain.`
+          ? `这一层把 ${episode.auditSummary.permissionDeniedCount} 个 denial 和 ${episode.auditSummary.policyHitCount} 个 policy hit 收束成可回看的执行证据，让下一个 Agent 或使用者知道这条 spine 哪里需要小心。`
+          : `This layer turns ${episode.auditSummary.permissionDeniedCount} denials and ${episode.auditSummary.policyHitCount} policy hits into replayable execution evidence so the next agent knows where this spine needs caution.`
     }
   ];
 

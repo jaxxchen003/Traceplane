@@ -259,8 +259,8 @@ export default async function LocaleHome({
             </div>
             <p className="mt-4 text-sm leading-7 text-slate-300">
               {locale === "zh"
-                ? "正式产品的权威状态在云端工作平面中，本地目录只是同步投影和 agent 友好的 working copy。首页必须把这层运行时状态显式展示出来。"
-                : "The source of truth lives in the cloud work plane. Local files are projections and agent-friendly working copies, so the home surface must make that runtime posture explicit."}
+                ? "正式产品的权威状态在云端工作平面中，本地目录只是同步投影和 agent 友好的 working copy。这样一个 Agent 做完后，下一个 Agent 才能沿着同一条 spine 接着做。"
+                : "The source of truth lives in the cloud work plane. Local files are projections and agent-friendly working copies so the next agent can continue along the same spine."}
             </p>
 
             <div className="mt-4 rounded-[20px] border border-white/10 bg-black/20 px-4 py-4 text-sm leading-7 text-slate-300">
@@ -269,15 +269,15 @@ export default async function LocaleHome({
               </span>{" "}
               {runtimeSurface.runtime.cloud.deploymentStage === "cloud-active"
                 ? locale === "zh"
-                  ? "云端工作平面已经生效，数据库和对象存储都在远端运行。"
-                  : "The cloud work plane is active. Both database and object storage are running remotely."
+                  ? "云端工作平面已经生效，Episode、brief、artifact 和本地投影都可以围绕同一条远端主线工作。"
+                  : "The cloud work plane is active. Episodes, briefs, artifacts, and local projections are all anchored to one remote spine."
                 : runtimeSurface.runtime.cloud.deploymentStage === "cloud-configured"
                   ? locale === "zh"
-                    ? "云端凭证已经配置，但当前运行时还没有完全切到云端数据库 / 对象存储。"
-                    : "Cloud credentials are configured, but the active runtime has not fully cut over to cloud database / object storage yet."
+                    ? "云端凭证已经配置，但当前还没完全切到统一远端主线。"
+                    : "Cloud credentials are configured, but the app has not fully cut over to one remote spine yet."
                   : locale === "zh"
-                    ? "当前仍是 demo-local，运行主线还在本地。"
-                    : "The app is still running in demo-local mode, with the active spine stored locally."}
+                    ? "当前仍是 demo-local，工作主线还在本地，跨 Agent continuity 只能部分成立。"
+                    : "The app is still running in demo-local mode, so cross-agent continuity only works partially."}
             </div>
 
             {runtimeSurface.runtime.cloud.readiness.blockers.length > 0 ? (
@@ -413,13 +413,13 @@ export default async function LocaleHome({
           <div className="space-y-4 text-sm leading-7 text-slate-300">
             <p>
               {locale === "zh"
-                ? "这个首页不再把 Project 放在主舞台，而是先把需要处理的 Episode 放到最前。Project 仍然存在，但它退到价值归属和汇总视角。"
-                : "This home surface no longer puts projects at center stage. It promotes the episodes that need action, while projects remain the layer for value attribution and summary."}
+                ? "这个首页不再把 Project 放在主舞台，而是先把可以继续、交接和处理的 Episode 放到最前。Project 仍然存在，但它退到归属和汇总视角。"
+                : "This home surface no longer puts projects at center stage. It promotes the episodes that can be continued, handed off, and acted on, while projects remain the summary layer."}
             </p>
             <p>
               {locale === "zh"
-                ? "排序原则是：待处理 > 异常/阻塞 > 活跃工作 > 最近活动。"
-                : "The ranking principle is: needs attention > blocked and risk > active work > recent activity."}
+                ? "排序原则是：待处理 > 异常/阻塞 > 活跃工作 > 最近活动。第一层卖点不是治理，而是 continuity。"
+                : "The ranking principle is: needs attention > blocked and risk > active work > recent activity. The first-layer value is continuity, not governance."}
             </p>
           </div>
         </Panel>

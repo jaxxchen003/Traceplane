@@ -2,12 +2,9 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 
-import { PrismaClient } from "@prisma/client";
-
 import "./_lib/load-env.mjs";
 import { readArtifactBlob } from "./_lib/artifact-storage.mjs";
-
-const prisma = new PrismaClient();
+import { createRuntimePrismaClient } from "./_lib/cloud-database.mjs";
 
 function localize(value, locale) {
   if (!value || typeof value !== "object") return "";
@@ -71,6 +68,8 @@ async function resolveArtifactContent(artifact, locale) {
 }
 
 async function syncEpisodeWorkspace(episodeId, locale = "zh") {
+  const runtimeClient = await createRuntimePrismaClient();
+  const prisma = runtimeClient.prisma;
   const episode = await prisma.episode.findUnique({
     where: { id: episodeId },
     include: {
@@ -141,6 +140,11 @@ async function syncEpisodeWorkspace(episodeId, locale = "zh") {
     JSON.stringify(
       {
         product: "Traceplane",
+        runtime: {
+          sourceOfTruth: runtimeClient.sourceOfTruth,
+          provider: runtimeClient.provider,
+          databaseSource: runtimeClient.source
+        },
         episodeId: episode.id,
         title: localize(episode.titleI18n, locale),
         goal: localize(episode.goalI18n, locale),
@@ -168,10 +172,13 @@ async function syncEpisodeWorkspace(episodeId, locale = "zh") {
     "utf8"
   );
 
+  await prisma.$disconnect();
+
   return {
     root,
     artifactCount: writtenArtifacts.length,
-    traceCount: episode.traceEvents.length
+    traceCount: episode.traceEvents.length,
+    runtime: runtimeClient
   };
 }
 
@@ -192,7 +199,12 @@ async function main() {
         locale,
         syncRoot: result.root,
         artifactCount: result.artifactCount,
-        traceCount: result.traceCount
+        traceCount: result.traceCount,
+        runtime: {
+          sourceOfTruth: result.runtime.sourceOfTruth,
+          provider: result.runtime.provider,
+          databaseSource: result.runtime.source
+        }
       },
       null,
       2
@@ -213,7 +225,4 @@ main()
       )
     );
     process.exitCode = 1;
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
   });

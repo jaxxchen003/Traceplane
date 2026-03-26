@@ -153,6 +153,14 @@ export async function projectEpisodeToLocalWorkspace({
     JSON.stringify(
       {
         product: "Traceplane",
+        runtime: {
+          sourceOfTruth: getRuntimeConfig().database.provider === "postgres" ? "cloud" : "local",
+          databaseProvider: getRuntimeConfig().database.provider,
+          databaseSource: getRuntimeConfig().database.source,
+          objectStorageProvider: getRuntimeConfig().objectStorage.provider,
+          deploymentStage: getRuntimeConfig().cloud.deploymentStage,
+          syncRootPath: getRuntimeConfig().syncRootPath
+        },
         episodeId: episode.id,
         projectId: episode.projectId,
         workspaceSlug: episode.project.workspace.slug,
@@ -167,6 +175,25 @@ export async function projectEpisodeToLocalWorkspace({
         policyVersion: episode.policyVersion,
         artifactCount: episode.artifacts.length,
         traceCount: episode.traceEvents.length,
+        projectedAt: new Date().toISOString()
+      },
+      null,
+      2
+    ),
+    "utf8"
+  );
+
+  await fs.writeFile(
+    path.join(workspacePath, "traceplane.runtime.json"),
+    JSON.stringify(
+      {
+        product: "Traceplane",
+        sourceOfTruth: getRuntimeConfig().database.provider === "postgres" ? "cloud" : "local",
+        databaseProvider: getRuntimeConfig().database.provider,
+        databaseSource: getRuntimeConfig().database.source,
+        objectStorageProvider: getRuntimeConfig().objectStorage.provider,
+        deploymentStage: getRuntimeConfig().cloud.deploymentStage,
+        syncRootPath: getRuntimeConfig().syncRootPath,
         projectedAt: new Date().toISOString()
       },
       null,
