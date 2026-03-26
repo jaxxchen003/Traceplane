@@ -14,6 +14,7 @@ type Dictionary = {
   nav: {
     dashboard: string;
     projects: string;
+    connect: string;
     audit: string;
   };
   common: {
@@ -149,7 +150,7 @@ type Dictionary = {
 
 export const dictionary: Record<Locale, Dictionary> = {
   zh: {
-    nav: { dashboard: "总览", projects: "项目", audit: "审计" },
+    nav: { dashboard: "总览", projects: "项目", connect: "接入", audit: "审计" },
     common: {
       workspace: "工作区",
       search: "搜索",
@@ -298,7 +299,7 @@ export const dictionary: Record<Locale, Dictionary> = {
     }
   },
   en: {
-    nav: { dashboard: "Overview", projects: "Projects", audit: "Audit" },
+    nav: { dashboard: "Overview", projects: "Projects", connect: "Connect", audit: "Audit" },
     common: {
       workspace: "Workspace",
       search: "Search",

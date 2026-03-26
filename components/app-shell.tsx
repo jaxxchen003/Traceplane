@@ -56,6 +56,12 @@ export function AppShell({
               {dict.nav.projects}
             </Link>
             <Link
+              href={`/${locale}/connect`}
+              className="block rounded-[22px] border border-amber-400/25 bg-amber-400/10 px-4 py-3 text-sm text-amber-50 transition hover:border-amber-300/40 hover:bg-amber-400/14"
+            >
+              {dict.nav.connect}
+            </Link>
+            <Link
               href={`/${locale}/audit`}
               className="block rounded-[22px] border border-white/8 bg-white/4 px-4 py-3 text-sm text-slate-200 transition hover:border-white/14 hover:bg-white/8"
             >
