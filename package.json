@@ -29,11 +29,13 @@
     "claude:hook:test": "node scripts/test-claude-hook-bridge.mjs",
     "lint": "eslint .",
     "ci": "npm run lint && npm run build",
-    "db:generate": "prisma generate",
+    "db:generate": "prisma generate && prisma generate --schema prisma/schema.postgres.prisma",
     "db:push": "prisma db push",
     "db:seed": "node prisma/seed.mjs",
     "db:setup": "prisma db push && node prisma/seed.mjs",
-    "db:cloud:push": "node scripts/db-cloud-push.mjs"
+    "db:cloud:generate": "prisma generate --schema prisma/schema.postgres.prisma",
+    "db:cloud:push": "node scripts/db-cloud-push.mjs",
+    "db:cloud:seed": "node prisma/seed-cloud.mjs"
   },
   "keywords": [],
   "author": "",

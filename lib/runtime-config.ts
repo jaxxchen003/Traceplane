@@ -78,13 +78,15 @@ function assessCloudReadiness(env: NodeJS.ProcessEnv): CloudReadiness {
 function detectDeploymentStage({
   cloudReady,
   databaseProvider,
-  objectStorageProvider
+  objectStorageProvider,
+  cloudDbActive
 }: {
   cloudReady: boolean;
   databaseProvider: string;
   objectStorageProvider: string;
+  cloudDbActive: boolean;
 }) {
-  if (cloudReady && databaseProvider === "postgres" && objectStorageProvider === "r2") {
+  if (cloudReady && cloudDbActive && databaseProvider === "postgres" && objectStorageProvider === "r2") {
     return "cloud-active";
   }
 
@@ -97,12 +99,21 @@ function detectDeploymentStage({
 
 export function getRuntimeConfig() {
   const env = getEnv();
-  const databaseUrl = env["DATABASE_URL"] || env["SUPABASE_DB_URL"] || "";
-  const databaseSource = hasValue(env["DATABASE_URL"])
-    ? "DATABASE_URL"
-    : hasValue(env["SUPABASE_DB_URL"])
+  const cloudDbActive = env["TRACEPLANE_CLOUD_DB_ACTIVE"] === "true";
+  const databaseUrl = cloudDbActive
+    ? env["SUPABASE_DB_URL"] || env["DATABASE_URL"] || ""
+    : env["DATABASE_URL"] || env["SUPABASE_DB_URL"] || "";
+  const databaseSource = cloudDbActive
+    ? hasValue(env["SUPABASE_DB_URL"])
       ? "SUPABASE_DB_URL"
-      : "none";
+      : hasValue(env["DATABASE_URL"])
+        ? "DATABASE_URL"
+        : "none"
+    : hasValue(env["DATABASE_URL"])
+      ? "DATABASE_URL"
+      : hasValue(env["SUPABASE_DB_URL"])
+        ? "SUPABASE_DB_URL"
+        : "none";
   const appBaseUrl = normalizeAppBaseUrl(env["APP_BASE_URL"]);
   const cloud = assessCloudReadiness(env as NodeJS.ProcessEnv);
   const objectStorageConfigured =
@@ -115,7 +126,8 @@ export function getRuntimeConfig() {
   const deploymentStage = detectDeploymentStage({
     cloudReady: cloud.ready,
     databaseProvider,
-    objectStorageProvider
+    objectStorageProvider,
+    cloudDbActive
   });
 
   return {
@@ -141,6 +153,7 @@ export function getRuntimeConfig() {
     cloud: {
       mode: cloud.ready ? "cloud-ready" : "demo-local",
       deploymentStage,
+      databaseActive: cloudDbActive,
       readiness: cloud
     },
     appBaseUrl,

@@ -10,6 +10,7 @@ const rootDir = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const prismaCli = resolve(rootDir, "node_modules", "prisma", "build", "index.js");
 const nextCli = resolve(rootDir, "node_modules", "next", "dist", "bin", "next");
 const standaloneServer = resolve(rootDir, ".next", "standalone", "server.js");
+const postgresSchema = resolve(rootDir, "prisma", "schema.postgres.prisma");
 
 function runNodeScript(scriptPath, args, env = process.env) {
   return new Promise((resolvePromise, rejectPromise) => {
@@ -66,7 +67,42 @@ async function repairLegacySqliteData(databaseUrl) {
   }
 }
 
+async function ensureCloudDatabaseReady() {
+  const cloudEnv = {
+    ...process.env,
+    SUPABASE_DB_URL: process.env.SUPABASE_DB_URL
+  };
+
+  console.log("[traceplane] ensuring cloud postgres schema");
+  await runNodeScript(prismaCli, ["db", "push", "--schema", postgresSchema, "--skip-generate"], cloudEnv);
+  console.log("[traceplane] cloud postgres schema push complete");
+
+  const { PrismaClient: CloudPrismaClient } = await import("../generated/prisma-cloud/index.js");
+  const prisma = new CloudPrismaClient();
+
+  try {
+    const workspaceCount = await prisma.workspace.count();
+    if (workspaceCount === 0) {
+      console.log("[traceplane] seeding cloud postgres demo data");
+      await runNodeScript(resolve(rootDir, "prisma", "seed-cloud.mjs"), [], cloudEnv);
+      console.log("[traceplane] cloud postgres seed complete");
+    }
+  } finally {
+    await prisma.$disconnect();
+  }
+
+  return cloudEnv;
+}
+
 async function ensureDatabaseReady() {
+  const cloudDbActive =
+    process.env.TRACEPLANE_CLOUD_DB_ACTIVE === "true" &&
+    Boolean(process.env.SUPABASE_DB_URL);
+
+  if (cloudDbActive) {
+    return ensureCloudDatabaseReady();
+  }
+
   const databaseUrl = process.env.DATABASE_URL ?? "file:./dev.db";
   const normalizedDatabaseUrl = normalizeDatabaseUrl(databaseUrl);
   const forceReset = process.env.DEMO_RESET_ENABLED === "true";
