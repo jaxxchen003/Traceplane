@@ -32,7 +32,8 @@
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:seed": "node prisma/seed.mjs",
-    "db:setup": "prisma db push && node prisma/seed.mjs"
+    "db:setup": "prisma db push && node prisma/seed.mjs",
+    "db:cloud:push": "node scripts/db-cloud-push.mjs"
   },
   "keywords": [],
   "author": "",

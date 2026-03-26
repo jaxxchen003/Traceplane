@@ -1,0 +1,306 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("SUPABASE_DB_URL")
+}
+
+enum ProjectStatus {
+  ACTIVE
+  AT_RISK
+  PILOT
+}
+
+enum EpisodeStatus {
+  PLANNED
+  IN_PROGRESS
+  BLOCKED
+  IN_REVIEW
+  COMPLETED
+  FAILED
+}
+
+enum WorkType {
+  RESEARCH
+  GENERATE
+  REVIEW
+  REVISE
+  APPROVE
+  SUMMARIZE
+}
+
+enum ReviewOutcome {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum MemoryType {
+  SEMANTIC
+  EPISODIC
+  PROCEDURAL
+}
+
+enum TraceStatus {
+  SUCCESS
+  WARNING
+  FAILED
+}
+
+enum FileType {
+  MARKDOWN
+  JSON
+  CSV
+  HTML
+  SVG
+  PDF
+  SCRIPT
+  IMAGE
+}
+
+enum EdgeType {
+  BELONGS_TO
+  USED_IN
+  GENERATED_FROM
+  APPROVED_BY
+  DEPENDS_ON
+  REVIEWS
+  CONTINUES
+  SPLITS_FROM
+  RESTRICTED_BY
+  SHARED_WITH
+  SUPERSEDES
+  REFERENCES
+}
+
+model Workspace {
+  id          String       @id @default(cuid())
+  name        String
+  slug        String       @unique
+  ownerId     String
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  projects    Project[]
+  policies    Policy[]
+  auditEvents AuditEvent[]
+}
+
+model Project {
+  id                  String        @id @default(cuid())
+  workspaceId         String
+  slug                String        @unique
+  nameI18n            Json
+  descriptionI18n     Json?
+  status              ProjectStatus @default(ACTIVE)
+  ownerName           String
+  activePolicyVersion String
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+  workspace           Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  episodes            Episode[]
+  projectAgents       ProjectAgent[]
+  policies            Policy[]
+  accessGrants        AccessGrant[]
+  auditEvents         AuditEvent[]
+}
+
+model Agent {
+  id             String         @id @default(cuid())
+  slug           String         @unique
+  name           String
+  roleI18n       Json
+  ownerName      String
+  capabilities   Json
+  lastActiveAt   DateTime?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  primaryEpisodes Episode[]     @relation("PrimaryAgentEpisodes")
+  episodeAgents  EpisodeAgent[]
+  projectAgents  ProjectAgent[]
+  memoryItems    MemoryItem[]
+  traceEvents    TraceEvent[]
+  artifacts      Artifact[]
+}
+
+model ProjectAgent {
+  projectId String
+  agentId   String
+  createdAt DateTime @default(now())
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  agent     Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@id([projectId, agentId])
+}
+
+model Episode {
+  id               String         @id @default(cuid())
+  projectId        String
+  primaryAgentId   String
+  parentEpisodeId  String?
+  titleI18n        Json
+  summaryI18n      Json?
+  goalI18n         Json?
+  successCriteriaI18n Json?
+  finalOutcomeI18n Json?
+  primaryActor     String?
+  workType         WorkType       @default(GENERATE)
+  relationIntent   EdgeType?
+  status           EpisodeStatus
+  blockedReasonI18n Json?
+  failureReasonI18n Json?
+  reviewOutcome    ReviewOutcome?
+  policyVersion    String
+  startedAt        DateTime
+  endedAt          DateTime?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  project          Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  primaryAgent     Agent          @relation("PrimaryAgentEpisodes", fields: [primaryAgentId], references: [id], onDelete: Cascade)
+  parentEpisode    Episode?       @relation("EpisodeToEpisode", fields: [parentEpisodeId], references: [id], onDelete: SetNull)
+  childEpisodes    Episode[]      @relation("EpisodeToEpisode")
+  episodeAgents    EpisodeAgent[]
+  memoryItems      MemoryItem[]
+  traceEvents      TraceEvent[]
+  artifacts        Artifact[]
+  auditEvents      AuditEvent[]
+  accessGrants     AccessGrant[]
+}
+
+model EpisodeAgent {
+  episodeId String
+  agentId   String
+  createdAt DateTime @default(now())
+  episode   Episode  @relation(fields: [episodeId], references: [id], onDelete: Cascade)
+  agent     Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@id([episodeId, agentId])
+}
+
+model MemoryItem {
+  id           String     @id @default(cuid())
+  episodeId    String
+  agentId      String?
+  titleI18n    Json
+  contentI18n  Json
+  type         MemoryType
+  source       String
+  importance   Int
+  sensitivity  String
+  ttlDays      Int?
+  createdAt    DateTime   @default(now())
+  episode      Episode    @relation(fields: [episodeId], references: [id], onDelete: Cascade)
+  agent        Agent?     @relation(fields: [agentId], references: [id], onDelete: SetNull)
+  auditEvents  AuditEvent[]
+}
+
+model TraceEvent {
+  id                     String       @id @default(cuid())
+  episodeId              String
+  actorAgentId           String?
+  stepIndex              Int
+  eventType              String
+  toolName               String?
+  stepTitleI18n          Json
+  status                 TraceStatus
+  shortResultI18n        Json
+  inputSummaryI18n       Json?
+  decisionSummaryI18n    Json?
+  toolPayloadSummaryI18n Json?
+  resultSummaryI18n      Json?
+  errorSummaryI18n       Json?
+  policyHitReasonI18n    Json?
+  permissionDeniedI18n   Json?
+  eventTime              DateTime
+  createdAt              DateTime     @default(now())
+  episode                Episode      @relation(fields: [episodeId], references: [id], onDelete: Cascade)
+  actorAgent             Agent?       @relation(fields: [actorAgentId], references: [id], onDelete: SetNull)
+  sourceArtifacts        Artifact[]   @relation("SourceTraceEvent")
+  auditEvents            AuditEvent[]
+}
+
+model Artifact {
+  id               String      @id @default(cuid())
+  episodeId        String
+  createdByAgentId String
+  sourceTraceEventId String?
+  artifactKey      String
+  titleI18n        Json
+  contentI18n      Json?
+  fileType         FileType
+  version          Int
+  uri              String?
+  sensitivity      String
+  shareScope       String
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+  episode          Episode     @relation(fields: [episodeId], references: [id], onDelete: Cascade)
+  createdByAgent   Agent       @relation(fields: [createdByAgentId], references: [id], onDelete: Cascade)
+  sourceTraceEvent TraceEvent? @relation("SourceTraceEvent", fields: [sourceTraceEventId], references: [id], onDelete: SetNull)
+  auditEvents      AuditEvent[]
+
+  @@unique([artifactKey, version])
+}
+
+model Policy {
+  id          String    @id @default(cuid())
+  workspaceId String
+  projectId   String?
+  name        String
+  version     String
+  rulesJson   Json
+  createdAt   DateTime  @default(now())
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  project     Project?  @relation(fields: [projectId], references: [id], onDelete: SetNull)
+}
+
+model AccessGrant {
+  id          String    @id @default(cuid())
+  projectId   String?
+  episodeId   String?
+  subjectType String
+  subjectId   String
+  scopeType   String
+  effect      String
+  createdAt   DateTime  @default(now())
+  project     Project?  @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  episode     Episode?  @relation(fields: [episodeId], references: [id], onDelete: SetNull)
+}
+
+model AuditEvent {
+  id                 String     @id @default(cuid())
+  workspaceId        String
+  projectId          String?
+  episodeId          String?
+  artifactId         String?
+  traceEventId       String?
+  memoryItemId       String?
+  occurredAt         DateTime
+  actorType          String
+  actorId            String
+  action             String
+  targetType         String
+  targetId           String
+  result             String
+  policyVersion      String?
+  policyHitReasonI18n Json?
+  permissionDecision String?
+  denyReasonI18n     Json?
+  workspace          Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  project            Project?   @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  episode            Episode?   @relation(fields: [episodeId], references: [id], onDelete: SetNull)
+  artifact           Artifact?  @relation(fields: [artifactId], references: [id], onDelete: SetNull)
+  traceEvent         TraceEvent? @relation(fields: [traceEventId], references: [id], onDelete: SetNull)
+  memoryItem         MemoryItem? @relation(fields: [memoryItemId], references: [id], onDelete: SetNull)
+}
+
+model NodeEdge {
+  id           String   @id @default(cuid())
+  fromNodeType String
+  fromNodeId   String
+  toNodeType   String
+  toNodeId     String
+  edgeType     EdgeType
+  createdAt    DateTime @default(now())
+}

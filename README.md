@@ -246,6 +246,11 @@ npm run cloud:verify:supabase
 npm run cloud:verify:r2
 ```
 
+把云端 Postgres schema 推到 Supabase：
+```bash
+npm run db:cloud:push
+```
+
 把某个 Episode 投影到本地同步工作区：
 ```bash
 npm run workspace:sync -- <episodeId> zh
@@ -253,6 +258,9 @@ npm run workspace:sync -- <episodeId> zh
 
 默认会写到：
 - `~/Traceplane/{workspace}/{project}/{episode}/...`
+
+进一步的切库路径见：
+- [postgres-cutover-plan.md](/Users/jaxxchen/projects/enterprise-agent-work-graph/docs/postgres-cutover-plan.md)
 
 健康检查接口现在会返回当前 runtime 是否已经 `cloud-ready`：
 

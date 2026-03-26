@@ -7,47 +7,61 @@
 ## 当前已经有的
 
 - `SUPABASE_PROJECT_URL`
+- `SUPABASE_DB_URL`
 - `SUPABASE_SECRET_KEY`
 - `SUPABASE_ANON_KEY`
 - `CLOUDFLARE_ACCOUNT_ID`
 - `R2_BUCKET`
 - `R2_ENDPOINT`
+- `R2_ACCESS_KEY_ID`
+- `R2_SECRET_ACCESS_KEY`
 - `APP_BASE_URL`
 - `DEFAULT_REGION`
 - `SYNC_ROOT_PATH`
 
-## 当前还缺的两个硬阻塞
+## 当前已验证通过
 
-### 1. 真正可用的 Supabase Postgres 连接串
-你现在给的：
+### 1. 本地云端配置完整性
+下面这些检查已经可以在本地通过：
 
-`SUPABASE_DB_URL=postgresql://postgres:[YOUR-PASSWORD]@...`
-
-这里的数据库密码还是占位符，所以当前还不能真正连云数据库。
-
-你需要补：
-
-- 实际数据库密码
-- 最终可用的 `DATABASE_URL` 或 `SUPABASE_DB_URL`
-
-建议直接在本地 `.env.local` 里写：
-
-```env
-DATABASE_URL=postgresql://postgres:REAL_PASSWORD@db.xxx.supabase.co:5432/postgres
+```bash
+npm run cloud:verify
 ```
 
-## 2. 真正可用的 R2 Access Key / Secret
-你现在给的：
+### 2. R2 连接
+R2 凭证和 endpoint 已经验证通过：
 
-- `R2_ACCESS_KEY_ID=https://...r2.cloudflarestorage.com`
-- `R2_SECRET_ACCESS_KEY=https://...r2.cloudflarestorage.com`
+```bash
+npm run cloud:verify:r2
+```
 
-这两个现在还是 endpoint，不是 R2 凭证。
+### 3. 云端 Postgres schema 命令路径
+仓库已经有：
 
-你真正需要的是：
+```bash
+npm run db:cloud:push
+```
 
-- `R2_ACCESS_KEY_ID=<Cloudflare R2 Access Key ID>`
-- `R2_SECRET_ACCESS_KEY=<Cloudflare R2 Secret Access Key>`
+这条命令现在会真正尝试用 `prisma/schema.postgres.prisma` 连 `SUPABASE_DB_URL`。
+
+## 当前剩余的硬阻塞
+
+### Supabase Postgres 连接性
+当前已经不是配置缺失，而是：
+
+- 本机 / 当前执行环境无法真正连上 `db.jtwbhglweyebzyvkyasr.supabase.co:5432`
+
+现象是：
+
+- `npm run db:cloud:push`
+- `npm run cloud:verify:supabase`
+
+都会落到数据库 reachability 错误，而不是变量缺失错误。
+
+也就是说，现在剩下的问题是：
+
+- 网络 / DNS / 可达性
+- 或 Supabase 连接入口本身需要调整
 
 ## 推荐最终本地配置
 
@@ -69,10 +83,6 @@ SYNC_ROOT_PATH=~/Traceplane
 ```
 
 ## 当前建议
-
-### 先补这两个值
-1. `DATABASE_URL` 的真实密码
-2. `R2_ACCESS_KEY_ID / R2_SECRET_ACCESS_KEY` 的真实凭证
 
 ### 然后我会继续做
 1. 从 SQLite 切到 Postgres
