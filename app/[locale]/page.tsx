@@ -130,7 +130,7 @@ function EpisodeList({
                     <span>{item.primaryActor}</span>
                     <span>{projectLabel}: {item.projectName}</span>
                     <span>{item.artifactCount} artifacts</span>
-                    <span>{item.handoffReady ? "handoff-ready" : "live-spine"}</span>
+                    <span>{item.handoffReady ? (locale === "zh" ? "可交接" : "handoff-ready") : (locale === "zh" ? "继续中" : "live-spine")}</span>
                   </div>
                 </div>
                 <div className="min-w-[220px] space-y-3 text-sm text-slate-300">

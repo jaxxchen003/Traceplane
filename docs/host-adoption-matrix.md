@@ -34,7 +34,7 @@ Agent 能直接调用 Traceplane 的 v1 工具：
 | Claude Code | Yes | Yes | Yes | Planned | 已有 `.mcp.json` + hooks + bridge + verify |
 | OpenCode | Yes | Yes | Partial | Yes | 已有本地 MCP 配置、verify、export normalize/import |
 | Gemini CLI | Yes | Yes | Planned | Planned | 已有 quickstart、setup、verify 和 MCP config |
-| Codex | Planned | Planned | Planned | Planned | 保持 MCP-first，等待更稳的 host 接入层 |
+| Codex | Yes | Partial | No | Planned | 当前以 MCP + skills 为主，深 trace 更适合未来走 API / Agents SDK |
 | OpenClaw | Planned | Planned | Planned | Planned | 更像 gateway/runtime 集成对象 |
 
 ## 结论
@@ -61,8 +61,13 @@ Agent 能直接调用 Traceplane 的 v1 工具：
 - Gemini CLI
 
 ### 暂缓深入
-- Codex
 - OpenClaw
+
+Codex 当前不是放弃，而是按更现实的层级推进：
+
+- 现在做 MCP + skills
+- 不把它误讲成 Claude hooks 同等级 capture
+- 未来如果要拿完整过程数据，更适合走 OpenAI API / Agents SDK
 
 不是因为它们不重要，而是因为当前阶段更重要的是先验证：
 

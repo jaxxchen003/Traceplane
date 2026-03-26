@@ -331,7 +331,8 @@ export async function getEpisodeCommandCenter(locale: Locale) {
         episode.handoffReady &&
         episode.status !== "BLOCKED" &&
         episode.status !== "FAILED" &&
-        episode.permissionDeniedCount === 0
+        episode.permissionDeniedCount === 0 &&
+        episode.policyHitCount === 0
     )
     .sort((a, b) => continueScore(b) - continueScore(a) || b.updatedAt.getTime() - a.updatedAt.getTime());
 
@@ -510,6 +511,14 @@ export async function getConnectSurfaceSummary() {
         status: "prepared",
         levels: ["MCP", "Verify"],
         latestSignal: "Setup and verification commands available"
+      },
+      {
+        id: "codex",
+        name: "Codex",
+        stage: "MCP+Skills",
+        status: "scoped",
+        levels: ["MCP", "Skills", "API trace"],
+        latestSignal: "MCP path is viable; full local capture still requires runtime-side integration"
       }
     ]
   };

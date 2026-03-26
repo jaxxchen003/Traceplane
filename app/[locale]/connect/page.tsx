@@ -43,6 +43,15 @@ export default async function ConnectPage({
       verify: "npm run gemini:verify",
       quickstart: "docs/gemini-quickstart.md",
       tone: "trace" as const
+    },
+    {
+      id: "codex",
+      name: "Codex",
+      level: ["MCP", "Skills", "API trace"],
+      setup: "Manual setup · docs/codex-integration.md",
+      verify: "Check Traceplane MCP tools inside Codex",
+      quickstart: "docs/codex-integration.md",
+      tone: "policy" as const
     }
   ];
   const nodes = [
@@ -77,16 +86,25 @@ export default async function ConnectPage({
       id: "gemini-host",
       label: "Gemini CLI",
       meta: locale === "zh" ? "MCP + setup verify" : "MCP + setup verify",
-      x: 36,
+      x: 30,
       y: 74,
       z: 0.58,
       tone: "trace" as const
     },
     {
+      id: "codex-host",
+      label: "Codex",
+      meta: locale === "zh" ? "MCP + skills + API trace" : "MCP + skills + API trace",
+      x: 54,
+      y: 78,
+      z: 0.54,
+      tone: "policy" as const
+    },
+    {
       id: "episode-spine",
       label: locale === "zh" ? "Episode Spine" : "Episode Spine",
       meta: locale === "zh" ? "输入、过程、产物、治理" : "Input, process, outputs, governance",
-      x: 64,
+      x: 76,
       y: 74,
       z: 0.5,
       tone: "audit" as const
@@ -96,6 +114,7 @@ export default async function ConnectPage({
     { from: "claude-host", to: "traceplane-core", emphasis: "strong" as const },
     { from: "opencode-host", to: "traceplane-core", emphasis: "strong" as const },
     { from: "gemini-host", to: "traceplane-core", emphasis: "soft" as const },
+    { from: "codex-host", to: "traceplane-core", emphasis: "soft" as const },
     { from: "traceplane-core", to: "episode-spine", emphasis: "strong" as const }
   ];
 
@@ -105,8 +124,8 @@ export default async function ConnectPage({
         title={locale === "zh" ? "Connect Traceplane" : "Connect Traceplane"}
         subtitle={
           locale === "zh"
-            ? "第一阶段不要替换用户已有 Agent，而是先把 Claude Code、OpenCode、Gemini CLI 的工作证据链接入同一条 Episode 主线。"
-            : "Do not replace existing agents in phase one. Connect Claude Code, OpenCode, and Gemini CLI into the same episode spine first."
+            ? "第一阶段不要替换用户已有 Agent，而是先把 Claude Code、OpenCode、Gemini CLI 和 Codex 的工作证据链接入同一条 Episode 主线。"
+            : "Do not replace existing agents in phase one. Connect Claude Code, OpenCode, Gemini CLI, and Codex into the same episode spine first."
         }
         nodes={nodes}
         edges={edges}
