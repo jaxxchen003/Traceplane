@@ -70,7 +70,8 @@ async function repairLegacySqliteData(databaseUrl) {
 async function ensureCloudDatabaseReady() {
   const cloudEnv = {
     ...process.env,
-    SUPABASE_DB_URL: process.env.SUPABASE_DB_URL
+    SUPABASE_DB_URL: process.env.SUPABASE_DB_URL,
+    TRACEPLANE_CLOUD_DB_RUNTIME: "active"
   };
 
   console.log("[traceplane] ensuring cloud postgres schema");
@@ -102,7 +103,12 @@ async function ensureDatabaseReady() {
   console.log(`[traceplane] cloud db active flag: ${cloudDbActive ? "on" : "off"}`);
 
   if (cloudDbActive) {
-    return ensureCloudDatabaseReady();
+    try {
+      return await ensureCloudDatabaseReady();
+    } catch (error) {
+      console.warn("[traceplane] cloud postgres activation failed, falling back to sqlite");
+      console.warn(error instanceof Error ? error.message : error);
+    }
   }
 
   const databaseUrl = process.env.DATABASE_URL ?? "file:./dev.db";
@@ -113,7 +119,8 @@ async function ensureDatabaseReady() {
   const isSqlite = normalizedDatabaseUrl.startsWith("file:");
   const runtimeEnv = {
     ...process.env,
-    DATABASE_URL: normalizedDatabaseUrl
+    DATABASE_URL: normalizedDatabaseUrl,
+    TRACEPLANE_CLOUD_DB_RUNTIME: cloudDbActive ? "fallback" : "local"
   };
 
   if (isSqlite) {

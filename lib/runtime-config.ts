@@ -99,7 +99,9 @@ function detectDeploymentStage({
 
 export function getRuntimeConfig() {
   const env = getEnv();
-  const cloudDbActive = env["TRACEPLANE_CLOUD_DB_ACTIVE"] === "true";
+  const cloudDbRequested = env["TRACEPLANE_CLOUD_DB_ACTIVE"] === "true";
+  const cloudDbRuntime = env["TRACEPLANE_CLOUD_DB_RUNTIME"] || (cloudDbRequested ? "requested" : "local");
+  const cloudDbActive = cloudDbRuntime === "active";
   const databaseUrl = cloudDbActive
     ? env["SUPABASE_DB_URL"] || env["DATABASE_URL"] || ""
     : env["DATABASE_URL"] || env["SUPABASE_DB_URL"] || "";
@@ -154,6 +156,8 @@ export function getRuntimeConfig() {
       mode: cloud.ready ? "cloud-ready" : "demo-local",
       deploymentStage,
       databaseActive: cloudDbActive,
+      databaseRequested: cloudDbRequested,
+      databaseRuntimeState: cloudDbRuntime,
       readiness: cloud
     },
     appBaseUrl,

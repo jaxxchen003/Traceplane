@@ -24,6 +24,7 @@ if (process.env.NODE_ENV !== "production") {
 
 const useCloudDatabase =
   getEnvFlag("TRACEPLANE_CLOUD_DB_ACTIVE") === "true" &&
+  getEnvFlag("TRACEPLANE_CLOUD_DB_RUNTIME") === "active" &&
   Boolean(getEnvFlag("SUPABASE_DB_URL"));
 
 function getCloudPrisma() {
