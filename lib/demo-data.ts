@@ -213,6 +213,53 @@ function summarizeEpisodeForCommandCenter(
 ) {
   const permissionDeniedCount = episode.auditEvents.filter((event: AuditRecord) => event.permissionDecision === "deny").length;
   const policyHitCount = episode.auditEvents.filter((event: AuditRecord) => event.policyHitReasonI18n).length;
+  const handoffReady =
+    episode.status === "COMPLETED" ||
+    episode.status === "IN_REVIEW" ||
+    (episode.status === "IN_PROGRESS" && episode.artifacts.length > 0);
+
+  let nextMove =
+    locale === "zh"
+      ? "把这条主线继续交给当前执行 Agent。"
+      : "Continue this spine with the current execution agent.";
+
+  if (episode.status === "IN_REVIEW") {
+    nextMove =
+      locale === "zh"
+        ? "把最新产物和 brief 交给下一位 Agent 或人工 reviewer。"
+        : "Hand the latest artifact and brief to the next agent or a human reviewer.";
+  } else if (episode.status === "COMPLETED") {
+    nextMove =
+      locale === "zh"
+        ? "直接从现有产物继续，而不是重新解释背景。"
+        : "Continue from the current artifacts instead of re-explaining the context.";
+  } else if (episode.status === "BLOCKED") {
+    nextMove =
+      locale === "zh"
+        ? "先修复缺失上下文、权限或依赖，再恢复同一条主线。"
+        : "Repair the missing context, permission, or dependency before resuming the same spine.";
+  } else if (episode.status === "FAILED") {
+    nextMove =
+      locale === "zh"
+        ? "先判断是重试、替代，还是从当前失败点拆出新主线。"
+        : "Decide whether to retry, supersede, or split a new spine from the failure point.";
+  } else if (episode.status === "PLANNED") {
+    nextMove =
+      locale === "zh"
+        ? "这条主线已经定义好了目标，下一位 Agent 可以直接开工。"
+        : "The goal is already defined, so the next agent can start immediately.";
+  }
+
+  let queueHint =
+    locale === "zh"
+      ? "继续这条主线"
+      : "Continue this spine";
+
+  if (episode.status === "BLOCKED" || episode.status === "FAILED" || permissionDeniedCount > 0 || policyHitCount > 0) {
+    queueHint = locale === "zh" ? "先修复再接力" : "Repair before handoff";
+  } else if (episode.status === "IN_PROGRESS" || episode.status === "PLANNED") {
+    queueHint = locale === "zh" ? "保持接力进行中" : "Keep the handoff live";
+  }
 
   return {
     id: episode.id,
@@ -231,17 +278,36 @@ function summarizeEpisodeForCommandCenter(
     reviewOutcome: episode.reviewOutcome,
     artifactCount: episode.artifacts.length,
     permissionDeniedCount,
-    policyHitCount
+    policyHitCount,
+    handoffReady,
+    nextMove,
+    queueHint
   };
 }
 
-function attentionScore(episode: ReturnType<typeof summarizeEpisodeForCommandCenter>) {
+function continueScore(episode: ReturnType<typeof summarizeEpisodeForCommandCenter>) {
   let score = 0;
-  if (episode.status === "IN_REVIEW") score += 60;
-  if (episode.status === "BLOCKED") score += 55;
-  if (episode.reviewOutcome === "PENDING") score += 35;
-  score += episode.permissionDeniedCount * 10;
-  score += episode.policyHitCount * 6;
+  if (episode.status === "IN_REVIEW") score += 80;
+  if (episode.status === "COMPLETED") score += 65;
+  if (episode.reviewOutcome === "PENDING") score += 25;
+  score += episode.artifactCount * 6;
+  return score;
+}
+
+function repairScore(episode: ReturnType<typeof summarizeEpisodeForCommandCenter>) {
+  let score = 0;
+  if (episode.status === "FAILED") score += 75;
+  if (episode.status === "BLOCKED") score += 60;
+  score += episode.permissionDeniedCount * 14;
+  score += episode.policyHitCount * 10;
+  return score;
+}
+
+function liveHandoffScore(episode: ReturnType<typeof summarizeEpisodeForCommandCenter>) {
+  let score = 0;
+  if (episode.status === "IN_PROGRESS") score += 50;
+  if (episode.status === "PLANNED") score += 30;
+  score += episode.artifactCount * 4;
   return score;
 }
 
@@ -249,16 +315,7 @@ export async function getEpisodeCommandCenter(locale: Locale) {
   const episodes = await findEpisodesForCommandCenter();
   const summarized = episodes.map((episode) => summarizeEpisodeForCommandCenter(episode, locale));
 
-  const needsAttention = summarized
-    .filter(
-      (episode) =>
-        episode.status === "IN_REVIEW" ||
-        episode.status === "BLOCKED" ||
-        episode.reviewOutcome === "PENDING"
-    )
-    .sort((a, b) => attentionScore(b) - attentionScore(a) || b.updatedAt.getTime() - a.updatedAt.getTime());
-
-  const blockedRisk = summarized
+  const contextRepair = summarized
     .filter(
       (episode) =>
         episode.status === "BLOCKED" ||
@@ -266,17 +323,31 @@ export async function getEpisodeCommandCenter(locale: Locale) {
         episode.permissionDeniedCount > 0 ||
         episode.policyHitCount > 0
     )
-    .sort(
-      (a, b) =>
-        b.permissionDeniedCount + b.policyHitCount - (a.permissionDeniedCount + a.policyHitCount) ||
-        b.updatedAt.getTime() - a.updatedAt.getTime()
-    );
+    .sort((a, b) => repairScore(b) - repairScore(a) || b.updatedAt.getTime() - a.updatedAt.getTime());
 
-  const activeWork = summarized
-    .filter((episode) => episode.status === "IN_PROGRESS" || episode.status === "PLANNED")
-    .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
+  const readyToContinue = summarized
+    .filter(
+      (episode) =>
+        episode.handoffReady &&
+        episode.status !== "BLOCKED" &&
+        episode.status !== "FAILED" &&
+        episode.permissionDeniedCount === 0
+    )
+    .sort((a, b) => continueScore(b) - continueScore(a) || b.updatedAt.getTime() - a.updatedAt.getTime());
 
-  const recentActivity = [...summarized]
+  const repairIds = new Set(contextRepair.map((episode) => episode.id));
+  const continueIds = new Set(readyToContinue.map((episode) => episode.id));
+
+  const liveHandoffs = summarized
+    .filter(
+      (episode) =>
+        (episode.status === "IN_PROGRESS" || episode.status === "PLANNED") &&
+        !repairIds.has(episode.id) &&
+        !continueIds.has(episode.id)
+    )
+    .sort((a, b) => liveHandoffScore(b) - liveHandoffScore(a) || b.updatedAt.getTime() - a.updatedAt.getTime());
+
+  const recentSpines = [...summarized]
     .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())
     .slice(0, 6);
 
@@ -286,8 +357,8 @@ export async function getEpisodeCommandCenter(locale: Locale) {
       label: episode.title,
       meta:
         locale === "zh"
-          ? `${episode.projectName} · ${episode.workType}`
-          : `${episode.projectName} · ${episode.workType}`,
+          ? `${episode.projectName} · ${episode.queueHint}`
+          : `${episode.projectName} · ${episode.queueHint}`,
       x: [24, 53, 77, 35, 68][index] ?? 50,
       y: [24, 38, 30, 67, 72][index] ?? 50,
       z: 0.96 - index * 0.08,
@@ -295,11 +366,11 @@ export async function getEpisodeCommandCenter(locale: Locale) {
     },
     {
       id: `${episode.id}-artifact`,
-      label: locale === "zh" ? "Output Layer" : "Output Layer",
+      label: locale === "zh" ? "Handoff Brief" : "Handoff Brief",
       meta:
         locale === "zh"
-          ? `${episode.artifactCount} 个产物`
-          : `${episode.artifactCount} artifacts`,
+          ? `${episode.artifactCount} 个产物 · ${episode.handoffReady ? "可交接" : "继续中"}`
+          : `${episode.artifactCount} artifacts · ${episode.handoffReady ? "handoff-ready" : "still live"}`,
       x: [16, 44, 84, 28, 72][index] ?? 50,
       y: [48, 60, 54, 86, 88][index] ?? 68,
       z: 0.58 - index * 0.04,
@@ -310,20 +381,20 @@ export async function getEpisodeCommandCenter(locale: Locale) {
   const graphEdges = summarized.slice(0, 5).map((episode) => ({
     from: `${episode.id}-episode`,
     to: `${episode.id}-artifact`,
-    emphasis: episode.artifactCount > 0 ? ("strong" as const) : ("soft" as const)
+    emphasis: episode.handoffReady ? ("strong" as const) : ("soft" as const)
   }));
 
   return {
     stats: {
-      needsAttention: needsAttention.length,
-      blockedRisk: blockedRisk.length,
-      activeWork: activeWork.length,
-      recentActivity: recentActivity.length
+      readyToContinue: readyToContinue.length,
+      contextRepair: contextRepair.length,
+      liveHandoffs: liveHandoffs.length,
+      recentSpines: recentSpines.length
     },
-    needsAttention,
-    blockedRisk,
-    activeWork,
-    recentActivity,
+    readyToContinue,
+    contextRepair,
+    liveHandoffs,
+    recentSpines,
     graphNodes,
     graphEdges
   };

@@ -63,10 +63,10 @@ type Dictionary = {
   dashboard: {
     title: string;
     subtitle: string;
-    needsAttention: string;
-    blockedRisk: string;
-    activeWork: string;
-    recentActivity: string;
+    readyToContinue: string;
+    contextRepair: string;
+    liveHandoffs: string;
+    recentSpines: string;
     openEpisode: string;
     openProject: string;
     noItems: string;
@@ -197,10 +197,10 @@ export const dictionary: Record<Locale, Dictionary> = {
     dashboard: {
       title: "Multi-Agent Continuity Home",
       subtitle: "先看哪些工作可以继续、交接和回放，再看异常、活跃执行与最近变化。首页不是任务列表，而是多 Agent continuity 的主屏。",
-      needsAttention: "待处理",
-      blockedRisk: "异常与阻塞",
-      activeWork: "活跃工作",
-      recentActivity: "最近活动",
+      readyToContinue: "可继续的工作",
+      contextRepair: "先修复上下文",
+      liveHandoffs: "进行中的接力",
+      recentSpines: "最近主线",
       openEpisode: "打开 Episode",
       openProject: "查看项目",
       noItems: "当前没有需要关注的 Episode。"
@@ -347,10 +347,10 @@ export const dictionary: Record<Locale, Dictionary> = {
       title: "Multi-Agent Continuity Home",
       subtitle:
         "Start with the work that can be continued, handed off, and replayed, then move through blocked/risk, active execution, and recent changes.",
-      needsAttention: "Needs Attention",
-      blockedRisk: "Blocked & Risk",
-      activeWork: "Active Work",
-      recentActivity: "Recent Activity",
+      readyToContinue: "Ready to Continue",
+      contextRepair: "Repair the Context",
+      liveHandoffs: "Live Handoffs",
+      recentSpines: "Recent Spines",
       openEpisode: "Open episode",
       openProject: "Open project",
       noItems: "There are no episodes in this section right now."

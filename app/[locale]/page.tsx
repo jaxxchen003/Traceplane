@@ -92,6 +92,9 @@ function EpisodeList({
     permissionDeniedCount: number;
     policyHitCount: number;
     artifactCount: number;
+    handoffReady: boolean;
+    nextMove: string;
+    queueHint: string;
   }>;
   emptyLabel: string;
   ctaLabel: string;
@@ -119,10 +122,15 @@ function EpisodeList({
                     <StatusBadge label={dict.statuses[item.status]} raw={item.status} />
                   </div>
                   <p className="text-sm leading-7 text-slate-300">{item.goal || item.summary}</p>
+                  <div className="mt-3 rounded-[18px] border border-white/10 bg-black/20 px-3 py-3 text-sm leading-6 text-slate-200">
+                    <div className="text-[10px] uppercase tracking-[0.18em] text-cyan-200/70">{item.queueHint}</div>
+                    <div className="mt-2">{item.nextMove}</div>
+                  </div>
                   <div className="mt-3 flex flex-wrap gap-2 text-xs uppercase tracking-[0.16em] text-slate-500">
                     <span>{item.primaryActor}</span>
                     <span>{projectLabel}: {item.projectName}</span>
                     <span>{item.artifactCount} artifacts</span>
+                    <span>{item.handoffReady ? "handoff-ready" : "live-spine"}</span>
                   </div>
                 </div>
                 <div className="min-w-[220px] space-y-3 text-sm text-slate-300">
@@ -364,9 +372,9 @@ export default async function LocaleHome({
         nodes={commandCenter.graphNodes}
         edges={commandCenter.graphEdges}
         stats={[
-          { label: dict.dashboard.needsAttention, value: `${commandCenter.stats.needsAttention}` },
-          { label: dict.dashboard.blockedRisk, value: `${commandCenter.stats.blockedRisk}` },
-          { label: dict.dashboard.activeWork, value: `${commandCenter.stats.activeWork}` }
+          { label: dict.dashboard.readyToContinue, value: `${commandCenter.stats.readyToContinue}` },
+          { label: dict.dashboard.contextRepair, value: `${commandCenter.stats.contextRepair}` },
+          { label: dict.dashboard.liveHandoffs, value: `${commandCenter.stats.liveHandoffs}` }
         ]}
       />
 
@@ -375,35 +383,35 @@ export default async function LocaleHome({
           <div className="grid gap-4 lg:grid-cols-3">
             <div className="rounded-[24px] border border-cyan-400/16 bg-cyan-400/8 px-4 py-4">
               <div className="text-[11px] uppercase tracking-[0.18em] text-cyan-200/80">
-                {dict.dashboard.needsAttention}
+                {dict.dashboard.readyToContinue}
               </div>
-              <div className="mt-3 text-3xl font-semibold text-white">{commandCenter.stats.needsAttention}</div>
+              <div className="mt-3 text-3xl font-semibold text-white">{commandCenter.stats.readyToContinue}</div>
               <div className="mt-2 text-sm leading-6 text-slate-300">
                 {locale === "zh"
-                  ? "优先展示需要你确认、处理或决策的工作。"
-                  : "Work that requires your decision or intervention comes first."}
+                  ? "这些主线已经具备 brief 或产物，下一位 Agent 可以直接接上。"
+                  : "These spines already have a brief or artifact, so the next agent can continue immediately."}
               </div>
             </div>
             <div className="rounded-[24px] border border-rose-400/16 bg-rose-400/8 px-4 py-4">
               <div className="text-[11px] uppercase tracking-[0.18em] text-rose-200/80">
-                {dict.dashboard.blockedRisk}
+                {dict.dashboard.contextRepair}
               </div>
-              <div className="mt-3 text-3xl font-semibold text-white">{commandCenter.stats.blockedRisk}</div>
+              <div className="mt-3 text-3xl font-semibold text-white">{commandCenter.stats.contextRepair}</div>
               <div className="mt-2 text-sm leading-6 text-slate-300">
                 {locale === "zh"
-                  ? "把阻塞、失败、权限拒绝和策略命中集中拉出来。"
-                  : "Blocked work, failures, denials, and policy hits are grouped together."}
+                  ? "先把缺失上下文、权限拒绝和失败点修好，再恢复接力。"
+                  : "Repair missing context, denials, and failure points before resuming the handoff."}
               </div>
             </div>
             <div className="rounded-[24px] border border-emerald-400/16 bg-emerald-400/8 px-4 py-4">
               <div className="text-[11px] uppercase tracking-[0.18em] text-emerald-200/80">
-                {dict.dashboard.activeWork}
+                {dict.dashboard.liveHandoffs}
               </div>
-              <div className="mt-3 text-3xl font-semibold text-white">{commandCenter.stats.activeWork}</div>
+              <div className="mt-3 text-3xl font-semibold text-white">{commandCenter.stats.liveHandoffs}</div>
               <div className="mt-2 text-sm leading-6 text-slate-300">
                 {locale === "zh"
-                  ? "顺利推进的工作次级展示，不盖过待处理与异常。"
-                  : "Healthy execution is visible, but never outranks attention and risk."}
+                  ? "这些主线正在跑，但还没到适合交接的时刻。"
+                  : "These spines are moving, but they are not yet ready for a clean handoff."}
               </div>
             </div>
           </div>
@@ -413,13 +421,13 @@ export default async function LocaleHome({
           <div className="space-y-4 text-sm leading-7 text-slate-300">
             <p>
               {locale === "zh"
-                ? "这个首页不再把 Project 放在主舞台，而是先把可以继续、交接和处理的 Episode 放到最前。Project 仍然存在，但它退到归属和汇总视角。"
-                : "This home surface no longer puts projects at center stage. It promotes the episodes that can be continued, handed off, and acted on, while projects remain the summary layer."}
+                ? "这个首页先回答下一位 Agent 应该从哪里接，不先回答系统里有多少项目。Project 仍然存在，但它退到归属和汇总层。"
+                : "This home surface answers where the next agent should continue from before it answers how many projects exist. Projects remain the ownership and summary layer."}
             </p>
             <p>
               {locale === "zh"
-                ? "排序原则是：待处理 > 异常/阻塞 > 活跃工作 > 最近活动。第一层卖点不是治理，而是 continuity。"
-                : "The ranking principle is: needs attention > blocked and risk > active work > recent activity. The first-layer value is continuity, not governance."}
+                ? "排序原则现在是：可继续 > 先修复 > 进行中接力 > 最近主线。第一层卖点不是治理，而是让 Agent 工作不断档。"
+                : "The ranking principle is now: ready to continue > repair the context > live handoffs > recent spines. The first-layer value is uninterrupted agent continuity."}
             </p>
           </div>
         </Panel>
@@ -478,9 +486,9 @@ export default async function LocaleHome({
 
       <EpisodeList
         locale={locale}
-        title={dict.dashboard.needsAttention}
-        eyebrow="Needs Attention"
-        items={commandCenter.needsAttention}
+        title={dict.dashboard.readyToContinue}
+        eyebrow="Continue Queue"
+        items={commandCenter.readyToContinue}
         emptyLabel={dict.dashboard.noItems}
         ctaLabel={dict.dashboard.openEpisode}
         projectLabel={dict.common.project}
@@ -489,18 +497,18 @@ export default async function LocaleHome({
       <div className="grid gap-6 xl:grid-cols-2">
         <EpisodeList
           locale={locale}
-          title={dict.dashboard.blockedRisk}
-          eyebrow="Blocked / Risk"
-          items={commandCenter.blockedRisk}
+          title={dict.dashboard.contextRepair}
+          eyebrow="Repair Queue"
+          items={commandCenter.contextRepair}
           emptyLabel={dict.dashboard.noItems}
           ctaLabel={dict.dashboard.openEpisode}
           projectLabel={dict.common.project}
         />
         <EpisodeList
           locale={locale}
-          title={dict.dashboard.activeWork}
-          eyebrow="Live Work"
-          items={commandCenter.activeWork}
+          title={dict.dashboard.liveHandoffs}
+          eyebrow="Live Handoffs"
+          items={commandCenter.liveHandoffs}
           emptyLabel={dict.dashboard.noItems}
           ctaLabel={dict.dashboard.openEpisode}
           projectLabel={dict.common.project}
@@ -509,9 +517,9 @@ export default async function LocaleHome({
 
       <EpisodeList
         locale={locale}
-        title={dict.dashboard.recentActivity}
-        eyebrow="Recent"
-        items={commandCenter.recentActivity}
+        title={dict.dashboard.recentSpines}
+        eyebrow="Recent Spine"
+        items={commandCenter.recentSpines}
         emptyLabel={dict.dashboard.noItems}
         ctaLabel={dict.dashboard.openEpisode}
         projectLabel={dict.common.project}
