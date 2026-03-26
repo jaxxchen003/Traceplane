@@ -239,6 +239,21 @@ cp .env.example .env
 - [cloud-sync-architecture.md](/Users/jaxxchen/projects/enterprise-agent-work-graph/docs/cloud-sync-architecture.md)
 - [cloud-setup-checklist.md](/Users/jaxxchen/projects/enterprise-agent-work-graph/docs/cloud-setup-checklist.md)
 
+验证云端准备度：
+```bash
+npm run cloud:verify
+npm run cloud:verify:supabase
+npm run cloud:verify:r2
+```
+
+把某个 Episode 投影到本地同步工作区：
+```bash
+npm run workspace:sync -- <episodeId> zh
+```
+
+默认会写到：
+- `~/Traceplane/{workspace}/{project}/{episode}/...`
+
 健康检查接口现在会返回当前 runtime 是否已经 `cloud-ready`：
 
 ```bash

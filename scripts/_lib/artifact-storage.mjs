@@ -40,57 +40,58 @@ function isR2Configured() {
   );
 }
 
-async function putR2Object(key, body) {
-  const accountId = process.env.CLOUDFLARE_ACCOUNT_ID;
+function getR2Host() {
+  return `${process.env.CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com`;
+}
+
+function getR2EndpointUrl() {
+  return process.env.R2_ENDPOINT.replace(/\/$/, "");
+}
+
+function getAuthHeaders({ method, key, payloadHash, contentType = "application/json" }) {
   const bucket = process.env.R2_BUCKET;
-  const endpoint = process.env.R2_ENDPOINT;
   const accessKeyId = process.env.R2_ACCESS_KEY_ID;
   const secretAccessKey = process.env.R2_SECRET_ACCESS_KEY;
-
   const region = "auto";
   const service = "s3";
-  const method = "PUT";
-  const host = `${accountId}.r2.cloudflarestorage.com`;
+  const host = getR2Host();
   const canonicalUri = `/${bucket}/${key}`;
-  const payloadHash = sha256Hex(body);
   const now = new Date();
   const amzDate = now.toISOString().replace(/[:-]|\.\d{3}/g, "");
   const dateStamp = amzDate.slice(0, 8);
   const canonicalHeaders =
-    `content-type:application/json\n` +
+    `content-type:${contentType}\n` +
     `host:${host}\n` +
     `x-amz-content-sha256:${payloadHash}\n` +
     `x-amz-date:${amzDate}\n`;
   const signedHeaders = "content-type;host;x-amz-content-sha256;x-amz-date";
-  const canonicalRequest = [
-    method,
-    canonicalUri,
-    "",
-    canonicalHeaders,
-    signedHeaders,
-    payloadHash
-  ].join("\n");
+  const canonicalRequest = [method, canonicalUri, "", canonicalHeaders, signedHeaders, payloadHash].join("\n");
   const credentialScope = `${dateStamp}/${region}/${service}/aws4_request`;
-  const stringToSign = [
-    "AWS4-HMAC-SHA256",
-    amzDate,
-    credentialScope,
-    sha256Hex(canonicalRequest)
-  ].join("\n");
+  const stringToSign = ["AWS4-HMAC-SHA256", amzDate, credentialScope, sha256Hex(canonicalRequest)].join("\n");
   const signature = sign(secretAccessKey, dateStamp, region, service, stringToSign);
   const authorization =
     `AWS4-HMAC-SHA256 Credential=${accessKeyId}/${credentialScope}, ` +
     `SignedHeaders=${signedHeaders}, Signature=${signature}`;
-  const url = `${endpoint.replace(/\/$/, "")}/${bucket}/${key}`;
-  const response = await fetch(url, {
-    method,
+
+  return {
+    url: `${getR2EndpointUrl()}/${bucket}/${key}`,
     headers: {
       host,
-      "content-type": "application/json",
+      "content-type": contentType,
       "x-amz-content-sha256": payloadHash,
       "x-amz-date": amzDate,
       Authorization: authorization
-    },
+    }
+  };
+}
+
+async function putR2Object(key, body) {
+  const method = "PUT";
+  const payloadHash = sha256Hex(body);
+  const { url, headers } = getAuthHeaders({ method, key, payloadHash });
+  const response = await fetch(url, {
+    method,
+    headers,
     body
   });
 
@@ -98,7 +99,48 @@ async function putR2Object(key, body) {
     throw new Error(`R2 upload failed with ${response.status}: ${(await response.text()).slice(0, 240)}`);
   }
 
-  return `r2://${bucket}/${key}`;
+  return `r2://${process.env.R2_BUCKET}/${key}`;
+}
+
+function parseR2Uri(uri) {
+  const normalized = uri.replace(/^r2:\/\//, "");
+  const [bucket, ...segments] = normalized.split("/");
+  return {
+    bucket,
+    key: segments.join("/")
+  };
+}
+
+async function readR2Object(uri) {
+  if (!isR2Configured()) {
+    throw new Error("R2 is not configured");
+  }
+
+  const { bucket, key } = parseR2Uri(uri);
+  if (!bucket || !key) {
+    throw new Error(`Invalid R2 URI: ${uri}`);
+  }
+
+  if (bucket !== process.env.R2_BUCKET) {
+    throw new Error(`R2 URI bucket mismatch: ${bucket}`);
+  }
+
+  const method = "GET";
+  const payloadHash = sha256Hex("");
+  const { url, headers } = getAuthHeaders({ method, key, payloadHash });
+  const response = await fetch(url, {
+    method,
+    headers
+  });
+
+  if (!response.ok) {
+    throw new Error(`R2 read failed with ${response.status}: ${(await response.text()).slice(0, 240)}`);
+  }
+
+  return {
+    contentType: response.headers.get("content-type") || undefined,
+    body: Buffer.from(await response.arrayBuffer())
+  };
 }
 
 export async function persistArtifactBlob(input) {
@@ -134,4 +176,13 @@ export async function persistArtifactBlob(input) {
       warning: error instanceof Error ? error.message : String(error)
     };
   }
+}
+
+export async function readArtifactBlob(uri) {
+  if (!uri || !uri.startsWith("r2://")) {
+    return null;
+  }
+
+  const response = await readR2Object(uri);
+  return JSON.parse(response.body.toString("utf8"));
 }

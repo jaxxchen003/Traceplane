@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { resolveArtifactLocalizedContent } from "@/lib/default-runtime";
 import { localize } from "@/lib/format";
 import type { Locale } from "@/lib/i18n";
 
@@ -491,11 +492,13 @@ export async function getArtifactDetail(artifactId: string, locale: Locale) {
   const traces = traceIds.length
     ? await prisma.traceEvent.findMany({ where: { id: { in: traceIds } }, orderBy: { stepIndex: "asc" } })
     : [];
+  const resolvedContent = await resolveArtifactLocalizedContent(artifact, locale);
 
   return {
     id: artifact.id,
     title: localize(artifact.titleI18n, locale),
-    content: localize(artifact.contentI18n, locale),
+    content: resolvedContent.content,
+    storageMode: resolvedContent.storageMode,
     type: artifact.fileType,
     currentVersion: artifact.version,
     createdBy: artifact.createdByAgent.name,

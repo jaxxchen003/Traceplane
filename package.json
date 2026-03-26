@@ -15,6 +15,7 @@
     "cloud:verify": "node scripts/verify-cloud-config.mjs",
     "cloud:verify:supabase": "node scripts/verify-supabase-connection.mjs",
     "cloud:verify:r2": "node scripts/verify-r2-connection.mjs",
+    "workspace:sync": "node scripts/sync-local-workspace.mjs",
     "mcp:host": "node scripts/setup-mcp-host.mjs",
     "claude:setup": "node scripts/setup-claude-project.mjs",
     "claude:verify": "node scripts/verify-claude-setup.mjs",

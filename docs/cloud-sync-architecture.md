@@ -109,3 +109,26 @@
 - 把 artifact/blob 先抽到对象存储抽象
 - 再补 local projection / sync agent
 - 最后再考虑完整的冲突处理和离线模式
+
+## 当前已落地的第一步
+
+仓库里现在已经有一条最小可运行链路：
+
+- artifact 内容可优先写入 `R2`
+- artifact 详情页可从 `R2` 回读内容
+- 可通过命令把某个 `Episode` 投影到本地同步目录
+
+```bash
+npm run workspace:sync -- <episodeId> zh
+```
+
+默认路径：
+
+```txt
+~/Traceplane/{workspace}/{project}/{episode}/
+  episode.json
+  artifacts/
+  trace/timeline.jsonl
+```
+
+这还不是最终双向同步器，但已经把“云端为主，本地为投影”的产品方向落实成了第一条真实路径。
