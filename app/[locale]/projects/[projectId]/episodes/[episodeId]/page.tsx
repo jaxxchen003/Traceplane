@@ -382,6 +382,124 @@ export default async function EpisodeReviewPage({
             />
           </Panel>
 
+          <Panel
+            title={locale === "zh" ? "Runtime Provenance" : "Runtime Provenance"}
+            eyebrow={locale === "zh" ? "Work Plane State" : "Work Plane State"}
+          >
+            <div className="space-y-4">
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div className="rounded-[24px] border border-cyan-400/18 bg-cyan-400/8 px-4 py-4">
+                  <div className="text-[11px] uppercase tracking-[0.18em] text-cyan-100/70">
+                    {locale === "zh" ? "Cloud Mode" : "Cloud Mode"}
+                  </div>
+                  <div className="mt-2 text-lg font-semibold text-cyan-50">{episode.runtimeSummary.cloudMode}</div>
+                  <div className="mt-2 text-sm text-cyan-100/70">
+                    {episode.runtimeSummary.databaseProvider} · {episode.runtimeSummary.objectStorageProvider}
+                  </div>
+                </div>
+                <div className="rounded-[24px] border border-amber-400/18 bg-amber-400/8 px-4 py-4">
+                  <div className="text-[11px] uppercase tracking-[0.18em] text-amber-100/70">
+                    {locale === "zh" ? "Capture Mode" : "Capture Mode"}
+                  </div>
+                  <div className="mt-2 text-lg font-semibold text-amber-50">{episode.provenanceSummary.mode}</div>
+                  <div className="mt-2 text-sm text-amber-100/70">{episode.provenanceSummary.host}</div>
+                </div>
+              </div>
+
+              <div className="rounded-[24px] border border-white/10 bg-white/5 px-4 py-4">
+                <div className="mb-3 flex items-center justify-between gap-3">
+                  <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
+                    {locale === "zh" ? "Storage Status" : "Storage Status"}
+                  </div>
+                  <StatusBadge
+                    label={
+                      episode.runtimeSummary.projectionExists
+                        ? locale === "zh"
+                          ? "Projected"
+                          : "Projected"
+                        : locale === "zh"
+                          ? "Pending"
+                          : "Pending"
+                    }
+                    raw={episode.runtimeSummary.projectionExists ? "COMPLETED" : "PLANNED"}
+                  />
+                </div>
+                <div className="grid gap-3 sm:grid-cols-3">
+                  <div className="rounded-2xl border border-white/8 bg-black/20 px-3 py-3">
+                    <div className="text-[11px] uppercase tracking-[0.14em] text-slate-500">
+                      {locale === "zh" ? "Artifacts" : "Artifacts"}
+                    </div>
+                    <div className="mt-2 text-2xl font-semibold text-white">{episode.storageSummary.totalArtifacts}</div>
+                  </div>
+                  <div className="rounded-2xl border border-white/8 bg-cyan-400/8 px-3 py-3">
+                    <div className="text-[11px] uppercase tracking-[0.14em] text-cyan-100/70">R2</div>
+                    <div className="mt-2 text-2xl font-semibold text-cyan-50">{episode.storageSummary.r2ArtifactCount}</div>
+                  </div>
+                  <div className="rounded-2xl border border-white/8 bg-amber-400/8 px-3 py-3">
+                    <div className="text-[11px] uppercase tracking-[0.14em] text-amber-100/70">
+                      {locale === "zh" ? "Inline" : "Inline"}
+                    </div>
+                    <div className="mt-2 text-2xl font-semibold text-amber-50">
+                      {episode.storageSummary.inlineArtifactCount}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="rounded-[24px] border border-white/10 bg-[linear-gradient(135deg,rgba(14,165,233,0.08),rgba(250,204,21,0.04),rgba(15,23,42,0.42))] px-4 py-4">
+                <div className="mb-3 flex items-center justify-between gap-3">
+                  <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
+                    {locale === "zh" ? "Projection + Review" : "Projection + Review"}
+                  </div>
+                  <StatusBadge
+                    label={episode.reviewOutcome ?? "PENDING"}
+                    raw={episode.reviewOutcome ?? "PENDING"}
+                  />
+                </div>
+                <div className="space-y-3 text-sm leading-7 text-slate-300">
+                  <div>
+                    <span className="font-medium text-white">
+                      {locale === "zh" ? "Projection Root:" : "Projection Root:"}
+                    </span>{" "}
+                    {episode.runtimeSummary.projectionRoot}
+                  </div>
+                  <div>
+                    <span className="font-medium text-white">
+                      {locale === "zh" ? "Episode Path:" : "Episode Path:"}
+                    </span>{" "}
+                    <span className="break-all text-slate-200">{episode.runtimeSummary.projectionPath}</span>
+                  </div>
+                  <div className="grid gap-3 sm:grid-cols-3">
+                    <div className="rounded-2xl border border-white/10 bg-black/20 px-3 py-3">
+                      <div className="text-[11px] uppercase tracking-[0.14em] text-slate-500">
+                        {locale === "zh" ? "Trace Events" : "Trace Events"}
+                      </div>
+                      <div className="mt-2 text-lg font-semibold text-white">
+                        {episode.provenanceSummary.signals.traceEventCount}
+                      </div>
+                    </div>
+                    <div className="rounded-2xl border border-white/10 bg-black/20 px-3 py-3">
+                      <div className="text-[11px] uppercase tracking-[0.14em] text-slate-500">
+                        {locale === "zh" ? "Hook Capture" : "Hook Capture"}
+                      </div>
+                      <div className="mt-2 text-lg font-semibold text-white">
+                        {episode.provenanceSummary.signals.hasHookCapture ? "Yes" : "No"}
+                      </div>
+                    </div>
+                    <div className="rounded-2xl border border-white/10 bg-black/20 px-3 py-3">
+                      <div className="text-[11px] uppercase tracking-[0.14em] text-slate-500">
+                        {locale === "zh" ? "Imported" : "Imported"}
+                      </div>
+                      <div className="mt-2 text-lg font-semibold text-white">
+                        {episode.provenanceSummary.signals.isImported ? "Yes" : "No"}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Panel>
+
           <Panel title={dict.common.summary} eyebrow={dict.episode.goal}>
             <div className="space-y-4 text-sm leading-7 text-slate-300">
               <div>{episode.goal}</div>

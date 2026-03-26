@@ -70,7 +70,11 @@ async function findEpisodeForReview(episodeId: string) {
   return prisma.episode.findUnique({
     where: { id: episodeId },
     include: {
-      project: true,
+      project: {
+        include: {
+          workspace: true
+        }
+      },
       primaryAgent: true,
       episodeAgents: { include: { agent: true } },
       memoryItems: { orderBy: { createdAt: "asc" } },
@@ -124,6 +128,14 @@ export async function getWorkspaceSummary() {
 function expandHomePath(input: string) {
   if (!input.startsWith("~/")) return input;
   return path.join(os.homedir(), input.slice(2));
+}
+
+function slugify(input: string) {
+  return input
+    .toLowerCase()
+    .replace(/[^a-z0-9\u4e00-\u9fa5]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .replace(/-{2,}/g, "-");
 }
 
 function summarizeEpisodeForCommandCenter(
@@ -532,9 +544,46 @@ export async function getEpisodeReview(episodeId: string, locale: Locale) {
     }
   });
 
+  const runtime = getRuntimeConfig();
+  const syncRoot = expandHomePath(runtime.syncRootPath);
+  const localizedEpisodeTitle = localize(episode.titleI18n, locale);
+  const episodeDirName = `${slugify(localizedEpisodeTitle)}--${episode.id.slice(-6)}`;
+  const projectionPath = path.join(
+    syncRoot,
+    episode.project.workspace.slug,
+    episode.project.slug,
+    episodeDirName
+  );
+
+  let projectionExists = false;
+  try {
+    const stat = await fs.stat(projectionPath);
+    projectionExists = stat.isDirectory();
+  } catch {
+    projectionExists = false;
+  }
+
+  const artifactUris = episode.artifacts.map((artifact) => artifact.uri);
+  const r2ArtifactCount = artifactUris.filter((uri) => typeof uri === "string" && uri.startsWith("r2://")).length;
+  const inlineArtifactCount = episode.artifacts.length - r2ArtifactCount;
+  const hasHookCapture = episode.traceEvents.some((event) =>
+    ["UserPromptSubmit", "PreToolUse", "PostToolUse", "Stop"].includes(event.eventType)
+  );
+  const isImported = episode.policyVersion.includes("import");
+  const provenanceMode = isImported
+    ? "transcript-import"
+    : hasHookCapture
+      ? "hook-capture"
+      : "local-ui";
+  const provenanceHost = isImported
+    ? "OpenCode / import pipeline"
+    : hasHookCapture
+      ? "Claude Code"
+      : "Traceplane local control panel";
+
   return {
     id: episode.id,
-    title: localize(episode.titleI18n, locale),
+    title: localizedEpisodeTitle,
     status: episode.status,
     projectId: episode.projectId,
     projectName: localize(episode.project.nameI18n, locale),
@@ -549,9 +598,33 @@ export async function getEpisodeReview(episodeId: string, locale: Locale) {
     primaryAgent: episode.primaryAgent.name,
     participatingAgents: episode.episodeAgents.map((item: EpisodeReviewRecord["episodeAgents"][number]) => item.agent.name),
     policyVersion: episode.policyVersion,
+    reviewOutcome: episode.reviewOutcome,
     riskSummary: {
       denied: episode.auditEvents.filter((event: AuditRecord) => event.permissionDecision === "deny").length,
       policyHits: episode.auditEvents.filter((event: AuditRecord) => event.policyHitReasonI18n).length
+    },
+    runtimeSummary: {
+      cloudMode: runtime.cloud.mode,
+      databaseProvider: runtime.database.provider,
+      objectStorageProvider: runtime.objectStorage.provider,
+      projectionRoot: runtime.syncRootPath,
+      projectionPath,
+      projectionExists
+    },
+    storageSummary: {
+      totalArtifacts: episode.artifacts.length,
+      r2ArtifactCount,
+      inlineArtifactCount,
+      projectionExists
+    },
+    provenanceSummary: {
+      mode: provenanceMode,
+      host: provenanceHost,
+      signals: {
+        hasHookCapture,
+        isImported,
+        traceEventCount: episode.traceEvents.length
+      }
     },
     timeline: episode.traceEvents.map((event: EpisodeReviewRecord["traceEvents"][number]) => ({
       id: event.id,
