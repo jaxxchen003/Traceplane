@@ -7,6 +7,7 @@
 ## 当前已经有的
 
 - `SUPABASE_PROJECT_URL`
+- `SUPABASE_POOLER_URL`
 - `SUPABASE_DB_URL`
 - `SUPABASE_SECRET_KEY`
 - `SUPABASE_ANON_KEY`
@@ -42,32 +43,33 @@ npm run cloud:verify:r2
 npm run db:cloud:push
 ```
 
-这条命令现在会真正尝试用 `prisma/schema.postgres.prisma` 连 `SUPABASE_DB_URL`。
+这条命令现在会优先使用 `SUPABASE_POOLER_URL`，否则回退到 `SUPABASE_DB_URL`。
 
 ## 当前剩余的硬阻塞
 
-### Supabase Postgres 连接性
-当前已经不是配置缺失，而是：
+### Supabase Postgres 连接入口
+当前已经不是 secret 缺失，而是云端激活仍在 fallback。
 
-- 本机 / 当前执行环境无法真正连上 `db.jtwbhglweyebzyvkyasr.supabase.co:5432`
+最新 Railway 启动日志已经明确：
 
-现象是：
+- 直连 `db.<project-ref>.supabase.co:5432` 时，云端 Postgres 激活失败
+- Traceplane 会自动回退到 sqlite，保持服务在线
 
-- `npm run db:cloud:push`
-- `npm run cloud:verify:supabase`
+根据 Supabase 官方连接文档，Railway 这类 IPv4 / serverless 环境更适合使用 **session pooler**。
 
-都会落到数据库 reachability 错误，而不是变量缺失错误。
+来源：
+- https://supabase.com/docs/guides/database/connecting-to-postgres
 
-也就是说，现在剩下的问题是：
+所以当前剩余的真正阻塞是：
 
-- 网络 / DNS / 可达性
-- 或 Supabase 连接入口本身需要调整
+- 还没有把 `SUPABASE_POOLER_URL` 配进部署环境
 
 ## 推荐最终本地配置
 
 ```env
 DATABASE_URL=
 SUPABASE_PROJECT_URL=
+SUPABASE_POOLER_URL=
 SUPABASE_SECRET_KEY=
 SUPABASE_ANON_KEY=
 

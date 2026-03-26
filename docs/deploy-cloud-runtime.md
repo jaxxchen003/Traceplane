@@ -18,6 +18,7 @@
 
 ### 服务端 secret
 - `SUPABASE_SECRET_KEY`
+- `SUPABASE_POOLER_URL`
 - `SUPABASE_DB_URL`
 - `R2_ACCESS_KEY_ID`
 - `R2_SECRET_ACCESS_KEY`
@@ -42,6 +43,7 @@
 
 ```env
 SUPABASE_PROJECT_URL=
+SUPABASE_POOLER_URL=
 SUPABASE_DB_URL=
 SUPABASE_SECRET_KEY=
 SUPABASE_ANON_KEY=
@@ -61,9 +63,25 @@ DEFAULT_REGION=global-us-cn
 短期内：
 
 - 可以不在 Railway 上单独配置 `DATABASE_URL`
-- 仍以 `SUPABASE_DB_URL` 作为云端 Postgres 准备值
+- 云端 Postgres 优先使用 `SUPABASE_POOLER_URL`
+- `SUPABASE_DB_URL` 保留为 direct 连接或备用连接值
 
 等 Prisma 正式从 SQLite 切到 Postgres 时，再统一收敛。
+
+## Supabase 连接模式建议
+
+对 Railway 这类 IPv4 / serverless 运行环境，当前推荐：
+
+- `SUPABASE_POOLER_URL` 作为正式运行时连接串
+- `SUPABASE_DB_URL` 仅保留给 direct 连接或排查场景
+
+原因是 Supabase 官方文档明确建议：
+
+- direct connection 默认更适合 IPv6 或稳定直连环境
+- pooler 更适合 serverless / 连接数波动大的环境
+
+来源：
+- https://supabase.com/docs/guides/database/connecting-to-postgres
 
 ## 安全原则
 

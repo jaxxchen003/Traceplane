@@ -1,3 +1,9 @@
+import {
+  detectCloudDatabaseSource,
+  detectSupabaseConnectionMode,
+  resolveCloudDatabaseUrl
+} from "@/lib/cloud-database";
+
 type CloudReadiness = {
   ready: boolean;
   blockers: string[];
@@ -33,11 +39,11 @@ function assessCloudReadiness(env: NodeJS.ProcessEnv): CloudReadiness {
     blockers.push("Missing SUPABASE_PROJECT_URL");
   }
 
-  if (!hasValue(env.DATABASE_URL) && !hasValue(env.SUPABASE_DB_URL)) {
-    blockers.push("Missing DATABASE_URL / SUPABASE_DB_URL");
+  if (!hasValue(env.DATABASE_URL) && !hasValue(env.SUPABASE_DB_URL) && !hasValue(env.SUPABASE_POOLER_URL)) {
+    blockers.push("Missing DATABASE_URL / SUPABASE_DB_URL / SUPABASE_POOLER_URL");
   }
 
-  if ((env.DATABASE_URL || env.SUPABASE_DB_URL || "").includes("[YOUR-PASSWORD]")) {
+  if ((env.DATABASE_URL || env.SUPABASE_POOLER_URL || env.SUPABASE_DB_URL || "").includes("[YOUR-PASSWORD]")) {
     blockers.push("Supabase database URL still contains placeholder password");
   }
 
@@ -102,19 +108,22 @@ export function getRuntimeConfig() {
   const cloudDbRequested = env["TRACEPLANE_CLOUD_DB_ACTIVE"] === "true";
   const cloudDbRuntime = env["TRACEPLANE_CLOUD_DB_RUNTIME"] || (cloudDbRequested ? "requested" : "local");
   const cloudDbActive = cloudDbRuntime === "active";
+  const configuredCloudDatabaseUrl = resolveCloudDatabaseUrl(env);
+  const cloudDatabaseSource = detectCloudDatabaseSource(env);
+  const cloudConnectionMode = detectSupabaseConnectionMode(configuredCloudDatabaseUrl);
   const databaseUrl = cloudDbActive
-    ? env["SUPABASE_DB_URL"] || env["DATABASE_URL"] || ""
-    : env["DATABASE_URL"] || env["SUPABASE_DB_URL"] || "";
+    ? configuredCloudDatabaseUrl || env["DATABASE_URL"] || ""
+    : env["DATABASE_URL"] || configuredCloudDatabaseUrl || "";
   const databaseSource = cloudDbActive
-    ? hasValue(env["SUPABASE_DB_URL"])
-      ? "SUPABASE_DB_URL"
+    ? cloudDatabaseSource !== "none"
+      ? cloudDatabaseSource
       : hasValue(env["DATABASE_URL"])
         ? "DATABASE_URL"
         : "none"
     : hasValue(env["DATABASE_URL"])
       ? "DATABASE_URL"
-      : hasValue(env["SUPABASE_DB_URL"])
-        ? "SUPABASE_DB_URL"
+      : cloudDatabaseSource !== "none"
+        ? cloudDatabaseSource
         : "none";
   const appBaseUrl = normalizeAppBaseUrl(env["APP_BASE_URL"]);
   const cloud = assessCloudReadiness(env as NodeJS.ProcessEnv);
@@ -125,6 +134,18 @@ export function getRuntimeConfig() {
     hasValue(env["R2_SECRET_ACCESS_KEY"]);
   const databaseProvider = detectDatabaseProvider(databaseUrl);
   const objectStorageProvider = objectStorageConfigured ? "r2" : "none";
+  const activationBlockers: string[] = [];
+
+  if (cloudDbRequested && cloudDbRuntime === "fallback") {
+    activationBlockers.push("Cloud database activation failed; Traceplane is running on sqlite fallback.");
+  }
+
+  if (cloudDbRequested && cloudConnectionMode === "direct") {
+    activationBlockers.push(
+      "Supabase direct connection is configured. For Railway and other IPv4/serverless environments, use a session pooler URL."
+    );
+  }
+
   const deploymentStage = detectDeploymentStage({
     cloudReady: cloud.ready,
     databaseProvider,
@@ -138,7 +159,8 @@ export function getRuntimeConfig() {
     database: {
       urlConfigured: hasValue(databaseUrl),
       provider: databaseProvider,
-      source: databaseSource
+      source: databaseSource,
+      connectionMode: cloudDbActive ? cloudConnectionMode : "local"
     },
     supabase: {
       configured:
@@ -158,6 +180,7 @@ export function getRuntimeConfig() {
       databaseActive: cloudDbActive,
       databaseRequested: cloudDbRequested,
       databaseRuntimeState: cloudDbRuntime,
+      activationBlockers,
       readiness: cloud
     },
     appBaseUrl,

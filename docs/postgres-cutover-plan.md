@@ -26,7 +26,7 @@
 它与当前业务模型保持一致，但 provider 切到：
 
 - `postgresql`
-- `SUPABASE_DB_URL`
+- `SUPABASE_DB_URL`（运行时优先由 `SUPABASE_POOLER_URL` 注入）
 
 ## 当前可执行命令
 
@@ -40,6 +40,12 @@ npm run db:cloud:push
 
 - `db push`
 - `--skip-generate`
+
+如果部署环境里存在：
+
+- `SUPABASE_POOLER_URL`
+
+则应优先把它注入到 `SUPABASE_DB_URL` 再执行。
 
 原因是：
 
@@ -74,8 +80,8 @@ npm run db:cloud:push
 
 ### Phase 3
 - 单独生成 Postgres Prisma client
-- 新建 `lib/prisma-cloud.ts`
 - 让 cloud runtime 先通过 feature flag 跑起来
+- 保持失败自动回退到 sqlite
 
 ### Phase 4
 - 再决定是否替换默认 Prisma datasource

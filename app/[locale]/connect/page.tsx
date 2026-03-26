@@ -152,9 +152,12 @@ export default async function ConnectPage({
               </div>
               <div className="rounded-[22px] border border-emerald-400/18 bg-emerald-400/8 px-4 py-4">
                 <div className="text-[11px] uppercase tracking-[0.18em] text-emerald-200/80">
-                  {locale === "zh" ? "对象存储" : "Object storage"}
+                  {locale === "zh" ? "对象存储 / 连接模式" : "Object storage / connection mode"}
                 </div>
-                <div className="mt-2 text-base font-medium text-white">{connectSurface.runtimeSurface.runtime.objectStorage.provider}</div>
+                <div className="mt-2 text-base font-medium text-white">
+                  {connectSurface.runtimeSurface.runtime.objectStorage.provider} ·{" "}
+                  {connectSurface.runtimeSurface.runtime.database.connectionMode}
+                </div>
               </div>
             </div>
             <div className="grid gap-3 md:grid-cols-2">
@@ -185,6 +188,18 @@ export default async function ConnectPage({
                   ? "当前 host 路线已经 ready / prepared，但仍需要云端 cutover 才会变成正式的 work plane ingestion。"
                   : "Host paths are ready / prepared, but a cloud cutover is still required before they become the formal work plane ingestion path."}
             </div>
+            {connectSurface.runtimeSurface.runtime.cloud.activationBlockers.length > 0 ? (
+              <div className="rounded-[22px] border border-rose-400/20 bg-rose-400/10 px-4 py-4 text-sm leading-7 text-rose-50">
+                <div className="text-[11px] uppercase tracking-[0.18em] text-rose-200/80">
+                  {locale === "zh" ? "Cloud activation blockers" : "Cloud activation blockers"}
+                </div>
+                <ul className="mt-3 space-y-2">
+                  {connectSurface.runtimeSurface.runtime.cloud.activationBlockers.map((blocker) => (
+                    <li key={blocker}>{blocker}</li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
           </div>
         </Panel>
       </section>

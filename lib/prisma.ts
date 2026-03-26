@@ -1,5 +1,6 @@
 import { createRequire } from "node:module";
 import { PrismaClient } from "@prisma/client";
+import { resolveCloudDatabaseUrl } from "@/lib/cloud-database";
 
 function getEnvFlag(key: string) {
   return process.env[key];
@@ -25,7 +26,7 @@ if (process.env.NODE_ENV !== "production") {
 const useCloudDatabase =
   getEnvFlag("TRACEPLANE_CLOUD_DB_ACTIVE") === "true" &&
   getEnvFlag("TRACEPLANE_CLOUD_DB_RUNTIME") === "active" &&
-  Boolean(getEnvFlag("SUPABASE_DB_URL"));
+  Boolean(resolveCloudDatabaseUrl(process.env));
 
 function getCloudPrisma() {
   const existingCloudPrisma = global.__traceplane_cloud_prisma__;

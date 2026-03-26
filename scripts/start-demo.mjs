@@ -12,6 +12,10 @@ const nextCli = resolve(rootDir, "node_modules", "next", "dist", "bin", "next");
 const standaloneServer = resolve(rootDir, ".next", "standalone", "server.js");
 const postgresSchema = resolve(rootDir, "prisma", "schema.postgres.prisma");
 
+function resolveCloudDatabaseUrl(env) {
+  return env.SUPABASE_POOLER_URL || env.SUPABASE_DB_URL || "";
+}
+
 function runNodeScript(scriptPath, args, env = process.env) {
   return new Promise((resolvePromise, rejectPromise) => {
     const child = spawn(process.execPath, [scriptPath, ...args], {
@@ -68,9 +72,10 @@ async function repairLegacySqliteData(databaseUrl) {
 }
 
 async function ensureCloudDatabaseReady() {
+  const cloudDatabaseUrl = resolveCloudDatabaseUrl(process.env);
   const cloudEnv = {
     ...process.env,
-    SUPABASE_DB_URL: process.env.SUPABASE_DB_URL,
+    SUPABASE_DB_URL: cloudDatabaseUrl,
     TRACEPLANE_CLOUD_DB_RUNTIME: "active"
   };
 

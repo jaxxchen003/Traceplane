@@ -220,7 +220,7 @@ export default async function LocaleHome({
             />
             <RuntimeSignal
               label={locale === "zh" ? "数据库" : "Database"}
-              value={`${runtimeSurface.runtime.database.provider} · ${runtimeSurface.runtime.database.source}`}
+              value={`${runtimeSurface.runtime.database.provider} · ${runtimeSurface.runtime.database.source} · ${runtimeSurface.runtime.database.connectionMode}`}
               tone={runtimeSurface.runtime.database.provider === "postgres" ? "good" : "warn"}
             />
             <RuntimeSignal
@@ -287,6 +287,19 @@ export default async function LocaleHome({
                 </div>
                 <ul className="mt-3 space-y-2">
                   {runtimeSurface.runtime.cloud.readiness.blockers.slice(0, 3).map((blocker) => (
+                    <li key={blocker}>{blocker}</li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+
+            {runtimeSurface.runtime.cloud.activationBlockers.length > 0 ? (
+              <div className="mt-4 rounded-[20px] border border-rose-400/20 bg-rose-400/10 px-4 py-4 text-sm text-rose-50">
+                <div className="text-[11px] uppercase tracking-[0.18em] text-rose-200/80">
+                  {locale === "zh" ? "云端激活阻塞" : "Cloud activation blockers"}
+                </div>
+                <ul className="mt-3 space-y-2">
+                  {runtimeSurface.runtime.cloud.activationBlockers.slice(0, 3).map((blocker) => (
                     <li key={blocker}>{blocker}</li>
                   ))}
                 </ul>
