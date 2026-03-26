@@ -40,7 +40,6 @@ const env = parseEnv(fs.readFileSync(envLocalPath, "utf8"));
 
 const required = [
   "SUPABASE_PROJECT_URL",
-  "SUPABASE_DB_URL",
   "SUPABASE_SECRET_KEY",
   "SUPABASE_ANON_KEY",
   "CLOUDFLARE_ACCOUNT_ID",
@@ -61,8 +60,18 @@ for (const key of required) {
 }
 
 result.checks.push({
+  item: "supabase_database_url_present",
+  ok: Boolean((env.SUPABASE_POOLER_URL || env.SUPABASE_DB_URL || "").trim().length > 0)
+});
+
+result.checks.push({
   item: "supabase_db_url_is_postgres",
-  ok: (env.SUPABASE_DB_URL || "").startsWith("postgresql://")
+  ok: (env.SUPABASE_POOLER_URL || env.SUPABASE_DB_URL || "").startsWith("postgresql://")
+});
+
+result.checks.push({
+  item: "supabase_prefers_pooler",
+  ok: Boolean((env.SUPABASE_POOLER_URL || "").includes("pooler.supabase.com") || (env.SUPABASE_POOLER_URL || "").includes(":6543"))
 });
 
 result.checks.push({
@@ -82,6 +91,10 @@ if (hasFailures) {
 } else {
   result.next_steps.push("Cloud config is locally complete. Next step is verifying live network connectivity.");
   result.next_steps.push("When network access is allowed, run Prisma against Supabase and verify R2 credentials.");
+}
+
+if (!result.checks.find((check) => check.item === "supabase_prefers_pooler")?.ok) {
+  result.next_steps.push("Set SUPABASE_POOLER_URL for Railway/serverless deployment instead of relying only on the direct database host.");
 }
 
 console.log(JSON.stringify(result, null, 2));

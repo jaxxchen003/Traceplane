@@ -20,6 +20,9 @@ const manifest = {
   env: [
     summarize("DATABASE_URL", { note: "Optional until Prisma cutover to Postgres is complete." }),
     summarize("SUPABASE_PROJECT_URL", { kind: "public-config" }),
+    summarize("SUPABASE_POOLER_URL", {
+      note: "Preferred for Railway/serverless Postgres activation."
+    }),
     summarize("SUPABASE_DB_URL"),
     summarize("SUPABASE_SECRET_KEY"),
     summarize("SUPABASE_ANON_KEY", { kind: "public-config" }),

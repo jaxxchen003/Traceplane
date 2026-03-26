@@ -6,7 +6,11 @@ import "./_lib/load-env.mjs";
 const { Client } = pg;
 
 async function main() {
-  const databaseUrl = process.env.SUPABASE_DB_URL || process.env.DATABASE_URL || "";
+  const databaseUrl =
+    process.env.SUPABASE_POOLER_URL || process.env.SUPABASE_DB_URL || process.env.DATABASE_URL || "";
+  const connectionMode = databaseUrl.includes("pooler.supabase.com") || databaseUrl.includes(":6543")
+    ? "pooler"
+    : "direct";
 
   if (!databaseUrl.startsWith("postgresql://") && !databaseUrl.startsWith("postgres://")) {
     throw new Error("DATABASE_URL is not configured for Postgres");
@@ -38,6 +42,7 @@ async function main() {
       {
         ok: true,
         provider: "postgres",
+        connectionMode,
         connection: result.rows?.[0] ?? null
       },
       null,
@@ -53,6 +58,11 @@ main()
         {
           ok: false,
           provider: "postgres",
+          connectionMode:
+            (process.env.SUPABASE_POOLER_URL || process.env.SUPABASE_DB_URL || "").includes("pooler.supabase.com") ||
+            (process.env.SUPABASE_POOLER_URL || process.env.SUPABASE_DB_URL || "").includes(":6543")
+              ? "pooler"
+              : "direct",
           error: error instanceof Error ? error.message : String(error)
         },
         null,
