@@ -113,6 +113,21 @@ npm run mcp:start
 npm run mcp:test
 ```
 
+生成 host 配置：
+
+```bash
+npm run mcp:host -- claude-code
+npm run mcp:host -- opencode
+npm run mcp:host -- gemini
+```
+
+如需直接写入文件：
+
+```bash
+npm run mcp:host -- claude-code .mcp.json
+npm run mcp:host -- gemini .gemini/settings.json
+```
+
 ## 环境变量
 - `DATABASE_URL`: Prisma 数据库连接。默认本地示例为 `file:./dev.db`
 - `NEXT_PUBLIC_DEFAULT_LOCALE`: 默认语言，当前示例为 `zh`
