@@ -13,6 +13,7 @@
     "mcp:start": "node scripts/mcp-server.mjs",
     "mcp:test": "node scripts/test-mcp.mjs",
     "mcp:host": "node scripts/setup-mcp-host.mjs",
+    "claude:setup": "node scripts/setup-claude-project.mjs",
     "import:transcript": "node scripts/import-transcript.mjs",
     "normalize:opencode": "node scripts/normalize-opencode-export.mjs",
     "claude:hook:test": "node scripts/test-claude-hook-bridge.mjs",

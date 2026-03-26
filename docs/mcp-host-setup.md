@@ -45,6 +45,17 @@ npm run mcp:host -- gemini .gemini/settings.json
 
 Anthropic 官方支持用 `.mcp.json` 在项目根目录配置 project-scoped MCP server。
 
+如果你希望一步到位把 MCP 和 hooks 都配好，优先直接运行：
+
+```bash
+npm run claude:setup -- q2-customer-pulse research-agent
+```
+
+它会在项目根目录写入：
+
+- `.mcp.json`
+- `.claude/settings.json`
+
 建议把下面模板保存为项目根目录的 `.mcp.json`，或者直接运行：
 
 ```bash

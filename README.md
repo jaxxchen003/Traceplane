@@ -150,6 +150,17 @@ npm run normalize:opencode -- \
 npm run claude:hook:test
 ```
 
+一键生成 Claude 项目配置：
+
+```bash
+npm run claude:setup -- q2-customer-pulse research-agent
+```
+
+它会生成：
+
+- `.mcp.json`
+- `.claude/settings.json`
+
 Claude Code hooks 示例配置：
 
 - [examples/hooks/claude/settings.json](/Users/jaxxchen/projects/enterprise-agent-work-graph/examples/hooks/claude/settings.json)
