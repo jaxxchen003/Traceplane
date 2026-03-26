@@ -156,6 +156,18 @@ npm run mcp:host -- opencode opencode.jsonc
 
 Gemini CLI 官方使用 `settings.json` 的 `mcpServers` 配置。
 
+如果你希望一步到位把 Gemini 项目配置写好，优先直接运行：
+
+```bash
+npm run gemini:setup
+```
+
+然后验证：
+
+```bash
+npm run gemini:verify
+```
+
 建议模板，或者直接运行：
 
 ```bash

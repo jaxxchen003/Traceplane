@@ -116,7 +116,7 @@ npm run dev
 |---|---|---|---|---|---|
 | Claude Code | Yes | Yes | Yes | Planned | 第一优先接入，已具备 hooks bridge |
 | OpenCode | Yes | Yes | Partial | Yes | 实时接入 + export 标准化都可用 |
-| Gemini CLI | Template | Template | Planned | Planned | 已有 host config 模板，待实装 |
+| Gemini CLI | Yes | Yes | Planned | Planned | 已有 quickstart、setup、verify 和 MCP config |
 | Codex | Planned | Planned | Planned | Planned | 当前先保留 MCP-first 策略 |
 | OpenClaw | Planned | Planned | Planned | Planned | 更适合作为 session/runtime 级接入 |
 
@@ -201,6 +201,18 @@ npm run opencode:setup
 
 ```bash
 npm run opencode:verify
+```
+
+一键生成 Gemini 项目配置：
+
+```bash
+npm run gemini:setup
+```
+
+验证 Gemini 配置：
+
+```bash
+npm run gemini:verify
 ```
 
 Claude Code hooks 示例配置：

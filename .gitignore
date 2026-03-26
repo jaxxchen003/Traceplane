@@ -7,6 +7,7 @@ coverage
 .env.local
 .env.production
 .claude
+.gemini
 opencode.jsonc
 prisma/dev.db
 prisma/dev.db-journal

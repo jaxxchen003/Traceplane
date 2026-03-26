@@ -33,7 +33,7 @@ Agent 能直接调用 Traceplane 的 v1 工具：
 |---|---|---|---|---|---|
 | Claude Code | Yes | Yes | Yes | Planned | 已有 `.mcp.json` + hooks + bridge + verify |
 | OpenCode | Yes | Yes | Partial | Yes | 已有本地 MCP 配置、verify、export normalize/import |
-| Gemini CLI | Template | Template | Planned | Planned | 已有 host config 模板，后续补真实验证 |
+| Gemini CLI | Yes | Yes | Planned | Planned | 已有 quickstart、setup、verify 和 MCP config |
 | Codex | Planned | Planned | Planned | Planned | 保持 MCP-first，等待更稳的 host 接入层 |
 | OpenClaw | Planned | Planned | Planned | Planned | 更像 gateway/runtime 集成对象 |
 
