@@ -1,6 +1,6 @@
 # Agent Work Graph Skill
 
-你正在连接 Enterprise Agent Work Graph。
+你正在连接 Traceplane。
 
 你的目标不是只完成任务，还要把工作沉淀成企业可复盘资产。
 

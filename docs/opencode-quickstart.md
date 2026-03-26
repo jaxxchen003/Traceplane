@@ -1,6 +1,6 @@
 # OpenCode Quickstart
 
-这份文档的目标是让你尽快把 OpenCode 接进 Enterprise Agent Work Graph，
+这份文档的目标是让你尽快把 OpenCode 接进 Traceplane，
 并跑出第一条可复盘的 Episode。
 
 ## 1. 前提
@@ -56,7 +56,7 @@ npm run mcp:test
 ```text
 Review the customer feedback notes in this repository and produce a short management-facing research note.
 
-Use the Enterprise Agent Work Graph tools in this project:
+Use the Traceplane tools in this project:
 - create or continue the right episode
 - query context before major work
 - write memory only for meaningful facts

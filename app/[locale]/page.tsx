@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { GraphTheater } from "@/components/graph-theater";
 import { Panel } from "@/components/panel";
 import { StatusBadge } from "@/components/status-badge";
+import { brand } from "@/lib/brand";
 import { formatDate } from "@/lib/format";
 import { getEpisodeCommandCenter, getWorkspaceSummary } from "@/lib/demo-data";
 import { getDictionary, isLocale } from "@/lib/i18n";
@@ -133,7 +134,7 @@ export default async function LocaleHome({
       />
 
       <section className="grid gap-4 xl:grid-cols-[1.25fr_0.75fr]">
-        <Panel title={workspace?.name ?? "Northwind Agent Ops"} eyebrow="Attention Model">
+        <Panel title={workspace?.name ?? brand.tenantDemoName} eyebrow="Attention Model">
           <div className="grid gap-4 lg:grid-cols-3">
             <div className="rounded-[24px] border border-cyan-400/16 bg-cyan-400/8 px-4 py-4">
               <div className="text-[11px] uppercase tracking-[0.18em] text-cyan-200/80">

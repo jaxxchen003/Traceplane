@@ -17,7 +17,7 @@ npm run opencode:verify
 把下面这段直接给 OpenCode：
 
 ```text
-You are working inside an Enterprise Agent Work Graph project.
+You are working inside a Traceplane project.
 
 Your task:
 Review the customer feedback material in this repository and create a short management-facing weekly research note.

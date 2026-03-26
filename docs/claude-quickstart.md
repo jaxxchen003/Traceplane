@@ -28,7 +28,7 @@ npm run claude:setup -- q2-customer-pulse research-agent
 
 其中：
 
-- `.mcp.json` 负责把 Enterprise Agent Work Graph 暴露给 Claude
+- `.mcp.json` 负责把 Traceplane MCP server 暴露给 Claude
 - `.claude/settings.json` 负责把 Claude 的关键 hook 事件回写成 Episode trace
 
 ## 3. 验证配置
@@ -67,7 +67,7 @@ npm run claude:hook:test
 ```text
 Review the current customer feedback notes in this repo and produce a short management-facing research note.
 
-Use the Enterprise Agent Work Graph tools in this project:
+Use the Traceplane tools in this project:
 - create or continue the right episode
 - query context before major work
 - record key facts with memory
@@ -111,6 +111,6 @@ Use the Enterprise Agent Work Graph tools in this project:
 
 这条链成立，就说明：
 
-`Claude Code + Enterprise Agent Work Graph`
+`Claude Code + Traceplane`
 
 已经具备第一阶段真实试用价值。

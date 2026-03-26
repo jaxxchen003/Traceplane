@@ -1,4 +1,6 @@
-# Enterprise Agent Work Graph
+# Traceplane
+
+> Enterprise Agent Work Graph
 
 ## 项目一句话
 面向企业多 Agent 协作场景的共享数据中枢，统一承载 memory、trace、artifact，并通过 policy、permission、audit 形成可管理、可复用、可追溯的工作图谱。
@@ -100,6 +102,28 @@ npm run dev
 - `create_artifact`
 - `query_context`
 - `get_episode_brief`
+
+## Host Adoption Matrix
+
+当前接入层分成 4 个成熟度等级：
+
+- `MCP`: 能读取和写入 Traceplane 的工作主线
+- `Setup`: 有一键配置和环境校验
+- `Capture`: 能把 host 的真实运行事件带回 Episode
+- `Import`: 能把历史 transcript / export 导入 Traceplane
+
+| Host | MCP | Setup | Capture | Import | 当前状态 |
+|---|---|---|---|---|---|
+| Claude Code | Yes | Yes | Yes | Planned | 第一优先接入，已具备 hooks bridge |
+| OpenCode | Yes | Yes | Partial | Yes | 实时接入 + export 标准化都可用 |
+| Gemini CLI | Template | Template | Planned | Planned | 已有 host config 模板，待实装 |
+| Codex | Planned | Planned | Planned | Planned | 当前先保留 MCP-first 策略 |
+| OpenClaw | Planned | Planned | Planned | Planned | 更适合作为 session/runtime 级接入 |
+
+更详细的分层说明见：
+- [mcp-host-setup.md](/Users/jaxxchen/projects/enterprise-agent-work-graph/docs/mcp-host-setup.md)
+- [agent-integration-strategy.md](/Users/jaxxchen/projects/enterprise-agent-work-graph/docs/agent-integration-strategy.md)
+- [host-adoption-matrix.md](/Users/jaxxchen/projects/enterprise-agent-work-graph/docs/host-adoption-matrix.md)
 
 本地启动：
 

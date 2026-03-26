@@ -1,6 +1,6 @@
 # Claude Code Project Guidance
 
-This repository exposes an MCP server for the Enterprise Agent Work Graph.
+This repository exposes an MCP server for Traceplane.
 
 When working in this project:
 

@@ -3,7 +3,7 @@
 这份文档定义一个中间层：
 
 不是直接绑 Claude Code、OpenCode 或 Gemini CLI 的原始导出格式，
-而是先把它们转换成统一的 `episode transcript package`，再导入 Enterprise Agent Work Graph。
+而是先把它们转换成统一的 `episode transcript package`，再导入 Traceplane。
 
 ## 1. 为什么需要这层
 

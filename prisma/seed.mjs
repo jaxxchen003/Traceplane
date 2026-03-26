@@ -21,8 +21,8 @@ async function main() {
 
   const workspace = await prisma.workspace.create({
     data: {
-      name: "Northwind Agent Ops",
-      slug: "northwind-agent-ops",
+      name: "Northwind",
+      slug: "northwind",
       ownerId: "manager-lin"
     }
   });

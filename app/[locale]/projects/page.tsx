@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { GraphTheater } from "@/components/graph-theater";
 import { Panel } from "@/components/panel";
 import { StatusBadge } from "@/components/status-badge";
+import { brand } from "@/lib/brand";
 import { formatDate } from "@/lib/format";
 import { getProjects, getWorkspaceSummary } from "@/lib/demo-data";
 import { getDictionary, isLocale } from "@/lib/i18n";
@@ -84,7 +85,7 @@ export default async function ProjectsPage({
   return (
     <div className="space-y-6">
       <GraphTheater
-        title={workspace?.name ?? "Northwind Agent Ops"}
+        title={workspace?.name ?? brand.tenantDemoName}
         subtitle={
           locale === "zh"
             ? "不是从文件夹看项目，而是从 Agent 工作图谱看项目。主舞台展示多项目的执行主线、产物簇和治理信号。"
