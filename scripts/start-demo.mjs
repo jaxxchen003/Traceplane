@@ -2,6 +2,7 @@ import { spawn } from "node:child_process";
 import { existsSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { PrismaClient } from "@prisma/client";
 
 import "./_lib/load-env.mjs";
 
@@ -51,6 +52,20 @@ function normalizeDatabaseUrl(databaseUrl) {
   return `file:${sqlitePath}`;
 }
 
+async function repairLegacySqliteData(databaseUrl) {
+  process.env.DATABASE_URL = databaseUrl;
+  const prisma = new PrismaClient();
+
+  try {
+    await prisma.$executeRawUnsafe(
+      "UPDATE Episode SET status = 'IN_REVIEW' WHERE status = 'PENDING_REVIEW'"
+    );
+    console.log("[traceplane] legacy sqlite value repair complete");
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
 async function ensureDatabaseReady() {
   const databaseUrl = process.env.DATABASE_URL ?? "file:./dev.db";
   const normalizedDatabaseUrl = normalizeDatabaseUrl(databaseUrl);
@@ -67,7 +82,7 @@ async function ensureDatabaseReady() {
     console.log(`[traceplane] ensuring sqlite schema at ${normalizedDatabaseUrl}`);
     await runNodeScript(prismaCli, ["db", "push"], runtimeEnv);
     console.log("[traceplane] sqlite schema push complete");
-    await runNodeScript(resolve(rootDir, "scripts", "repair-legacy-sqlite-data.mjs"), [], runtimeEnv);
+    await repairLegacySqliteData(normalizedDatabaseUrl);
   }
 
   if (!forceReset && databaseExists) {
