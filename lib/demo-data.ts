@@ -1,3 +1,8 @@
+import fs from "node:fs/promises";
+import os from "node:os";
+import path from "node:path";
+
+import { getRuntimeConfig } from "@/lib/runtime-config";
 import { prisma } from "@/lib/prisma";
 import { resolveArtifactLocalizedContent } from "@/lib/default-runtime";
 import { localize } from "@/lib/format";
@@ -113,6 +118,11 @@ function statusWeight(status: string) {
 export async function getWorkspaceSummary() {
   const workspace = await prisma.workspace.findFirst();
   return workspace;
+}
+
+function expandHomePath(input: string) {
+  if (!input.startsWith("~/")) return input;
+  return path.join(os.homedir(), input.slice(2));
 }
 
 function summarizeEpisodeForCommandCenter(
@@ -234,6 +244,61 @@ export async function getEpisodeCommandCenter(locale: Locale) {
     recentActivity,
     graphNodes,
     graphEdges
+  };
+}
+
+export async function getRuntimeSurfaceSummary() {
+  const runtime = getRuntimeConfig();
+  const [artifactCount, r2ArtifactCount, inReviewCount, failedCount] = await Promise.all([
+    prisma.artifact.count(),
+    prisma.artifact.count({
+      where: {
+        uri: {
+          startsWith: "r2://"
+        }
+      }
+    }),
+    prisma.episode.count({
+      where: {
+        status: "IN_REVIEW"
+      }
+    }),
+    prisma.episode.count({
+      where: {
+        status: "FAILED"
+      }
+    })
+  ]);
+
+  const syncRoot = expandHomePath(runtime.syncRootPath);
+  let syncRootExists = false;
+  let projectedWorkspaceCount = 0;
+
+  try {
+    const stat = await fs.stat(syncRoot);
+    syncRootExists = stat.isDirectory();
+    if (syncRootExists) {
+      const entries = await fs.readdir(syncRoot);
+      projectedWorkspaceCount = entries.length;
+    }
+  } catch {
+    syncRootExists = false;
+  }
+
+  return {
+    runtime,
+    counts: {
+      artifactCount,
+      r2ArtifactCount,
+      inlineArtifactCount: artifactCount - r2ArtifactCount,
+      inReviewCount,
+      failedCount
+    },
+    localProjection: {
+      rootPath: runtime.syncRootPath,
+      rootExists: syncRootExists,
+      projectedWorkspaceCount
+    }
   };
 }
 
