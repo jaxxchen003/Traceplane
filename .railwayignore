@@ -1,0 +1,14 @@
+.git
+.github
+.next
+node_modules
+npm-debug.log
+.env
+.env.local
+coverage
+dist
+*.log
+docs
+examples
+原始讨论记录.md
+.tmp

@@ -1,7 +1,7 @@
 {
   "name": "enterprise-agent-work-graph",
   "version": "1.0.0",
-  "description": "面向企业多 Agent 协作场景的共享数据中枢，统一承载 memory、trace、artifact，并通过 policy、permission、audit 形成可管理、可复用、可追溯的工作图谱。",
+  "description": "让多个 Agent 的工作接成一条不断档、可回看、可交接的工作主线。",
   "directories": {
     "doc": "docs"
   },
