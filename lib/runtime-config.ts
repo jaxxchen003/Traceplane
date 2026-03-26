@@ -73,15 +73,38 @@ function assessCloudReadiness(env: NodeJS.ProcessEnv): CloudReadiness {
 
 export function getRuntimeConfig() {
   const databaseUrl = process.env.DATABASE_URL || process.env.SUPABASE_DB_URL || "";
+  const databaseSource = hasValue(process.env.DATABASE_URL)
+    ? "DATABASE_URL"
+    : hasValue(process.env.SUPABASE_DB_URL)
+      ? "SUPABASE_DB_URL"
+      : "none";
   const appBaseUrl = normalizeAppBaseUrl(process.env.APP_BASE_URL);
   const cloud = assessCloudReadiness(process.env);
+  const objectStorageConfigured =
+    hasValue(process.env.R2_BUCKET) &&
+    hasValue(process.env.R2_ENDPOINT) &&
+    hasValue(process.env.R2_ACCESS_KEY_ID) &&
+    hasValue(process.env.R2_SECRET_ACCESS_KEY);
 
   return {
     service: "traceplane",
     productDefinition: "Enterprise Agent Work Graph",
     database: {
       urlConfigured: hasValue(databaseUrl),
-      provider: detectDatabaseProvider(databaseUrl)
+      provider: detectDatabaseProvider(databaseUrl),
+      source: databaseSource
+    },
+    supabase: {
+      configured:
+        hasValue(process.env.SUPABASE_PROJECT_URL) &&
+        hasValue(process.env.SUPABASE_SECRET_KEY) &&
+        hasValue(process.env.SUPABASE_ANON_KEY),
+      projectUrlConfigured: hasValue(process.env.SUPABASE_PROJECT_URL)
+    },
+    objectStorage: {
+      provider: objectStorageConfigured ? "r2" : "none",
+      configured: objectStorageConfigured,
+      bucket: process.env.R2_BUCKET || null
     },
     cloud: {
       mode: cloud.ready ? "cloud-ready" : "demo-local",
@@ -89,6 +112,10 @@ export function getRuntimeConfig() {
     },
     appBaseUrl,
     defaultRegion: process.env.DEFAULT_REGION || "global-us-cn",
-    syncRootPath: process.env.SYNC_ROOT_PATH || "~/Traceplane"
+    syncRootPath: process.env.SYNC_ROOT_PATH || "~/Traceplane",
+    localProjection: {
+      mode: "cloud-first-projection",
+      rootPath: process.env.SYNC_ROOT_PATH || "~/Traceplane"
+    }
   } as const;
 }

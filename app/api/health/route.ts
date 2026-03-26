@@ -18,7 +18,13 @@ export async function GET() {
       timestamp: new Date().toISOString(),
       database: {
         status: "ok",
-        provider: runtime.database.provider
+        provider: runtime.database.provider,
+        source: runtime.database.source
+      },
+      storage: {
+        provider: runtime.objectStorage.provider,
+        configured: runtime.objectStorage.configured,
+        bucket: runtime.objectStorage.bucket
       },
       runtime,
       counts: {

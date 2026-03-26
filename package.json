@@ -13,6 +13,7 @@
     "mcp:start": "node scripts/mcp-server.mjs",
     "mcp:test": "node scripts/test-mcp.mjs",
     "cloud:verify": "node scripts/verify-cloud-config.mjs",
+    "cloud:manifest": "node scripts/print-cloud-env-manifest.mjs",
     "cloud:verify:supabase": "node scripts/verify-supabase-connection.mjs",
     "cloud:verify:r2": "node scripts/verify-r2-connection.mjs",
     "workspace:sync": "node scripts/sync-local-workspace.mjs",
