@@ -2,6 +2,8 @@
 
 import { useMemo, useState } from "react";
 
+import { brand } from "@/lib/brand";
+
 type GraphNodeTone = "memory" | "trace" | "artifact" | "policy" | "audit" | "agent";
 
 type GraphNode = {
@@ -148,8 +150,11 @@ export function GraphTheater({
 
       <div className="relative z-10 flex flex-col gap-6 xl:flex-row">
         <div className="xl:max-w-[360px]">
-          <div className="text-[11px] uppercase tracking-[0.34em] text-cyan-200/68">
-            Agent Work Graph
+          <div className="flex items-center gap-3 text-[11px] uppercase tracking-[0.3em] text-cyan-200/68">
+            <span className="flex h-6 w-6 items-center justify-center rounded-full border border-cyan-300/30 bg-[radial-gradient(circle_at_35%_35%,rgba(165,243,252,0.95),rgba(8,145,178,0.9))] text-[10px] font-semibold text-slate-950 shadow-[0_0_26px_rgba(34,211,238,0.24)]">
+              T
+            </span>
+            <span>{brand.name}</span>
           </div>
           <h2 className="mt-3 text-[30px] font-semibold tracking-[-0.03em] text-white">
             {title}

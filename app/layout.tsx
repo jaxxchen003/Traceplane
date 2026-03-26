@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 
+import { brand } from "@/lib/brand";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Enterprise Agent Work Graph",
-  description: "A shared data plane and control plane for enterprise AI agents."
+  title: `${brand.name} · ${brand.category}`,
+  description: brand.shortPitchEn
 };
 
 export default function RootLayout({

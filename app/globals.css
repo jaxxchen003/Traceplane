@@ -10,7 +10,7 @@ html {
   font-family: var(--font-sans);
   background:
     radial-gradient(circle at top left, rgba(56, 189, 248, 0.18), transparent 22%),
-    radial-gradient(circle at top right, rgba(168, 85, 247, 0.16), transparent 24%),
+    radial-gradient(circle at top right, rgba(245, 158, 11, 0.14), transparent 24%),
     linear-gradient(180deg, #071120 0%, #091827 42%, #030712 100%);
 }
 
@@ -20,7 +20,7 @@ body {
   color: #e2e8f0;
   background:
     radial-gradient(circle at top left, rgba(56, 189, 248, 0.1), transparent 18%),
-    radial-gradient(circle at 78% 0%, rgba(244, 114, 182, 0.08), transparent 24%),
+    radial-gradient(circle at 78% 0%, rgba(245, 158, 11, 0.08), transparent 24%),
     linear-gradient(180deg, rgba(9, 15, 27, 0.94), rgba(2, 6, 23, 0.98));
 }
 

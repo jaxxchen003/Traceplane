@@ -248,6 +248,7 @@ docker run --rm -p 3000:3000 --env-file .env enterprise-agent-work-graph
 - `docs/mvp-plan.md`: MVP 的实现逻辑、范围、路线图和最终产品形态
 - `docs/product-surface.md`: 第一版产品的页面、视图、交互和 demo 形态
 - `docs/page-specs.md`: 第一版 5 个核心页面的字段级规格
+- `docs/brand-options.md`: 对外产品命名备选，以及当前推荐名
 - `docs/discussion-insights.md`: 从原始讨论中提炼出的关键洞察和思路演进
 - `docs/open-questions.md`: 当前关键未决问题
 - `AGENTS.md`: 实现约束与工程规则
@@ -260,9 +261,10 @@ docker run --rm -p 3000:3000 --env-file .env enterprise-agent-work-graph
 - `examples/playbooks/opencode-first-episode.md`: OpenCode 的第一条 Episode 试跑剧本
 
 ## 当前命名
-- 英文工作名：`Enterprise Agent Work Graph`
-- 中文工作名：`企业级 Agent 工作图谱`
-- 目录名：`enterprise-agent-work-graph`
+- 推荐对外名：`Traceplane`
+- 对外描述：`Enterprise Agent Work Graph`
+- 中文描述：`Agent 工作控制平面`
+- 仓库目录名：`enterprise-agent-work-graph`
 
 ## 当前平台判断
 - 默认路线：自建底层产品架构
