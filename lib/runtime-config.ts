@@ -3,6 +3,10 @@ type CloudReadiness = {
   blockers: string[];
 };
 
+function getEnv() {
+  return process.env as Record<string, string | undefined>;
+}
+
 function hasValue(value: string | undefined) {
   return Boolean(value && value.trim().length > 0);
 }
@@ -92,19 +96,20 @@ function detectDeploymentStage({
 }
 
 export function getRuntimeConfig() {
-  const databaseUrl = process.env.DATABASE_URL || process.env.SUPABASE_DB_URL || "";
-  const databaseSource = hasValue(process.env.DATABASE_URL)
+  const env = getEnv();
+  const databaseUrl = env["DATABASE_URL"] || env["SUPABASE_DB_URL"] || "";
+  const databaseSource = hasValue(env["DATABASE_URL"])
     ? "DATABASE_URL"
-    : hasValue(process.env.SUPABASE_DB_URL)
+    : hasValue(env["SUPABASE_DB_URL"])
       ? "SUPABASE_DB_URL"
       : "none";
-  const appBaseUrl = normalizeAppBaseUrl(process.env.APP_BASE_URL);
-  const cloud = assessCloudReadiness(process.env);
+  const appBaseUrl = normalizeAppBaseUrl(env["APP_BASE_URL"]);
+  const cloud = assessCloudReadiness(env as NodeJS.ProcessEnv);
   const objectStorageConfigured =
-    hasValue(process.env.R2_BUCKET) &&
-    hasValue(process.env.R2_ENDPOINT) &&
-    hasValue(process.env.R2_ACCESS_KEY_ID) &&
-    hasValue(process.env.R2_SECRET_ACCESS_KEY);
+    hasValue(env["R2_BUCKET"]) &&
+    hasValue(env["R2_ENDPOINT"]) &&
+    hasValue(env["R2_ACCESS_KEY_ID"]) &&
+    hasValue(env["R2_SECRET_ACCESS_KEY"]);
   const databaseProvider = detectDatabaseProvider(databaseUrl);
   const objectStorageProvider = objectStorageConfigured ? "r2" : "none";
   const deploymentStage = detectDeploymentStage({
@@ -123,15 +128,15 @@ export function getRuntimeConfig() {
     },
     supabase: {
       configured:
-        hasValue(process.env.SUPABASE_PROJECT_URL) &&
-        hasValue(process.env.SUPABASE_SECRET_KEY) &&
-        hasValue(process.env.SUPABASE_ANON_KEY),
-      projectUrlConfigured: hasValue(process.env.SUPABASE_PROJECT_URL)
+        hasValue(env["SUPABASE_PROJECT_URL"]) &&
+        hasValue(env["SUPABASE_SECRET_KEY"]) &&
+        hasValue(env["SUPABASE_ANON_KEY"]),
+      projectUrlConfigured: hasValue(env["SUPABASE_PROJECT_URL"])
     },
     objectStorage: {
       provider: objectStorageProvider,
       configured: objectStorageConfigured,
-      bucket: process.env.R2_BUCKET || null
+      bucket: env["R2_BUCKET"] || null
     },
     cloud: {
       mode: cloud.ready ? "cloud-ready" : "demo-local",
@@ -139,11 +144,11 @@ export function getRuntimeConfig() {
       readiness: cloud
     },
     appBaseUrl,
-    defaultRegion: process.env.DEFAULT_REGION || "global-us-cn",
-    syncRootPath: process.env.SYNC_ROOT_PATH || "~/Traceplane",
+    defaultRegion: env["DEFAULT_REGION"] || "global-us-cn",
+    syncRootPath: env["SYNC_ROOT_PATH"] || "~/Traceplane",
     localProjection: {
       mode: "cloud-first-projection",
-      rootPath: process.env.SYNC_ROOT_PATH || "~/Traceplane"
+      rootPath: env["SYNC_ROOT_PATH"] || "~/Traceplane"
     }
   } as const;
 }
