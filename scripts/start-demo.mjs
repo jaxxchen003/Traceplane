@@ -16,6 +16,18 @@ function resolveCloudDatabaseUrl(env) {
   return env.SUPABASE_POOLER_URL || env.SUPABASE_DB_URL || "";
 }
 
+function detectCloudDatabaseSource(env) {
+  if (env.SUPABASE_POOLER_URL) {
+    return "SUPABASE_POOLER_URL";
+  }
+
+  if (env.SUPABASE_DB_URL) {
+    return "SUPABASE_DB_URL";
+  }
+
+  return "none";
+}
+
 function runNodeScript(scriptPath, args, env = process.env) {
   return new Promise((resolvePromise, rejectPromise) => {
     const child = spawn(process.execPath, [scriptPath, ...args], {
@@ -73,11 +85,18 @@ async function repairLegacySqliteData(databaseUrl) {
 
 async function ensureCloudDatabaseReady() {
   const cloudDatabaseUrl = resolveCloudDatabaseUrl(process.env);
+  const cloudDatabaseSource = detectCloudDatabaseSource(process.env);
   const cloudEnv = {
     ...process.env,
+    DATABASE_URL: cloudDatabaseUrl,
     SUPABASE_DB_URL: cloudDatabaseUrl,
     TRACEPLANE_CLOUD_DB_RUNTIME: "active"
   };
+
+  const cloudHost = cloudDatabaseUrl ? new URL(cloudDatabaseUrl).hostname : "none";
+  console.log(
+    `[traceplane] cloud database source: ${cloudDatabaseSource} -> ${cloudHost}`
+  );
 
   console.log("[traceplane] ensuring cloud postgres schema");
   await runNodeScript(prismaCli, ["db", "push", "--schema", postgresSchema, "--skip-generate"], cloudEnv);
