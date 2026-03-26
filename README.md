@@ -144,6 +144,16 @@ npm run normalize:opencode -- \
   .tmp/opencode-normalized.json
 ```
 
+运行 Claude hook bridge 自测：
+
+```bash
+npm run claude:hook:test
+```
+
+Claude Code hooks 示例配置：
+
+- [examples/hooks/claude/settings.json](/Users/jaxxchen/projects/enterprise-agent-work-graph/examples/hooks/claude/settings.json)
+
 ## 环境变量
 - `DATABASE_URL`: Prisma 数据库连接。默认本地示例为 `file:./dev.db`
 - `NEXT_PUBLIC_DEFAULT_LOCALE`: 默认语言，当前示例为 `zh`
@@ -198,6 +208,7 @@ docker run --rm -p 3000:3000 --env-file .env enterprise-agent-work-graph
 - `docs/agent-integration-strategy.md`: 主流 Agent 接入策略、MCP-first 路线、BYO Agent 到 managed runtime 的演进
 - `docs/mcp-spec-v1.md`: 第一版 MCP 工具范围与字段定义
 - `docs/mcp-host-setup.md`: Claude Code、OpenCode、Gemini CLI 的 MCP 接入模板
+- `examples/hooks/claude/`: Claude Code hooks 示例配置
 - `docs/onboarding-skill.md`: onboarding skill 的职责、结构和边界
 - `docs/demo-workflow.md`: 对外演示用的最小多 Agent 工作链路
 - `docs/transcript-import.md`: 标准化 transcript / session 导入层，定义 host export 如何落成统一 episode package

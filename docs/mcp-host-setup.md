@@ -79,6 +79,38 @@ claude mcp add agentWorkGraph --scope project -- node scripts/mcp-server.mjs
 - 生成关键结果前先查询上下文
 - 关键步骤要写入 trace 和 artifact
 
+### 可选：同时打开 Claude hooks
+
+如果你不只想让 Claude 调用 MCP，还想让它把运行中的关键事件写进当前 Episode，
+可以配合仓库里的 hook bridge：
+
+```bash
+node scripts/claude-hook-bridge.mjs
+```
+
+示例配置见：
+
+- `examples/hooks/claude/settings.json`
+
+当前 bridge 会消费这些 hook 事件：
+
+- `UserPromptSubmit`
+- `PreToolUse`
+- `PostToolUse`
+- `Stop`
+
+并把它们写成：
+
+- Episode 自动创建或绑定
+- trace events
+- audit events
+
+最小自测命令：
+
+```bash
+npm run claude:hook:test
+```
+
 ## 3. OpenCode
 
 OpenCode 官方在 `opencode.json` / `opencode.jsonc` 里通过 `mcp` 字段配置本地 MCP server。

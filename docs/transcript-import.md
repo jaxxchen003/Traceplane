@@ -19,6 +19,11 @@
 - 导入历史工作记录
 - 在 host 没有完整 hook 能力时补全证据链
 
+当前我们已经同时覆盖了两条路径：
+
+- `Claude hooks -> Episode traces`
+- `OpenCode export -> normalized transcript -> import`
+
 ## 2. 导入脚本
 
 仓库现在包含：
@@ -156,3 +161,23 @@ npm run import:transcript -- .tmp/opencode-normalized.json
 - 关键过程
 - 最终产物
 - 基础审计
+
+### Claude Code
+
+Claude Code 当前优先不是走 transcript 反解析，而是走实时 hook bridge：
+
+```bash
+node scripts/claude-hook-bridge.mjs
+```
+
+它会把官方 hook 事件写进当前 Episode，特别适合：
+
+- `UserPromptSubmit`
+- `PreToolUse`
+- `PostToolUse`
+- `Stop`
+
+也就是说：
+
+- Claude：当前优先 `hooks -> Episode`
+- OpenCode：当前优先 `export -> normalize -> import`

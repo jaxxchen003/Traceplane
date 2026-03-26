@@ -1,0 +1,46 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "AWG_PROJECT_SLUG=q2-customer-pulse AWG_PRIMARY_AGENT_SLUG=research-agent node scripts/claude-hook-bridge.mjs"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "AWG_PROJECT_SLUG=q2-customer-pulse AWG_PRIMARY_AGENT_SLUG=research-agent node scripts/claude-hook-bridge.mjs"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "AWG_PROJECT_SLUG=q2-customer-pulse AWG_PRIMARY_AGENT_SLUG=research-agent node scripts/claude-hook-bridge.mjs"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "AWG_PROJECT_SLUG=q2-customer-pulse AWG_PRIMARY_AGENT_SLUG=research-agent AWG_AUTO_REVIEW_ON_STOP=true node scripts/claude-hook-bridge.mjs"
+          }
+        ]
+      }
+    ]
+  }
+}

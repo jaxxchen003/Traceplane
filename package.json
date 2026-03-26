@@ -15,6 +15,7 @@
     "mcp:host": "node scripts/setup-mcp-host.mjs",
     "import:transcript": "node scripts/import-transcript.mjs",
     "normalize:opencode": "node scripts/normalize-opencode-export.mjs",
+    "claude:hook:test": "node scripts/test-claude-hook-bridge.mjs",
     "lint": "eslint .",
     "ci": "npm run lint && npm run build",
     "db:generate": "prisma generate",
