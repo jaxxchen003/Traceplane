@@ -23,6 +23,7 @@
 - memory 检索支持
 - snapshot / branch 原语
 - 原始 trace 附件存储
+- 本地工作区投影与同步
 
 ## 默认接口
 
@@ -56,6 +57,8 @@ interface StorageRuntime {
   appendTraceBlob(input: PutBlobInput): Promise<{ uri: string; size: number }>;
   listNamespace(path: string): Promise<Array<{ path: string; size?: number }>>;
   createSnapshot(scope: RuntimeScope, name: string): Promise<{ snapshotId: string }>;
+  projectToLocalWorkspace(scope: RuntimeScope, targetPath: string): Promise<{ syncedCount: number }>;
+  syncLocalWorkspace(targetPath: string): Promise<{ uploadedCount: number; conflictCount: number }>;
   searchMemory(input: SearchMemoryInput): Promise<
     Array<{ memoryId: string; score: number; excerpt?: string }>
   >;
@@ -76,6 +79,7 @@ interface StorageRuntime {
 - blob
 - retrieval
 - snapshot
+- local projection / sync
 
 因为这些是底层实现会变化的地方。
 
@@ -98,11 +102,16 @@ interface StorageRuntime {
 - `createSnapshot`
   - 先实现为 metadata-level snapshot
   - 后续再升级为更强的 branch/sandbox
+- `projectToLocalWorkspace`
+  - 把云端 episode namespace 投影到本地工作区
+- `syncLocalWorkspace`
+  - 把本地变更回写到云端并处理冲突
 
 ### 适用阶段
 - 当前 MVP
 - 企业可控版本
 - 未来私有化 / 合规部署版本
+- 云端优先 + 本地同步工作区版本
 
 ## Db9Runtime
 

@@ -223,10 +223,26 @@ Claude Code hooks 示例配置：
 - `DATABASE_URL`: Prisma 数据库连接。默认本地示例为 `file:./dev.db`
 - `NEXT_PUBLIC_DEFAULT_LOCALE`: 默认语言，当前示例为 `zh`
 - `DEMO_RESET_ENABLED`: 仅用于 demo 容器首次启动或强制重置时自动重建 demo 数据
+- `SUPABASE_PROJECT_URL`: 云端工作平面的 Supabase 项目地址
+- `SUPABASE_SECRET_KEY`: 仅后端使用的 Supabase 服务密钥
+- `R2_BUCKET / R2_ENDPOINT / R2_ACCESS_KEY_ID / R2_SECRET_ACCESS_KEY`: 云端 artifact/blob 存储
+- `APP_BASE_URL`: 对外服务地址，建议使用完整 `https://...`
+- `DEFAULT_REGION`: 当前默认可写成 `global-us-cn`
+- `SYNC_ROOT_PATH`: 本地同步工作区目录，建议统一成 `~/Traceplane`
 
 可直接从 `.env.example` 复制一份：
 ```bash
 cp .env.example .env
+```
+
+如果要从本地 demo 过渡到正式云端准备，先看：
+- [cloud-sync-architecture.md](/Users/jaxxchen/projects/enterprise-agent-work-graph/docs/cloud-sync-architecture.md)
+- [cloud-setup-checklist.md](/Users/jaxxchen/projects/enterprise-agent-work-graph/docs/cloud-setup-checklist.md)
+
+健康检查接口现在会返回当前 runtime 是否已经 `cloud-ready`：
+
+```bash
+curl -sS http://127.0.0.1:3000/api/health
 ```
 
 ## Docker 运行

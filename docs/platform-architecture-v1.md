@@ -8,6 +8,7 @@
 - 支撑 `memory + trace + artifact + graph + audit`
 - 保持企业级控制权，不把核心数据平面锁死在第三方 runtime 上
 - 允许未来接入 agent-native backend，例如 `db9`
+- 正式产品默认云端优先，同时允许本地同步工作区做文件投影与离线缓存
 
 ## 核心判断
 
@@ -64,6 +65,31 @@ Postgres 负责：
 - trace blob
 - raw context
 - 大文件版本
+
+### 2.5 Sync Plane: Local Workspace Projection
+正式产品不应把本地目录当成主存储，而应把它当成：
+
+- 本地缓存
+- 文件投影
+- agent 可直接读写的工作区镜像
+- 离线查看和局部编辑层
+
+推荐模式：
+
+- 云端是 `system of record`
+- 本地是 `working copy`
+
+这更接近：
+
+- 坚果云 / Dropbox 的同步工作区
+- 但同步对象不是泛文件夹，而是带 `project / episode / artifact / trace` 语义的工作命名空间
+
+本地同步层负责：
+
+- 把云端 artifact 映射到本地目录
+- 把 trace / snapshot / transcript 投影成本地文件
+- 监听本地新增或修改并回写云端
+- 处理冲突、版本和最近一次同步状态
 
 ### 3. Retrieval Plane: Vector Layer
 默认将向量检索设计为可替换层。
@@ -128,6 +154,7 @@ Postgres 负责：
 - agent 侧路径直观
 - manager 侧图谱稳定
 - artifact / trace / audit 更容易回链
+- 云端与本地同步层都能围绕同一命名空间工作
 
 ### Graph 在应用层，而不是数据库品牌层
 我们不把“图谱能力”外包给某种底层数据库叙事。
@@ -201,6 +228,7 @@ embedding、distill、archive 不应该是后补脚本。
 - `Object Storage`：artifact 和 raw blob
 - `pgvector`：默认语义检索
 - `Queue + Worker`：异步任务
+- `Sync Agent / Local Projection Service`：本地工作区同步
 - `Next.js / API layer`：产品与控制层
 
 ### 当前不建议

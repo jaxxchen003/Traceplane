@@ -19,6 +19,7 @@
 - Artifact Store
 - Graph Index
 - Semantic Search
+- Local Workspace Projection
 
 ### 2.2 Control Plane
 负责企业治理和可管理性：
@@ -124,6 +125,26 @@ graph TD
 6. 系统写入 `node_edges`
 7. 系统为关键行为补写 `audit_event`
 
+### 6.3 云端优先，本地投影
+正式产品默认应采用：
+
+- 云端存储作为主记录
+- 本地工作区作为同步投影
+
+也就是说：
+
+- `episode / memory / trace / artifact / audit` 的权威状态在云端
+- 本地目录主要服务于：
+  - Agent 直接读写文件
+  - 用户离线查看
+  - 类坚果云的同步体验
+
+本地不应成为最终权威来源，只应作为：
+
+- working copy
+- sync cache
+- projection layer
+
 ### 6.2 查询流
 1. 调用方请求 `episode graph`
 2. 权限系统检查 Workspace / Project / Episode / Node 访问权限
@@ -138,6 +159,7 @@ graph TD
 - Object Storage：Artifact 二进制文件
 - Vector DB：Memory 语义索引
 - Queue：异步索引、蒸馏、归档、告警
+- Local Sync Agent：本地工作区镜像与回写
 
 ### 7.2 图层策略
 MVP 不必一开始上图数据库。

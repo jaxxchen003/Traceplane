@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
 
 import { prisma } from "@/lib/prisma";
+import { getRuntimeConfig } from "@/lib/runtime-config";
 
 export async function GET() {
   try {
+    const runtime = getRuntimeConfig();
     const [workspaceCount, projectCount, episodeCount] = await Promise.all([
       prisma.workspace.count(),
       prisma.project.count(),
@@ -11,13 +13,14 @@ export async function GET() {
     ]);
 
     return NextResponse.json({
-      service: "enterprise-agent-work-graph",
+      service: runtime.service,
       status: "ok",
       timestamp: new Date().toISOString(),
       database: {
         status: "ok",
-        provider: "sqlite"
+        provider: runtime.database.provider
       },
+      runtime,
       counts: {
         workspaces: workspaceCount,
         projects: projectCount,
@@ -27,7 +30,7 @@ export async function GET() {
   } catch (error) {
     return NextResponse.json(
       {
-        service: "enterprise-agent-work-graph",
+        service: "traceplane",
         status: "degraded",
         timestamp: new Date().toISOString(),
         database: {
