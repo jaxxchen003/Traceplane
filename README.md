@@ -88,6 +88,30 @@ npm run dev
 - `GET /api/audit?projectId=...&episodeId=...&locale=zh|en`
 - `GET /api/health`
 
+## 当前 MCP Server
+仓库现在已经包含一个可运行的 stdio MCP server，暴露 8 个 v1 工具：
+
+- `create_episode`
+- `update_episode_status`
+- `link_episode`
+- `write_memory`
+- `append_trace`
+- `create_artifact`
+- `query_context`
+- `get_episode_brief`
+
+本地启动：
+
+```bash
+npm run mcp:start
+```
+
+本地自测：
+
+```bash
+npm run mcp:test
+```
+
 ## 环境变量
 - `DATABASE_URL`: Prisma 数据库连接。默认本地示例为 `file:./dev.db`
 - `NEXT_PUBLIC_DEFAULT_LOCALE`: 默认语言，当前示例为 `zh`

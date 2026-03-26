@@ -52,8 +52,12 @@ enum TraceStatus {
 enum FileType {
   MARKDOWN
   JSON
+  CSV
   HTML
   SVG
+  PDF
+  SCRIPT
+  IMAGE
 }
 
 enum EdgeType {
