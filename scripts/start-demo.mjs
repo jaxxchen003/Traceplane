@@ -3,6 +3,8 @@ import { existsSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import "./_lib/load-env.mjs";
+
 const rootDir = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const prismaCli = resolve(rootDir, "node_modules", "prisma", "build", "index.js");
 const nextCli = resolve(rootDir, "node_modules", "next", "dist", "bin", "next");

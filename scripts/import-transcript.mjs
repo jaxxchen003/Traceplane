@@ -4,6 +4,8 @@ import path from "node:path";
 import { PrismaClient } from "@prisma/client";
 import { z } from "zod";
 
+import "./_lib/load-env.mjs";
+
 const prisma = new PrismaClient();
 
 const localizedTextSchema = z.union([

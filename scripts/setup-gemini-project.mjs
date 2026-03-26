@@ -1,6 +1,8 @@
 import fs from "node:fs";
 import path from "node:path";
 
+import "./_lib/load-env.mjs";
+
 const cwd = process.cwd();
 const dbUrl = process.env.DATABASE_URL || "file:./dev.db";
 const outputPath = process.argv[2] || path.join(".gemini", "settings.json");

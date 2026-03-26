@@ -245,6 +245,14 @@ cp .env.example .env
 curl -sS http://127.0.0.1:3000/api/health
 ```
 
+另外还可以直接跑两条云端校验脚本：
+
+```bash
+npm run cloud:verify
+npm run cloud:verify:supabase
+npm run cloud:verify:r2
+```
+
 ## Docker 运行
 ```bash
 docker build -t enterprise-agent-work-graph .

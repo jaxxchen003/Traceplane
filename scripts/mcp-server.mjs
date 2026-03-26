@@ -3,6 +3,9 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import * as z from "zod/v4";
 
+import "./_lib/load-env.mjs";
+import { persistArtifactBlob } from "./_lib/artifact-storage.mjs";
+
 const prisma = new PrismaClient();
 
 function toI18n(value, fallback = null) {
@@ -493,6 +496,18 @@ server.registerTool(
       where: { artifactKey: key },
       orderBy: { version: "desc" }
     });
+    const nextVersion = latest ? latest.version + 1 : 1;
+    const contentI18n = content ? toI18n(content) : null;
+    const blobResult = await persistArtifactBlob({
+      workspaceId: episode.project.workspaceId,
+      projectId: episode.projectId,
+      episodeId: episode_id,
+      artifactKey: key,
+      version: nextVersion,
+      fileType: artifact_type,
+      titleI18n: toI18n(title),
+      contentI18n
+    });
 
     const artifact = await prisma.$transaction(async (tx) => {
       const created = await tx.artifact.create({
@@ -502,10 +517,10 @@ server.registerTool(
           sourceTraceEventId: source_trace_id ?? null,
           artifactKey: key,
           titleI18n: toI18n(title),
-          contentI18n: content ? toI18n(content) : null,
+          contentI18n,
           fileType: artifact_type,
-          version: latest ? latest.version + 1 : 1,
-          uri: uri ?? null,
+          version: nextVersion,
+          uri: uri ?? blobResult.uri ?? null,
           sensitivity: sensitivity ?? "Internal",
           shareScope: share_scope ?? "project"
         }
@@ -562,7 +577,9 @@ server.registerTool(
     return toolResult({
       artifact_id: artifact.id,
       artifact_key: artifact.artifactKey,
-      version: artifact.version
+      version: artifact.version,
+      storage_mode: blobResult.storageMode,
+      storage_warning: blobResult.warning ?? null
     });
   }
 );

@@ -4,6 +4,8 @@ import { spawn } from "node:child_process";
 
 import { PrismaClient } from "@prisma/client";
 
+import "./_lib/load-env.mjs";
+
 const prisma = new PrismaClient();
 
 function runHook(payload, env) {

@@ -1,6 +1,8 @@
 import fs from "node:fs";
 import path from "node:path";
 
+import "./_lib/load-env.mjs";
+
 const host = process.argv[2];
 const explicitOutput = process.argv[3];
 const cwd = process.cwd();

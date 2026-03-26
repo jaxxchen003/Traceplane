@@ -2,6 +2,8 @@ import { PrismaClient } from "@prisma/client";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
 
+import "./_lib/load-env.mjs";
+
 const prisma = new PrismaClient();
 
 async function main() {

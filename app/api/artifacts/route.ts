@@ -1,6 +1,7 @@
 import { Prisma } from "@prisma/client";
 import { NextResponse } from "next/server";
 
+import { persistArtifactBlob } from "@/lib/artifact-storage";
 import { prisma } from "@/lib/prisma";
 
 export async function POST(request: Request) {
@@ -24,6 +25,17 @@ export async function POST(request: Request) {
   });
 
   const nextVersion = latest ? latest.version + 1 : 1;
+  const contentI18n = body.contentI18n ?? null;
+  const blobResult = await persistArtifactBlob({
+    workspaceId: episode.project.workspaceId,
+    projectId: episode.projectId,
+    episodeId: body.episodeId,
+    artifactKey: body.artifactKey,
+    version: nextVersion,
+    fileType: body.fileType ?? "MARKDOWN",
+    titleI18n: body.titleI18n,
+    contentI18n
+  });
 
   const artifact = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     const created = await tx.artifact.create({
@@ -33,10 +45,10 @@ export async function POST(request: Request) {
         sourceTraceEventId: body.sourceTraceEventId ?? null,
         artifactKey: body.artifactKey,
         titleI18n: body.titleI18n,
-        contentI18n: body.contentI18n ?? null,
+        contentI18n,
         fileType: body.fileType ?? "MARKDOWN",
         version: nextVersion,
-        uri: body.uri ?? null,
+        uri: body.uri ?? blobResult.uri ?? null,
         sensitivity: body.sensitivity ?? "Internal",
         shareScope: body.shareScope ?? "project"
       }
@@ -91,5 +103,12 @@ export async function POST(request: Request) {
     return created;
   });
 
-  return NextResponse.json(artifact, { status: 201 });
+  return NextResponse.json(
+    {
+      ...artifact,
+      storageMode: blobResult.storageMode,
+      storageWarning: blobResult.warning ?? null
+    },
+    { status: 201 }
+  );
 }

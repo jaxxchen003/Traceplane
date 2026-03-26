@@ -1,6 +1,8 @@
 import fs from "node:fs";
 import path from "node:path";
 
+import "./_lib/load-env.mjs";
+
 const projectSlug = process.argv[2];
 const primaryAgentSlug = process.argv[3];
 const autoReviewOnStop = process.argv[4] ?? "true";
