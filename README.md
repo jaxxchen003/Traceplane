@@ -165,6 +165,7 @@ docker run --rm -p 3000:3000 --env-file .env enterprise-agent-work-graph
 - `docs/episode-relations.md`: Episode 关系类型、推断原则、自动化默认策略
 - `docs/agent-integration-strategy.md`: 主流 Agent 接入策略、MCP-first 路线、BYO Agent 到 managed runtime 的演进
 - `docs/mcp-spec-v1.md`: 第一版 MCP 工具范围与字段定义
+- `docs/mcp-host-setup.md`: Claude Code、OpenCode、Gemini CLI 的 MCP 接入模板
 - `docs/platform-architecture-v1.md`: 平台级底层架构判断，明确为什么默认自建而不是直接押注 db9
 - `docs/storage-runtime-interface.md`: 存储运行时接口边界，定义未来如何支持可替换 backend
 - `docs/mvp-plan.md`: MVP 的实现逻辑、范围、路线图和最终产品形态
@@ -174,6 +175,7 @@ docker run --rm -p 3000:3000 --env-file .env enterprise-agent-work-graph
 - `docs/open-questions.md`: 当前关键未决问题
 - `AGENTS.md`: 实现约束与工程规则
 - `.agent/PLANS.md`: 分阶段执行计划
+- `examples/mcp/`: 主流 Agent host 的 MCP 配置模板
 
 ## 当前命名
 - 英文工作名：`Enterprise Agent Work Graph`

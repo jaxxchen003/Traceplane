@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "agentWorkGraph": {
+      "command": "node",
+      "args": ["scripts/mcp-server.mjs"],
+      "env": {
+        "DATABASE_URL": "file:./dev.db"
+      }
+    }
+  }
+}

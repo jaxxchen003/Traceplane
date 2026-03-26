@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "agentWorkGraph": {
+      "command": "node",
+      "args": ["scripts/mcp-server.mjs"],
+      "cwd": "/ABSOLUTE/PATH/TO/enterprise-agent-work-graph",
+      "env": {
+        "DATABASE_URL": "file:./dev.db"
+      },
+      "timeout": 30000,
+      "trust": false
+    }
+  }
+}
