@@ -34,18 +34,15 @@ function getCloudPrisma() {
     return existingCloudPrisma;
   }
 
+  const cloudDatabaseUrl = resolveCloudDatabaseUrl(process.env);
+  if (cloudDatabaseUrl) {
+    process.env.SUPABASE_DB_URL = cloudDatabaseUrl;
+    process.env.DATABASE_URL = cloudDatabaseUrl;
+  }
   const cloudClientModule = require("../generated/prisma-cloud/index.js") as {
     PrismaClient: typeof PrismaClient;
   };
-  const cloudDatabaseUrl = resolveCloudDatabaseUrl(process.env);
   const cloudPrisma = new cloudClientModule.PrismaClient({
-    datasources: cloudDatabaseUrl
-      ? {
-          db: {
-            url: cloudDatabaseUrl
-          }
-        }
-      : undefined,
     log: process.env.NODE_ENV === "development" ? ["warn", "error"] : ["error"]
   });
 

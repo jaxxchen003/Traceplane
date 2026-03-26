@@ -102,16 +102,10 @@ async function ensureCloudDatabaseReady() {
   await runNodeScript(prismaCli, ["db", "push", "--schema", postgresSchema, "--skip-generate"], cloudEnv);
   console.log("[traceplane] cloud postgres schema push complete");
 
-  const { PrismaClient: CloudPrismaClient } = await import("../generated/prisma-cloud/index.js");
   process.env.SUPABASE_DB_URL = cloudDatabaseUrl;
   process.env.DATABASE_URL = cloudDatabaseUrl;
-  const prisma = new CloudPrismaClient({
-    datasources: {
-      db: {
-        url: cloudDatabaseUrl
-      }
-    }
-  });
+  const { PrismaClient: CloudPrismaClient } = await import("../generated/prisma-cloud/index.js");
+  const prisma = new CloudPrismaClient();
 
   try {
     const workspaceCount = await prisma.workspace.count();
