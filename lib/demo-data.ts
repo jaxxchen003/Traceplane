@@ -120,6 +120,75 @@ function statusWeight(status: string) {
   return status === "denied" ? 2 : status === "warning" ? 1 : 0;
 }
 
+function buildHandoffSummary(params: {
+  locale: Locale;
+  goal: string;
+  status: string;
+  reviewOutcome: string | null;
+  primaryActor: string;
+  timeline: Array<{
+    stepTitle: string;
+    shortResult: string;
+    errorSummary: string | null;
+    permissionDeniedReason: string | null;
+    policyHitReason: string | null;
+  }>;
+  memories: Array<{ title: string }>;
+  artifacts: Array<{ title: string; type: string }>;
+}) {
+  const { locale, goal, status, reviewOutcome, primaryActor, timeline, memories, artifacts } = params;
+  const latestStep = timeline.at(-1) ?? null;
+  const latestArtifact = artifacts.at(-1) ?? null;
+
+  let nextAction =
+    locale === "zh"
+      ? `由 ${primaryActor} 继续沿当前 episode 推进。`
+      : `Continue the current episode with ${primaryActor}.`;
+
+  if (status === "IN_REVIEW") {
+    nextAction =
+      locale === "zh"
+        ? "把最新产物交给下一位 Agent 或人工 reviewer 做确认。"
+        : "Hand the latest artifact to the next agent or a human reviewer for confirmation.";
+  } else if (status === "COMPLETED") {
+    nextAction =
+      locale === "zh"
+        ? "把这条 brief 交给下一位 Agent，直接基于现有产物继续工作。"
+        : "Hand this brief to the next agent and continue from the existing artifacts.";
+  } else if (status === "FAILED") {
+    nextAction =
+      locale === "zh"
+        ? "先处理失败原因，再决定是重试、替代还是拆出新 episode。"
+        : "Resolve the failure first, then decide whether to retry, supersede, or split into a new episode.";
+  } else if (status === "BLOCKED") {
+    nextAction =
+      locale === "zh"
+        ? "先解除阻塞，再把同一条工作主线交还给执行 Agent。"
+        : "Clear the blocker first, then hand the same work spine back to the execution agent.";
+  }
+
+  return {
+    goal,
+    latestStepTitle: latestStep?.stepTitle ?? (locale === "zh" ? "尚无执行步骤" : "No execution step yet"),
+    latestResult:
+      latestStep?.shortResult ??
+      (locale === "zh" ? "这条主线还没有可交接的最新结果。" : "This spine has no latest result to hand off yet."),
+    latestArtifactTitle:
+      latestArtifact?.title ?? (locale === "zh" ? "尚无可交接产物" : "No handoff artifact yet"),
+    latestArtifactType: latestArtifact?.type ?? "none",
+    memoryTitles: memories.slice(0, 3).map((memory) => memory.title),
+    cautionItems: [
+      latestStep?.errorSummary,
+      latestStep?.permissionDeniedReason,
+      latestStep?.policyHitReason
+    ].filter(Boolean) as string[],
+    nextAction,
+    readyForHandoff:
+      status === "COMPLETED" || status === "IN_REVIEW" || (status === "IN_PROGRESS" && Boolean(latestArtifact)),
+    reviewOutcome
+  };
+}
+
 export async function getWorkspaceSummary() {
   const workspace = await prisma.workspace.findFirst();
   return workspace;
@@ -581,6 +650,65 @@ export async function getEpisodeReview(episodeId: string, locale: Locale) {
       ? "Claude Code"
       : "Traceplane local control panel";
 
+  const timeline = episode.traceEvents.map((event: EpisodeReviewRecord["traceEvents"][number]) => ({
+    id: event.id,
+    stepIndex: event.stepIndex,
+    eventTime: event.eventTime,
+    eventType: event.eventType,
+    actor: event.actorAgent?.name ?? "System",
+    toolName: event.toolName,
+    status: event.status,
+    stepTitle: localize(event.stepTitleI18n, locale),
+    shortResult: localize(event.shortResultI18n, locale),
+    inputSummary: localize(event.inputSummaryI18n, locale),
+    decisionSummary: localize(event.decisionSummaryI18n, locale),
+    toolPayloadSummary: localize(event.toolPayloadSummaryI18n, locale),
+    resultSummary: localize(event.resultSummaryI18n, locale),
+    errorSummary: localize(event.errorSummaryI18n, locale),
+    policyHitReason: localize(event.policyHitReasonI18n, locale),
+    permissionDeniedReason: localize(event.permissionDeniedI18n, locale),
+    linkedMemoryIds: edges
+      .filter(
+        (edge: EdgeRecord) =>
+          edge.toNodeId === event.id && edge.toNodeType === "trace" && edge.fromNodeType === "memory"
+      )
+      .map((edge: EdgeRecord) => edge.fromNodeId),
+    linkedArtifactIds: edges
+      .filter((edge: EdgeRecord) =>
+        (edge.fromNodeId === event.id && edge.fromNodeType === "trace" && edge.toNodeType === "artifact") ||
+        (edge.toNodeId === event.id && edge.toNodeType === "trace" && edge.fromNodeType === "artifact")
+      )
+      .map((edge: EdgeRecord) => (edge.fromNodeType === "artifact" ? edge.fromNodeId : edge.toNodeId))
+  }));
+
+  const memories = episode.memoryItems.map((memory: EpisodeReviewRecord["memoryItems"][number]) => ({
+    id: memory.id,
+    title: localize(memory.titleI18n, locale),
+    content: localize(memory.contentI18n, locale),
+    type: memory.type,
+    source: memory.source,
+    importance: memory.importance,
+    sensitivity: memory.sensitivity,
+    ttlDays: memory.ttlDays,
+    usedInStepCount: edges.filter(
+      (edge: EdgeRecord) => edge.fromNodeId === memory.id && edge.edgeType === "USED_IN"
+    ).length
+  }));
+
+  const artifacts = episode.artifacts.map((artifact: EpisodeReviewRecord["artifacts"][number]) => ({
+    id: artifact.id,
+    artifactKey: artifact.artifactKey,
+    title: localize(artifact.titleI18n, locale),
+    content: localize(artifact.contentI18n, locale),
+    type: artifact.fileType,
+    version: artifact.version,
+    generatedBy: artifact.createdByAgent.name,
+    generatedAt: artifact.createdAt,
+    shareScope: artifact.shareScope,
+    sensitivity: artifact.sensitivity,
+    uri: artifact.uri
+  }));
+
   return {
     id: episode.id,
     title: localizedEpisodeTitle,
@@ -626,62 +754,19 @@ export async function getEpisodeReview(episodeId: string, locale: Locale) {
         traceEventCount: episode.traceEvents.length
       }
     },
-    timeline: episode.traceEvents.map((event: EpisodeReviewRecord["traceEvents"][number]) => ({
-      id: event.id,
-      stepIndex: event.stepIndex,
-      eventTime: event.eventTime,
-      eventType: event.eventType,
-      actor: event.actorAgent?.name ?? "System",
-      toolName: event.toolName,
-      status: event.status,
-      stepTitle: localize(event.stepTitleI18n, locale),
-      shortResult: localize(event.shortResultI18n, locale),
-      inputSummary: localize(event.inputSummaryI18n, locale),
-      decisionSummary: localize(event.decisionSummaryI18n, locale),
-      toolPayloadSummary: localize(event.toolPayloadSummaryI18n, locale),
-      resultSummary: localize(event.resultSummaryI18n, locale),
-      errorSummary: localize(event.errorSummaryI18n, locale),
-      policyHitReason: localize(event.policyHitReasonI18n, locale),
-      permissionDeniedReason: localize(event.permissionDeniedI18n, locale),
-      linkedMemoryIds: edges
-        .filter(
-          (edge: EdgeRecord) =>
-            edge.toNodeId === event.id && edge.toNodeType === "trace" && edge.fromNodeType === "memory"
-        )
-        .map((edge: EdgeRecord) => edge.fromNodeId),
-      linkedArtifactIds: edges
-        .filter((edge: EdgeRecord) =>
-          (edge.fromNodeId === event.id && edge.fromNodeType === "trace" && edge.toNodeType === "artifact") ||
-          (edge.toNodeId === event.id && edge.toNodeType === "trace" && edge.fromNodeType === "artifact")
-        )
-        .map((edge: EdgeRecord) => (edge.fromNodeType === "artifact" ? edge.fromNodeId : edge.toNodeId))
-    })),
-    memories: episode.memoryItems.map((memory: EpisodeReviewRecord["memoryItems"][number]) => ({
-      id: memory.id,
-      title: localize(memory.titleI18n, locale),
-      content: localize(memory.contentI18n, locale),
-      type: memory.type,
-      source: memory.source,
-      importance: memory.importance,
-      sensitivity: memory.sensitivity,
-      ttlDays: memory.ttlDays,
-      usedInStepCount: edges.filter(
-        (edge: EdgeRecord) => edge.fromNodeId === memory.id && edge.edgeType === "USED_IN"
-      ).length
-    })),
-    artifacts: episode.artifacts.map((artifact: EpisodeReviewRecord["artifacts"][number]) => ({
-      id: artifact.id,
-      artifactKey: artifact.artifactKey,
-      title: localize(artifact.titleI18n, locale),
-      content: localize(artifact.contentI18n, locale),
-      type: artifact.fileType,
-      version: artifact.version,
-      generatedBy: artifact.createdByAgent.name,
-      generatedAt: artifact.createdAt,
-      shareScope: artifact.shareScope,
-      sensitivity: artifact.sensitivity,
-      uri: artifact.uri
-    })),
+    handoffSummary: buildHandoffSummary({
+      locale,
+      goal: localize(episode.goalI18n, locale),
+      status: episode.status,
+      reviewOutcome: episode.reviewOutcome,
+      primaryActor: episode.primaryActor ?? episode.primaryAgent.name,
+      timeline,
+      memories,
+      artifacts
+    }),
+    timeline,
+    memories,
+    artifacts,
     auditSummary: {
       readCount: episode.auditEvents.filter((event: AuditRecord) => event.action.startsWith("read")).length,
       writeCount: episode.auditEvents.filter(

@@ -209,28 +209,105 @@ export default async function EpisodeReviewPage({
           nodes={briefingNodes}
         />
 
-        <Panel title={dict.episode.auditSummary} eyebrow={dict.common.auditTrail}>
-          <div className="grid gap-3 text-sm text-slate-300">
-            <div className="rounded-[20px] border border-cyan-400/16 bg-cyan-400/8 px-4 py-4">
-              {episode.auditSummary.readCount} reads
+        <div className="space-y-4">
+          <Panel title={locale === "zh" ? "Next Agent Handoff" : "Next Agent Handoff"} eyebrow="Brief">
+            <div className="space-y-4 text-sm leading-7 text-slate-300">
+              <div className="rounded-[20px] border border-cyan-400/16 bg-cyan-400/8 px-4 py-4">
+                <div className="text-[11px] uppercase tracking-[0.18em] text-cyan-100/80">
+                  {locale === "zh" ? "最新一步" : "Latest step"}
+                </div>
+                <div className="mt-2 text-base font-semibold text-white">{episode.handoffSummary.latestStepTitle}</div>
+                <div className="mt-2">{episode.handoffSummary.latestResult}</div>
+              </div>
+
+              <div className="grid gap-3 md:grid-cols-2">
+                <div className="rounded-[20px] border border-white/10 bg-white/5 px-4 py-4">
+                  <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
+                    {locale === "zh" ? "最新产物" : "Latest artifact"}
+                  </div>
+                  <div className="mt-2 text-sm font-medium text-white">
+                    {episode.handoffSummary.latestArtifactTitle}
+                  </div>
+                </div>
+                <div className="rounded-[20px] border border-white/10 bg-white/5 px-4 py-4">
+                  <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
+                    {locale === "zh" ? "可交接状态" : "Handoff state"}
+                  </div>
+                  <div className="mt-2 text-sm font-medium text-white">
+                    {episode.handoffSummary.readyForHandoff
+                      ? locale === "zh"
+                        ? "可以直接交给下一位 Agent"
+                        : "Ready to hand to the next agent"
+                      : locale === "zh"
+                        ? "还不适合交接"
+                        : "Not ready for handoff yet"}
+                  </div>
+                </div>
+              </div>
+
+              <div className="rounded-[20px] border border-emerald-400/16 bg-emerald-400/8 px-4 py-4">
+                <div className="text-[11px] uppercase tracking-[0.18em] text-emerald-100/80">
+                  {locale === "zh" ? "下一步建议" : "Next action"}
+                </div>
+                <div className="mt-2 text-white">{episode.handoffSummary.nextAction}</div>
+              </div>
+
+              {episode.handoffSummary.memoryTitles.length > 0 ? (
+                <div className="rounded-[20px] border border-white/10 bg-white/5 px-4 py-4">
+                  <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
+                    {locale === "zh" ? "交接时优先带上" : "Bring into handoff"}
+                  </div>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {episode.handoffSummary.memoryTitles.map((title: string) => (
+                      <span
+                        key={title}
+                        className="rounded-full border border-white/10 bg-white/6 px-3 py-1 text-xs text-slate-200"
+                      >
+                        {title}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+
+              {episode.handoffSummary.cautionItems.length > 0 ? (
+                <div className="rounded-[20px] border border-amber-400/16 bg-amber-400/8 px-4 py-4">
+                  <div className="text-[11px] uppercase tracking-[0.18em] text-amber-100/80">
+                    {locale === "zh" ? "交接注意" : "Cautions"}
+                  </div>
+                  <ul className="mt-3 space-y-2">
+                    {episode.handoffSummary.cautionItems.map((item: string) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
             </div>
-            <div className="rounded-[20px] border border-emerald-400/16 bg-emerald-400/8 px-4 py-4">
-              {episode.auditSummary.writeCount} writes
+          </Panel>
+
+          <Panel title={dict.episode.auditSummary} eyebrow={dict.common.auditTrail}>
+            <div className="grid gap-3 text-sm text-slate-300">
+              <div className="rounded-[20px] border border-cyan-400/16 bg-cyan-400/8 px-4 py-4">
+                {episode.auditSummary.readCount} reads
+              </div>
+              <div className="rounded-[20px] border border-emerald-400/16 bg-emerald-400/8 px-4 py-4">
+                {episode.auditSummary.writeCount} writes
+              </div>
+              <div className="rounded-[20px] border border-rose-400/16 bg-rose-400/8 px-4 py-4">
+                {episode.auditSummary.permissionDeniedCount} denials
+              </div>
+              <div className="rounded-[20px] border border-amber-400/16 bg-amber-400/8 px-4 py-4">
+                {episode.auditSummary.policyHitCount} policy hits
+              </div>
+              <Link
+                href={`/${locale}/audit?episodeId=${episode.id}`}
+                className="mt-2 inline-flex rounded-full border border-white/10 bg-white/6 px-4 py-2 font-medium text-cyan-100"
+              >
+                {dict.common.viewAudit}
+              </Link>
             </div>
-            <div className="rounded-[20px] border border-rose-400/16 bg-rose-400/8 px-4 py-4">
-              {episode.auditSummary.permissionDeniedCount} denials
-            </div>
-            <div className="rounded-[20px] border border-amber-400/16 bg-amber-400/8 px-4 py-4">
-              {episode.auditSummary.policyHitCount} policy hits
-            </div>
-            <Link
-              href={`/${locale}/audit?episodeId=${episode.id}`}
-              className="mt-2 inline-flex rounded-full border border-white/10 bg-white/6 px-4 py-2 font-medium text-cyan-100"
-            >
-              {dict.common.viewAudit}
-            </Link>
-          </div>
-        </Panel>
+          </Panel>
+        </div>
       </section>
 
       <div className="grid gap-6 xl:grid-cols-[1.6fr_0.9fr]">
