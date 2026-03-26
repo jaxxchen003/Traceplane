@@ -57,16 +57,20 @@ async function ensureDatabaseReady() {
   const forceReset = process.env.DEMO_RESET_ENABLED === "true";
   const sqlitePath = resolveSqlitePath(normalizedDatabaseUrl);
   const databaseExists = sqlitePath ? existsSync(sqlitePath) : true;
+  const isSqlite = normalizedDatabaseUrl.startsWith("file:");
   const runtimeEnv = {
     ...process.env,
     DATABASE_URL: normalizedDatabaseUrl
   };
 
+  if (isSqlite) {
+    await runNodeScript(prismaCli, ["db", "push"], runtimeEnv);
+  }
+
   if (!forceReset && databaseExists) {
     return runtimeEnv;
   }
 
-  await runNodeScript(prismaCli, ["db", "push"], runtimeEnv);
   await runNodeScript(resolve(rootDir, "prisma", "seed.mjs"), [], runtimeEnv);
   return runtimeEnv;
 }
