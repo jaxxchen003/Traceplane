@@ -194,7 +194,65 @@ export async function getWorkspaceSummary() {
   return workspace;
 }
 
+function buildContinuationPacket(params: {
+  locale: Locale;
+  projectName: string;
+  episodeTitle: string;
+  goal: string;
+  successCriteria: string;
+  primaryActor: string;
+  handoffSummary: ReturnType<typeof buildHandoffSummary>;
+  memories: Array<{ title: string; content: string }>;
+  artifacts: Array<{ title: string; type: string; version: number }>;
+  timeline: Array<{
+    stepTitle: string;
+    shortResult: string;
+    errorSummary: string | null;
+    permissionDeniedReason: string | null;
+    policyHitReason: string | null;
+  }>;
+}) {
+  const { locale, projectName, episodeTitle, goal, successCriteria, primaryActor, handoffSummary, memories, artifacts, timeline } = params;
+  const lines = locale === "zh"
+    ? [
+        "你正在接手 Traceplane 中的一条工作主线。",
+        `项目：${projectName}`,
+        `Episode：${episodeTitle}`,
+        `目标：${goal}`,
+        `成功标准：${successCriteria}`,
+        `当前主执行角色：${primaryActor}`,
+        `最新一步：${handoffSummary.latestStepTitle}`,
+        `最新结果：${handoffSummary.latestResult}`,
+        `最新产物：${handoffSummary.latestArtifactTitle} (${handoffSummary.latestArtifactType})`,
+        `下一步建议：${handoffSummary.nextAction}`,
+        `优先带上的上下文：${memories.slice(0, 3).map((memory) => memory.title).join("；") || "无"}`,
+        `最近工作脉络：${timeline.slice(-3).map((item) => `${item.stepTitle} -> ${item.shortResult}`).join("；") || "无"}`,
+        `可直接复用的产物：${artifacts.slice(0, 3).map((artifact) => `${artifact.title} v${artifact.version}`).join("；") || "无"}`,
+        `交接注意：${handoffSummary.cautionItems.join("；") || "当前没有显式风险提示"}`,
+        "工作要求：不要重新收集已经存在的上下文，先基于现有 brief、memory 和 artifact 继续。"
+      ]
+    : [
+        "You are taking over an active Traceplane work spine.",
+        `Project: ${projectName}`,
+        `Episode: ${episodeTitle}`,
+        `Goal: ${goal}`,
+        `Success criteria: ${successCriteria}`,
+        `Current execution role: ${primaryActor}`,
+        `Latest step: ${handoffSummary.latestStepTitle}`,
+        `Latest result: ${handoffSummary.latestResult}`,
+        `Latest artifact: ${handoffSummary.latestArtifactTitle} (${handoffSummary.latestArtifactType})`,
+        `Recommended next action: ${handoffSummary.nextAction}`,
+        `Carry forward these context nodes: ${memories.slice(0, 3).map((memory) => memory.title).join("; ") || "None"}`,
+        `Recent work path: ${timeline.slice(-3).map((item) => `${item.stepTitle} -> ${item.shortResult}`).join("; ") || "None"}`,
+        `Reusable artifacts: ${artifacts.slice(0, 3).map((artifact) => `${artifact.title} v${artifact.version}`).join("; ") || "None"}`,
+        `Cautions: ${handoffSummary.cautionItems.join("; ") || "No explicit caution items"}`,
+        "Instruction: do not re-collect existing context. Continue from the current brief, memories, and artifacts."
+      ];
+  return lines.join("\n");
+}
+
 function expandHomePath(input: string) {
+
   if (!input.startsWith("~/")) return input;
   return path.join(os.homedir(), input.slice(2));
 }
@@ -789,6 +847,17 @@ export async function getEpisodeReview(episodeId: string, locale: Locale) {
     uri: artifact.uri
   }));
 
+  const handoffSummary = buildHandoffSummary({
+    locale,
+    goal: localize(episode.goalI18n, locale),
+    status: episode.status,
+    reviewOutcome: episode.reviewOutcome,
+    primaryActor: episode.primaryActor ?? episode.primaryAgent.name,
+    timeline,
+    memories,
+    artifacts
+  });
+
   return {
     id: episode.id,
     title: localizedEpisodeTitle,
@@ -834,15 +903,18 @@ export async function getEpisodeReview(episodeId: string, locale: Locale) {
         traceEventCount: episode.traceEvents.length
       }
     },
-    handoffSummary: buildHandoffSummary({
+    handoffSummary,
+    continuationPacket: buildContinuationPacket({
       locale,
+      projectName: localize(episode.project.nameI18n, locale),
+      episodeTitle: localizedEpisodeTitle,
       goal: localize(episode.goalI18n, locale),
-      status: episode.status,
-      reviewOutcome: episode.reviewOutcome,
+      successCriteria: localize(episode.successCriteriaI18n, locale),
       primaryActor: episode.primaryActor ?? episode.primaryAgent.name,
-      timeline,
+      handoffSummary,
       memories,
-      artifacts
+      artifacts,
+      timeline
     }),
     timeline,
     memories,

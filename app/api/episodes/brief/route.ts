@@ -32,6 +32,7 @@ export async function GET(request: NextRequest) {
       (edge) => edge.fromNodeType === "episode" || edge.toNodeType === "episode"
     ) ?? [],
     handoffBrief: episode.handoffSummary,
+    continuationPacket: episode.continuationPacket,
     keyMemories: episode.memories.slice(0, 3),
     latestArtifacts: episode.artifacts.slice(0, 3),
     attentionItems: [

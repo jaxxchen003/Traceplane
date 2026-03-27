@@ -282,6 +282,15 @@ export default async function EpisodeReviewPage({
                   </ul>
                 </div>
               ) : null}
+
+              <div className="rounded-[20px] border border-white/10 bg-black/30 px-4 py-4">
+                <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
+                  {locale === "zh" ? "Agent Continuation Packet" : "Agent Continuation Packet"}
+                </div>
+                <pre className="mt-3 overflow-x-auto whitespace-pre-wrap break-words rounded-2xl border border-white/8 bg-slate-950/80 p-4 text-[12px] leading-6 text-slate-200">
+                  {episode.continuationPacket}
+                </pre>
+              </div>
             </div>
           </Panel>
 

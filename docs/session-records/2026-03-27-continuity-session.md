@@ -128,3 +128,74 @@ Traceplane 当前已明确收敛到第一层产品：
    - 不扩大到完整企业治理叙事
    - 不提前进入 managed runtime 叙事
 
+
+### 5. 首页改成 continuity queues
+
+已完成：
+
+- `lib/demo-data.ts`
+  - `getEpisodeCommandCenter()` 改成 continuity-first 分组
+- `app/[locale]/page.tsx`
+  - 首页改成 `readyToContinue / contextRepair / liveHandoffs / recentSpines`
+
+当前首页已经不再按传统“任务列表”表达，而是按：
+
+- 可继续的工作
+- 先修复上下文
+- 进行中的接力
+- 最近主线
+
+并且每条卡片都开始明确显示：
+
+- 这条 spine 是否适合交接
+- 下一步怎么继续
+- 当前应该进入哪个 continuity queue
+
+补充修正：
+
+- 带 `policy hit` 的主线不再同时进入“可继续”和“先修复”
+- 现在会优先落在修复队列，避免首页 attention model 相互冲突
+
+### 6. Codex 接入层级已校准
+
+已完成：
+
+- `docs/codex-integration.md`
+- `docs/host-adoption-matrix.md`
+- `app/[locale]/connect/page.tsx`
+
+当前结论：
+
+- `Codex` 现在适合按 `MCP + skills` 接入
+- 不应对外表述成与 `Claude Code hooks` 同等级的本地过程捕获
+- 更深的过程 trace 更适合未来走 `OpenAI API / Agents SDK` 路线
+
+### 7. Continuation Packet 成为下一层 handoff 产物
+
+已完成：
+
+- `lib/demo-data.ts`
+  - 新增 `continuationPacket`
+- `app/api/episodes/brief/route.ts`
+  - 新增 `continuationPacket` 返回
+- `app/[locale]/projects/[projectId]/episodes/[episodeId]/page.tsx`
+  - `Next Agent Handoff` 面板内新增 `Agent Continuation Packet`
+
+这意味着当前 handoff 已经分成两层：
+
+- `handoff brief`：给人快速理解当前工作主线
+- `continuation packet`：给下一位 Agent 直接继续执行
+
+### 8. 部署状态补充
+
+当前线上状态：
+
+- continuity-first 首页文案已经上线
+- 云端 runtime 仍稳定在 `cloud-active`
+- Railway 最近多次出现上传超时，不是代码错误，而是部署链路不稳定
+
+因此当前策略是：
+
+- 本地和 GitHub 继续保持最新
+- 线上在不稳定时保持上一版稳定可用版本
+- 新一轮 Railway 上传成功后再同步最新 continuity UI
