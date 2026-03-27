@@ -199,3 +199,27 @@ Traceplane 当前已明确收敛到第一层产品：
 - 本地和 GitHub 继续保持最新
 - 线上在不稳定时保持上一版稳定可用版本
 - 新一轮 Railway 上传成功后再同步最新 continuity UI
+
+### 9. Continuation Packet 进入本地投影和项目入口
+
+已完成：
+
+- `scripts/sync-local-workspace.mjs`
+  - 本地同步时会额外写出 `continuation-packet.txt` 和 `handoff-brief.json`
+- `lib/default-runtime.ts`
+  - 应用内的本地投影 runtime 也会写同样的 continuity 文件
+- `app/[locale]/projects/[projectId]/page.tsx`
+  - `Best Next Handoff` 面板新增 `Project Handoff Starter`
+
+这意味着第一层 continuity 现在不只停留在 UI：
+
+- 页面里有 handoff brief
+- API 里有 continuation packet
+- 本地 `~/Traceplane/...` 目录里也有可以直接交给下一个 Agent 的 continuation 文件
+
+当前这条闭环已经更接近真实使用：
+
+1. Agent 工作形成 episode
+2. Traceplane 生成 handoff brief / continuation packet
+3. 本地同步目录出现 continuation 文件
+4. 下一位 Agent 可以直接从文件或页面继续

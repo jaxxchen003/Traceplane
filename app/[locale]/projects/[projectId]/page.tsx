@@ -157,6 +157,25 @@ export default async function ProjectOverviewPage({
   const handoffCandidate = project.episodes.find(
     (episode: { status: string }) => episode.status === "IN_REVIEW" || episode.status === "COMPLETED"
   ) ?? project.episodes[0] ?? null;
+  const handoffStarter = handoffCandidate
+    ? locale === "zh"
+      ? [
+          `项目：${project.name}`,
+          `优先继续的主线：${handoffCandidate.title}`,
+          `当前执行者：${handoffCandidate.primaryAgent}`,
+          `状态：${handoffCandidate.status}`,
+          `目标摘要：${handoffCandidate.summary}`,
+          "动作：打开这条 Episode，先读取 handoff brief，再把 brief 交给下一位 Agent 继续。"
+        ].join("\n")
+      : [
+          `Project: ${project.name}`,
+          `Best spine to continue: ${handoffCandidate.title}`,
+          `Current actor: ${handoffCandidate.primaryAgent}`,
+          `Status: ${handoffCandidate.status}`,
+          `Goal summary: ${handoffCandidate.summary}`,
+          "Action: open this episode, read the handoff brief, then pass the brief to the next agent."
+        ].join("\n")
+    : null;
 
   return (
     <div className="space-y-6">
@@ -221,6 +240,17 @@ export default async function ProjectOverviewPage({
                     ? "打开这条 Episode，直接读取 handoff brief，把它交给下一位 Agent 继续。"
                     : "Open this episode, read the handoff brief, and give it to the next agent to continue."}
                 </div>
+
+                {handoffStarter ? (
+                  <div className="rounded-[20px] border border-white/10 bg-black/30 px-4 py-4">
+                    <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
+                      {locale === "zh" ? "Project Handoff Starter" : "Project Handoff Starter"}
+                    </div>
+                    <pre className="mt-3 overflow-x-auto whitespace-pre-wrap break-words rounded-2xl border border-white/8 bg-slate-950/80 p-4 text-[12px] leading-6 text-slate-200">
+                      {handoffStarter}
+                    </pre>
+                  </div>
+                ) : null}
 
                 <div className="flex flex-wrap gap-2 pt-1">
                   <Link
