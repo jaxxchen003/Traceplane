@@ -223,3 +223,41 @@ Traceplane 当前已明确收敛到第一层产品：
 2. Traceplane 生成 handoff brief / continuation packet
 3. 本地同步目录出现 continuation 文件
 4. 下一位 Agent 可以直接从文件或页面继续
+
+### 10. 首页与 Connect 页进入 Continuity Launchpad 阶段
+
+已完成：
+
+- `lib/demo-data.ts`
+  - `getEpisodeCommandCenter()` 现在会返回 `continuityLaunchpad`
+  - launchpad 会自动挑选当前最适合继续的一条主线
+  - 同时给出：
+    - `briefHref`
+    - `continuation-packet.txt` 路径
+    - `handoff-brief.json` 路径
+    - packet 是否已存在
+    - 推荐接力 host
+- `app/[locale]/page.tsx`
+  - 新增 `Continue From Brief or File` 面板
+  - 首页不再只讲“Connect -> Work -> Brief -> Continue”抽象流程
+  - 现在会直接展示：
+    - 当前最适合继续的 episode
+    - 本地 continuation packet 路径
+    - 下一步建议和推荐 host
+  - 首页 `Connected Hosts` 里也正式补上了 `Codex`
+- `app/[locale]/connect/page.tsx`
+  - 新增 `Continue Into The Next Agent` 面板
+  - 用户接完 host 后，可以直接看到：
+    - 应该打开哪条 brief
+    - 本地 packet 路径
+    - 建议如何把 packet 交给下一个 Agent
+
+这一轮的意义是：
+
+- 首页开始真正像“continuity 入口”，而不是“continuity 说明页”
+- Connect 页开始真正像“接入后立刻继续工作”的控制台，而不是 setup 文档列表
+- 第一层产品的主叙事进一步收紧成：
+  - 连接一个 Agent
+  - 自动形成 Episode
+  - 生成 handoff brief / continuation packet
+  - 让下一个 Agent 继续，而不是重新开始

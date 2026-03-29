@@ -46,7 +46,11 @@ async function findProjectForOverview(projectId: string) {
 async function findEpisodesForCommandCenter() {
   return prisma.episode.findMany({
     include: {
-      project: true,
+      project: {
+        include: {
+          workspace: true
+        }
+      },
       primaryAgent: true,
       artifacts: true,
       auditEvents: true
@@ -331,6 +335,8 @@ function summarizeEpisodeForCommandCenter(
     primaryAgent: episode.primaryAgent.name,
     projectId: episode.projectId,
     projectName: localize(episode.project.nameI18n, locale),
+    projectSlug: episode.project.slug,
+    workspaceSlug: episode.project.workspace.slug,
     updatedAt: episode.updatedAt,
     startedAt: episode.startedAt,
     reviewOutcome: episode.reviewOutcome,
@@ -367,6 +373,121 @@ function liveHandoffScore(episode: ReturnType<typeof summarizeEpisodeForCommandC
   if (episode.status === "PLANNED") score += 30;
   score += episode.artifactCount * 4;
   return score;
+}
+
+function buildProjectionDisplayPath(base: string, ...parts: string[]) {
+  const normalizedBase = base.endsWith("/") ? base.slice(0, -1) : base;
+  return `${normalizedBase}/${parts.join("/")}`;
+}
+
+async function buildContinuityLaunchpad(
+  locale: Locale,
+  params: {
+    readyToContinue: Array<ReturnType<typeof summarizeEpisodeForCommandCenter>>;
+    contextRepair: Array<ReturnType<typeof summarizeEpisodeForCommandCenter>>;
+    liveHandoffs: Array<ReturnType<typeof summarizeEpisodeForCommandCenter>>;
+    recentSpines: Array<ReturnType<typeof summarizeEpisodeForCommandCenter>>;
+  }
+) {
+  const runtime = getRuntimeConfig();
+  const preferredQueue =
+    params.readyToContinue[0]
+      ? { source: "continue" as const, episode: params.readyToContinue[0] }
+      : params.contextRepair[0]
+        ? { source: "repair" as const, episode: params.contextRepair[0] }
+        : params.liveHandoffs[0]
+          ? { source: "live" as const, episode: params.liveHandoffs[0] }
+          : params.recentSpines[0]
+            ? { source: "recent" as const, episode: params.recentSpines[0] }
+            : null;
+
+  if (!preferredQueue) return null;
+
+  const { source, episode } = preferredQueue;
+  const episodeDirName = `${slugify(episode.title)}--${episode.id.slice(-6)}`;
+  const displayProjectionRoot = buildProjectionDisplayPath(
+    runtime.syncRootPath,
+    episode.workspaceSlug,
+    episode.projectSlug,
+    episodeDirName
+  );
+  const expandedProjectionRoot = path.join(
+    expandHomePath(runtime.syncRootPath),
+    episode.workspaceSlug,
+    episode.projectSlug,
+    episodeDirName
+  );
+
+  let projectionExists = false;
+  let packetExists = false;
+  let handoffJsonExists = false;
+
+  try {
+    const stat = await fs.stat(expandedProjectionRoot);
+    projectionExists = stat.isDirectory();
+    if (projectionExists) {
+      try {
+        packetExists = (await fs.stat(path.join(expandedProjectionRoot, "continuation-packet.txt"))).isFile();
+      } catch {
+        packetExists = false;
+      }
+      try {
+        handoffJsonExists = (await fs.stat(path.join(expandedProjectionRoot, "handoff-brief.json"))).isFile();
+      } catch {
+        handoffJsonExists = false;
+      }
+    }
+  } catch {
+    projectionExists = false;
+  }
+
+  const modeLabel =
+    source === "continue"
+      ? locale === "zh"
+        ? "继续这条主线"
+        : "Continue this spine"
+      : source === "repair"
+        ? locale === "zh"
+          ? "先修复再继续"
+          : "Repair before continuing"
+        : source === "live"
+          ? locale === "zh"
+            ? "保持接力进行中"
+            : "Keep this handoff live"
+          : locale === "zh"
+            ? "从最近主线开始"
+            : "Start from the latest spine";
+
+  const packetInstruction =
+    locale === "zh"
+      ? "把 continuation-packet.txt 或 handoff-brief.json 交给下一个 Agent，并要求它直接沿当前 spine 继续。"
+      : "Pass continuation-packet.txt or handoff-brief.json to the next agent and ask it to continue the current spine directly.";
+
+  return {
+    mode: source,
+    modeLabel,
+    episodeId: episode.id,
+    episodeTitle: episode.title,
+    projectId: episode.projectId,
+    projectName: episode.projectName,
+    nextMove: episode.nextMove,
+    queueHint: episode.queueHint,
+    briefHref: `/${locale}/projects/${episode.projectId}/episodes/${episode.id}`,
+    packetPath: `${displayProjectionRoot}/continuation-packet.txt`,
+    handoffJsonPath: `${displayProjectionRoot}/handoff-brief.json`,
+    projectionExists,
+    packetExists,
+    handoffJsonExists,
+    packetInstruction,
+    recommendedHost:
+      source === "repair"
+        ? locale === "zh"
+          ? "Claude Code 或当前执行 Agent"
+          : "Claude Code or the current execution agent"
+        : locale === "zh"
+          ? "任意已接入 Agent"
+          : "Any connected agent"
+  };
 }
 
 export async function getEpisodeCommandCenter(locale: Locale) {
@@ -443,6 +564,13 @@ export async function getEpisodeCommandCenter(locale: Locale) {
     emphasis: episode.handoffReady ? ("strong" as const) : ("soft" as const)
   }));
 
+  const continuityLaunchpad = await buildContinuityLaunchpad(locale, {
+    readyToContinue,
+    contextRepair,
+    liveHandoffs,
+    recentSpines
+  });
+
   return {
     stats: {
       readyToContinue: readyToContinue.length,
@@ -454,6 +582,7 @@ export async function getEpisodeCommandCenter(locale: Locale) {
     contextRepair,
     liveHandoffs,
     recentSpines,
+    continuityLaunchpad,
     graphNodes,
     graphEdges
   };

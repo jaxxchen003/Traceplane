@@ -3,8 +3,84 @@ import { notFound } from "next/navigation";
 import { GraphTheater } from "@/components/graph-theater";
 import { Panel } from "@/components/panel";
 import { brand } from "@/lib/brand";
-import { getConnectSurfaceSummary } from "@/lib/demo-data";
+import { getConnectSurfaceSummary, getEpisodeCommandCenter } from "@/lib/demo-data";
 import { getDictionary, isLocale } from "@/lib/i18n";
+
+function ContinuationRoute({
+  locale,
+  launchpad
+}: {
+  locale: "zh" | "en";
+  launchpad: {
+    modeLabel: string;
+    episodeTitle: string;
+    projectName: string;
+    nextMove: string;
+    briefHref: string;
+    packetPath: string;
+    handoffJsonPath: string;
+    packetExists: boolean;
+    packetInstruction: string;
+    recommendedHost: string;
+  } | null;
+}) {
+  if (!launchpad) {
+    return (
+      <Panel title={locale === "zh" ? "Continue Into The Next Agent" : "Continue Into The Next Agent"} eyebrow="Launchpad">
+        <div className="rounded-[24px] border border-dashed border-white/10 bg-white/4 px-5 py-8 text-sm leading-7 text-slate-400">
+          {locale === "zh"
+            ? "当前还没有可以演示的交接主线。先完成一次 host setup，并让 Traceplane 自动形成第一条 episode。"
+            : "There is no handoff spine to demonstrate yet. Finish one host setup first and let Traceplane form the first episode."}
+        </div>
+      </Panel>
+    );
+  }
+
+  return (
+    <Panel title={locale === "zh" ? "Continue Into The Next Agent" : "Continue Into The Next Agent"} eyebrow="Launchpad">
+      <div className="grid gap-4 xl:grid-cols-[1fr_1fr_0.78fr]">
+        <div className="rounded-[24px] border border-white/10 bg-black/20 px-4 py-4">
+          <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
+            {locale === "zh" ? "直接打开 brief" : "Open the brief directly"}
+          </div>
+          <h3 className="mt-3 text-lg font-semibold text-white">{launchpad.episodeTitle}</h3>
+          <p className="mt-2 text-sm text-slate-400">{launchpad.projectName}</p>
+          <p className="mt-4 text-sm leading-7 text-slate-300">{launchpad.nextMove}</p>
+          <a
+            href={launchpad.briefHref}
+            className="mt-5 inline-flex rounded-full border border-cyan-300/30 bg-cyan-400/10 px-4 py-2 text-xs font-medium text-cyan-100"
+          >
+            {locale === "zh" ? "打开 episode brief" : "Open episode brief"}
+          </a>
+        </div>
+        <div className="rounded-[24px] border border-white/10 bg-white/5 px-4 py-4">
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
+              {locale === "zh" ? "把本地 packet 交给下一个 Agent" : "Pass the local packet to the next agent"}
+            </div>
+            <span className={`rounded-full border px-2.5 py-1 text-[10px] uppercase tracking-[0.16em] ${launchpad.packetExists ? "border-emerald-400/20 bg-emerald-400/10 text-emerald-100" : "border-white/10 bg-white/6 text-slate-300"}`}>
+              {launchpad.packetExists ? "packet ready" : locale === "zh" ? "等待投影" : "awaiting projection"}
+            </span>
+          </div>
+          <div className="mt-4 space-y-3 text-sm text-slate-300">
+            <pre className="overflow-x-auto rounded-[18px] border border-white/10 bg-slate-950/70 px-4 py-3 text-xs text-slate-100"><code>{launchpad.packetPath}</code></pre>
+            <pre className="overflow-x-auto rounded-[18px] border border-white/10 bg-slate-950/70 px-4 py-3 text-xs text-slate-100"><code>{launchpad.handoffJsonPath}</code></pre>
+          </div>
+        </div>
+        <div className="rounded-[24px] border border-amber-400/16 bg-amber-400/8 px-4 py-4">
+          <div className="text-[11px] uppercase tracking-[0.18em] text-amber-200/80">
+            {locale === "zh" ? "建议接力方式" : "Suggested handoff mode"}
+          </div>
+          <div className="mt-3 text-lg font-semibold text-white">{launchpad.recommendedHost}</div>
+          <div className="mt-3 rounded-[18px] border border-white/10 bg-black/20 px-3 py-3 text-sm leading-7 text-slate-200">
+            {launchpad.modeLabel}
+          </div>
+          <p className="mt-4 text-sm leading-7 text-slate-300">{launchpad.packetInstruction}</p>
+        </div>
+      </div>
+    </Panel>
+  );
+}
 
 export default async function ConnectPage({
   params
@@ -15,7 +91,10 @@ export default async function ConnectPage({
   if (!isLocale(locale)) notFound();
 
   const dict = getDictionary(locale);
-  const connectSurface = await getConnectSurfaceSummary();
+  const [connectSurface, commandCenter] = await Promise.all([
+    getConnectSurfaceSummary(),
+    getEpisodeCommandCenter(locale)
+  ]);
   const hostCards = [
     {
       id: "claude",
@@ -273,6 +352,8 @@ export default async function ConnectPage({
           ))}
         </div>
       </Panel>
+
+      <ContinuationRoute locale={locale} launchpad={commandCenter.continuityLaunchpad} />
 
       <Panel title={locale === "zh" ? "Host Setup Matrix" : "Host Setup Matrix"} eyebrow={dict.nav.connect}>
         <div className="grid gap-4 xl:grid-cols-3">
