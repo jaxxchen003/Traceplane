@@ -47,11 +47,11 @@ const toneStyles: Record<
     tab: "border-emerald-400/24 bg-emerald-400/10 text-emerald-100"
   },
   artifact: {
-    glow: "from-fuchsia-400/35 via-violet-400/15 to-transparent",
-    border: "border-fuchsia-300/40",
-    text: "text-fuchsia-50",
-    pill: "bg-fuchsia-400/14 text-fuchsia-100",
-    tab: "border-fuchsia-400/24 bg-fuchsia-400/10 text-fuchsia-100"
+    glow: "from-amber-300/35 via-orange-300/15 to-transparent",
+    border: "border-amber-200/40",
+    text: "text-amber-50",
+    pill: "bg-amber-300/14 text-amber-100",
+    tab: "border-amber-300/24 bg-amber-300/10 text-amber-100"
   },
   policy: {
     glow: "from-amber-400/35 via-orange-400/15 to-transparent",
@@ -68,11 +68,11 @@ const toneStyles: Record<
     tab: "border-rose-400/24 bg-rose-400/10 text-rose-100"
   },
   agent: {
-    glow: "from-indigo-400/35 via-blue-400/15 to-transparent",
-    border: "border-indigo-300/40",
-    text: "text-indigo-50",
-    pill: "bg-indigo-400/14 text-indigo-100",
-    tab: "border-indigo-400/24 bg-indigo-400/10 text-indigo-100"
+    glow: "from-sky-300/35 via-cyan-300/15 to-transparent",
+    border: "border-sky-200/40",
+    text: "text-sky-50",
+    pill: "bg-sky-300/14 text-sky-100",
+    tab: "border-sky-300/24 bg-sky-300/10 text-sky-100"
   }
 };
 
@@ -145,7 +145,7 @@ export function GraphTheater({
 
   return (
     <section className="relative overflow-hidden rounded-[36px] border border-white/10 bg-[#08111f] px-6 py-6 shadow-[0_40px_120px_rgba(2,6,23,0.55)]">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(56,189,248,0.18),transparent_24%),radial-gradient(circle_at_85%_18%,rgba(192,132,252,0.18),transparent_22%),radial-gradient(circle_at_50%_78%,rgba(52,211,153,0.12),transparent_26%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(103,232,249,0.18),transparent_24%),radial-gradient(circle_at_85%_18%,rgba(251,191,36,0.14),transparent_22%),radial-gradient(circle_at_50%_78%,rgba(52,211,153,0.12),transparent_26%)]" />
       <div className="pointer-events-none absolute inset-0 opacity-70 [background-image:linear-gradient(rgba(148,163,184,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.08)_1px,transparent_1px)] [background-size:42px_42px]" />
 
       <div className="relative z-10 flex flex-col gap-6 xl:flex-row">
@@ -233,7 +233,7 @@ export function GraphTheater({
         <div className="relative min-h-[480px] flex-1 overflow-hidden rounded-[30px] border border-white/8 bg-[linear-gradient(180deg,rgba(15,23,42,0.52),rgba(2,6,23,0.9))]">
           <div className="pointer-events-none absolute inset-0 [perspective:1800px]">
             <div className="absolute left-[8%] top-[12%] h-[74%] w-[84%] rounded-[36px] border border-cyan-400/10 [transform:rotateX(70deg)]" />
-            <div className="absolute left-[16%] top-[24%] h-[54%] w-[68%] rounded-[999px] border border-fuchsia-400/10 [transform:rotateX(72deg)]" />
+            <div className="absolute left-[16%] top-[24%] h-[54%] w-[68%] rounded-[999px] border border-amber-400/10 [transform:rotateX(72deg)]" />
             <div className="absolute left-[22%] top-[31%] h-[40%] w-[56%] rounded-[999px] border border-emerald-400/10 [transform:rotateX(74deg)]" />
           </div>
 

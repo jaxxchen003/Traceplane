@@ -1,7 +1,7 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { ArtifactPreview } from "@/components/artifact-preview";
+import { ActionLink, ContinuityCard, LabeledValue, MetricCard } from "@/components/continuity-primitives";
 import { Panel } from "@/components/panel";
 import { StatusBadge } from "@/components/status-badge";
 import { formatDate } from "@/lib/format";
@@ -23,7 +23,7 @@ export default async function ArtifactDetailPage({
 
   return (
     <div className="space-y-6">
-      <section className="rounded-[34px] border border-white/10 bg-[linear-gradient(180deg,rgba(8,15,32,0.92),rgba(2,6,23,0.96))] px-6 py-7 shadow-[0_30px_90px_rgba(2,6,23,0.45)]">
+      <section className="tp-panel-shell rounded-[34px] px-6 py-7">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div>
             <div className="text-[11px] uppercase tracking-[0.24em] text-cyan-200/80">{dict.artifact.title}</div>
@@ -34,16 +34,13 @@ export default async function ArtifactDetailPage({
           </div>
           <div className="flex gap-3">
             {artifact.uri ? (
-              <a href={artifact.uri} className="rounded-full border border-white/10 bg-white/6 px-4 py-2 text-sm text-slate-100 hover:border-white/20">
+              <a href={artifact.uri} className="tp-action-link tp-action-link--secondary px-4 py-2 text-sm">
                 {dict.common.download}
               </a>
             ) : null}
-            <Link
-              href={`/${locale}/projects/${artifact.sourceProjectId}/episodes/${artifact.sourceEpisodeId}`}
-              className="rounded-full border border-cyan-400/30 bg-cyan-400/12 px-4 py-2 text-sm text-cyan-50"
-            >
+            <ActionLink href={`/${locale}/projects/${artifact.sourceProjectId}/episodes/${artifact.sourceEpisodeId}`}>
               {dict.common.backToProject}
-            </Link>
+            </ActionLink>
           </div>
         </div>
       </section>
@@ -60,85 +57,60 @@ export default async function ArtifactDetailPage({
           >
             <div className="space-y-4">
               <div className="grid gap-3 sm:grid-cols-2">
-                <div className="rounded-[24px] border border-cyan-400/16 bg-cyan-400/8 px-4 py-4">
-                  <div className="text-[11px] uppercase tracking-[0.18em] text-cyan-100/70">
-                    {locale === "zh" ? "Storage Mode" : "Storage Mode"}
-                  </div>
-                  <div className="mt-2 text-lg font-semibold text-cyan-50">{artifact.runtimeSummary.storageMode}</div>
-                  <div className="mt-2 text-sm text-cyan-100/70">
-                    {artifact.runtimeSummary.databaseProvider} · {artifact.runtimeSummary.objectStorageProvider}
-                  </div>
-                </div>
-                <div className="rounded-[24px] border border-amber-400/16 bg-amber-400/8 px-4 py-4">
-                  <div className="text-[11px] uppercase tracking-[0.18em] text-amber-100/70">
-                    {locale === "zh" ? "Provenance Mode" : "Provenance Mode"}
-                  </div>
-                  <div className="mt-2 text-lg font-semibold text-amber-50">{artifact.provenanceSummary.mode}</div>
-                  <div className="mt-2 text-sm text-amber-100/70">{artifact.provenanceSummary.host}</div>
-                </div>
+                <MetricCard
+                  label={locale === "zh" ? "Storage Mode" : "Storage Mode"}
+                  value={artifact.runtimeSummary.storageMode}
+                  detail={`${artifact.runtimeSummary.databaseProvider} · ${artifact.runtimeSummary.objectStorageProvider}`}
+                  tone="cyan"
+                />
+                <MetricCard
+                  label={locale === "zh" ? "Provenance Mode" : "Provenance Mode"}
+                  value={artifact.provenanceSummary.mode}
+                  detail={artifact.provenanceSummary.host}
+                  tone="amber"
+                />
               </div>
 
-              <div className="rounded-[24px] border border-white/10 bg-white/5 px-4 py-4 text-sm text-slate-300">
+              <ContinuityCard
+                label={locale === "zh" ? "Projection Surface" : "Projection Surface"}
+                className="text-sm text-slate-300"
+              >
                 <div className="mb-3 flex items-center justify-between gap-3">
-                  <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-                    {locale === "zh" ? "Projection Surface" : "Projection Surface"}
-                  </div>
                   <StatusBadge
                     label={artifact.runtimeSummary.projectionExists ? "Projected" : "Pending"}
                     raw={artifact.runtimeSummary.projectionExists ? "COMPLETED" : "PLANNED"}
                   />
                 </div>
                 <div className="space-y-2">
-                  <div>
-                    <span className="font-medium text-white">{locale === "zh" ? "Cloud Mode:" : "Cloud Mode:"}</span>{" "}
-                    {artifact.runtimeSummary.cloudMode}
-                  </div>
-                  <div>
-                    <span className="font-medium text-white">{locale === "zh" ? "Projection Root:" : "Projection Root:"}</span>{" "}
-                    <span className="break-all text-slate-200">{artifact.runtimeSummary.projectionRoot}</span>
-                  </div>
+                  <div><span className="font-medium text-white">{locale === "zh" ? "Cloud Mode:" : "Cloud Mode:"}</span> {artifact.runtimeSummary.cloudMode}</div>
+                  <div><span className="font-medium text-white">{locale === "zh" ? "Projection Root:" : "Projection Root:"}</span> <span className="break-all text-slate-200">{artifact.runtimeSummary.projectionRoot}</span></div>
                   <div className="grid gap-3 pt-2 sm:grid-cols-2">
-                    <div className="rounded-2xl border border-white/8 bg-black/20 px-3 py-3">
-                      <div className="text-[11px] uppercase tracking-[0.14em] text-slate-500">
-                        {locale === "zh" ? "Source Traces" : "Source Traces"}
-                      </div>
-                      <div className="mt-2 text-lg font-semibold text-white">{artifact.provenanceSummary.traceCount}</div>
-                    </div>
-                    <div className="rounded-2xl border border-white/8 bg-black/20 px-3 py-3">
-                      <div className="text-[11px] uppercase tracking-[0.14em] text-slate-500">
-                        {locale === "zh" ? "Source Memories" : "Source Memories"}
-                      </div>
-                      <div className="mt-2 text-lg font-semibold text-white">{artifact.provenanceSummary.memoryCount}</div>
-                    </div>
+                    <MetricCard label={locale === "zh" ? "Source Traces" : "Source Traces"} value={artifact.provenanceSummary.traceCount} className="tp-deep-card" />
+                    <MetricCard label={locale === "zh" ? "Source Memories" : "Source Memories"} value={artifact.provenanceSummary.memoryCount} className="tp-deep-card" />
                   </div>
                 </div>
-              </div>
+              </ContinuityCard>
             </div>
           </Panel>
 
           <Panel title={dict.common.versionHistory} eyebrow="Versions">
             <div className="space-y-3">
               {artifact.versions.map((version: { id: string; version: number; generatedBy: string; createdAt: Date }) => (
-                <div key={version.id} className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 text-sm text-slate-300">
-                  <div className="font-medium text-white">v{version.version}</div>
-                  <div className="mt-1">{version.generatedBy}</div>
+                <ContinuityCard key={version.id} label={`v${version.version}`} detail={version.generatedBy} className="text-sm text-slate-300">
                   <div className="mt-1 text-slate-500">{formatDate(version.createdAt, locale)}</div>
-                </div>
+                </ContinuityCard>
               ))}
             </div>
           </Panel>
 
           <Panel title={dict.common.provenance} eyebrow={dict.artifact.sourceEpisode}>
             <div className="space-y-4 text-sm text-slate-300">
-              <div>
-                <div className="mb-1 text-[11px] uppercase tracking-[0.18em] text-slate-500">{dict.artifact.sourceEpisode}</div>
-                <div className="font-medium text-white">{artifact.sourceEpisodeTitle}</div>
-              </div>
+              <LabeledValue label={dict.artifact.sourceEpisode} value={artifact.sourceEpisodeTitle} />
               <div>
                 <div className="mb-1 text-[11px] uppercase tracking-[0.18em] text-slate-500">Trace</div>
                 <div className="space-y-2">
                   {artifact.sourceTraces.map((trace: { id: string; stepIndex: number; title: string }) => (
-                    <div key={trace.id} className="rounded-xl border border-white/10 bg-white/5 px-3 py-2">
+                    <div key={trace.id} className="tp-soft-card rounded-xl px-3 py-2">
                       Step {trace.stepIndex} · {trace.title}
                     </div>
                   ))}
@@ -148,7 +120,7 @@ export default async function ArtifactDetailPage({
                 <div className="mb-1 text-[11px] uppercase tracking-[0.18em] text-slate-500">{dict.common.memories}</div>
                 <div className="space-y-2">
                   {artifact.sourceMemories.map((memory: { id: string; title: string }) => (
-                    <div key={memory.id} className="rounded-xl border border-white/10 bg-white/5 px-3 py-2">
+                    <div key={memory.id} className="tp-soft-card rounded-xl px-3 py-2">
                       {memory.title}
                     </div>
                   ))}
@@ -163,22 +135,8 @@ export default async function ArtifactDetailPage({
                 {artifact.consumedByAgents.length > 0 ? artifact.consumedByAgents.length : 0} downstream agent references
               </div>
               <div className="grid gap-3 sm:grid-cols-2">
-                <div className="rounded-2xl border border-white/10 bg-white/5 px-3 py-3">
-                  <div className="text-[11px] uppercase tracking-[0.14em] text-slate-500">
-                    Hook Capture
-                  </div>
-                  <div className="mt-2 text-lg font-semibold text-white">
-                    {artifact.provenanceSummary.hasHookCapture ? "Yes" : "No"}
-                  </div>
-                </div>
-                <div className="rounded-2xl border border-white/10 bg-white/5 px-3 py-3">
-                  <div className="text-[11px] uppercase tracking-[0.14em] text-slate-500">
-                    Imported
-                  </div>
-                  <div className="mt-2 text-lg font-semibold text-white">
-                    {artifact.provenanceSummary.isImported ? "Yes" : "No"}
-                  </div>
-                </div>
+                <MetricCard label="Hook Capture" value={artifact.provenanceSummary.hasHookCapture ? "Yes" : "No"} />
+                <MetricCard label="Imported" value={artifact.provenanceSummary.isImported ? "Yes" : "No"} />
               </div>
             </div>
           </Panel>

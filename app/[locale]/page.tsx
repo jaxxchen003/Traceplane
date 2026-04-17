@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { ContinuityLaunchpad } from "@/components/continuity-launchpad";
+import { HostTile, RuntimeSignal } from "@/components/continuity-primitives";
 import { GraphTheater } from "@/components/graph-theater";
 import { Panel } from "@/components/panel";
 import { StatusBadge } from "@/components/status-badge";
@@ -8,176 +10,6 @@ import { brand } from "@/lib/brand";
 import { formatDate } from "@/lib/format";
 import { getEpisodeCommandCenter, getRuntimeSurfaceSummary, getWorkspaceSummary } from "@/lib/demo-data";
 import { getDictionary, isLocale } from "@/lib/i18n";
-
-function HostTile({
-  name,
-  status,
-  labels,
-  note
-}: {
-  name: string;
-  status: string;
-  labels: string[];
-  note: string;
-}) {
-  return (
-    <div className="rounded-[22px] border border-white/10 bg-white/5 px-4 py-4">
-      <div className="flex items-center justify-between gap-3">
-        <div className="text-sm font-medium text-white">{name}</div>
-        <div className="rounded-full border border-cyan-400/20 bg-cyan-400/10 px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-cyan-100">
-          {status}
-        </div>
-      </div>
-      <div className="mt-3 flex flex-wrap gap-2">
-        {labels.map((label) => (
-          <span
-            key={label}
-            className="rounded-full border border-white/10 bg-white/6 px-2.5 py-1 text-[10px] uppercase tracking-[0.16em] text-slate-300"
-          >
-            {label}
-          </span>
-        ))}
-      </div>
-      <p className="mt-3 text-sm leading-6 text-slate-300">{note}</p>
-    </div>
-  );
-}
-
-function RuntimeSignal({
-  label,
-  value,
-  tone = "neutral"
-}: {
-  label: string;
-  value: string;
-  tone?: "neutral" | "good" | "warn";
-}) {
-  const toneClass =
-    tone === "good"
-      ? "border-emerald-400/20 bg-emerald-400/10 text-emerald-100"
-      : tone === "warn"
-        ? "border-amber-400/20 bg-amber-400/10 text-amber-100"
-        : "border-white/10 bg-white/6 text-slate-100";
-
-  return (
-    <div className={`rounded-[20px] border px-4 py-4 ${toneClass}`}>
-      <div className="text-[11px] uppercase tracking-[0.2em] text-slate-400">{label}</div>
-      <div className="mt-2 text-sm font-medium">{value}</div>
-    </div>
-  );
-}
-
-function ContinuityLaunchpad({
-  locale,
-  launchpad
-}: {
-  locale: "zh" | "en";
-  launchpad: {
-    modeLabel: string;
-    episodeTitle: string;
-    projectName: string;
-    nextMove: string;
-    briefHref: string;
-    packetPath: string;
-    handoffJsonPath: string;
-    projectionExists: boolean;
-    packetExists: boolean;
-    handoffJsonExists: boolean;
-    packetInstruction: string;
-    recommendedHost: string;
-  } | null;
-}) {
-  if (!launchpad) {
-    return (
-      <Panel
-        title={locale === "zh" ? "Continue From Brief or File" : "Continue From Brief or File"}
-        eyebrow="Launchpad"
-      >
-        <div className="rounded-[24px] border border-dashed border-white/10 bg-white/4 px-5 py-8 text-sm leading-7 text-slate-400">
-          {locale === "zh"
-            ? "当前还没有可继续的主线。先接入一个 Agent，让 Traceplane 先形成第一条 Episode。"
-            : "There is no live spine to continue yet. Connect one agent first so Traceplane can form the first episode."}
-        </div>
-      </Panel>
-    );
-  }
-
-  return (
-    <Panel
-      title={locale === "zh" ? "Continue From Brief or File" : "Continue From Brief or File"}
-      eyebrow="Launchpad"
-    >
-      <div className="rounded-[28px] border border-cyan-400/16 bg-[radial-gradient(circle_at_top_left,rgba(34,211,238,0.12),transparent_28%),linear-gradient(180deg,rgba(15,23,42,0.82),rgba(2,6,23,0.95))] px-5 py-5">
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="rounded-full border border-cyan-300/25 bg-cyan-400/10 px-3 py-1 text-[10px] uppercase tracking-[0.18em] text-cyan-100">
-            {launchpad.modeLabel}
-          </div>
-          <div className="rounded-full border border-amber-300/25 bg-amber-400/10 px-3 py-1 text-[10px] uppercase tracking-[0.18em] text-amber-100">
-            {launchpad.recommendedHost}
-          </div>
-        </div>
-        <div className="mt-4 grid gap-4 xl:grid-cols-[0.95fr_1.05fr]">
-          <div className="rounded-[24px] border border-white/10 bg-black/20 px-4 py-4">
-            <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-              {locale === "zh" ? "继续当前 brief" : "Continue from the brief"}
-            </div>
-            <h3 className="mt-3 text-xl font-semibold text-white">{launchpad.episodeTitle}</h3>
-            <p className="mt-2 text-sm text-slate-400">{launchpad.projectName}</p>
-            <p className="mt-4 text-sm leading-7 text-slate-300">{launchpad.nextMove}</p>
-            <div className="mt-5 flex flex-wrap gap-2">
-              <Link
-                href={launchpad.briefHref}
-                className="inline-flex rounded-full border border-cyan-300/30 bg-cyan-400/10 px-4 py-2 text-xs font-medium text-cyan-100"
-              >
-                {locale === "zh" ? "打开 episode brief" : "Open episode brief"}
-              </Link>
-              <Link
-                href={`/${locale}/connect`}
-                className="inline-flex rounded-full border border-white/10 bg-white/6 px-4 py-2 text-xs font-medium text-slate-200"
-              >
-                {locale === "zh" ? "查看接入台" : "Open connect console"}
-              </Link>
-            </div>
-          </div>
-
-          <div className="rounded-[24px] border border-white/10 bg-white/5 px-4 py-4">
-            <div className="flex flex-wrap items-center gap-2">
-              <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-                {locale === "zh" ? "从本地 packet 继续" : "Continue from the local packet"}
-              </div>
-              <span className={`rounded-full border px-2.5 py-1 text-[10px] uppercase tracking-[0.16em] ${launchpad.packetExists ? "border-emerald-400/20 bg-emerald-400/10 text-emerald-100" : "border-white/10 bg-white/6 text-slate-300"}`}>
-                {launchpad.packetExists
-                  ? locale === "zh"
-                    ? "packet ready"
-                    : "packet ready"
-                  : locale === "zh"
-                    ? "等待投影"
-                    : "awaiting projection"}
-              </span>
-            </div>
-            <div className="mt-4 space-y-3 text-sm text-slate-300">
-              <div>
-                <div className="mb-2 text-[11px] uppercase tracking-[0.18em] text-slate-500">
-                  continuation-packet.txt
-                </div>
-                <pre className="overflow-x-auto rounded-[18px] border border-white/10 bg-slate-950/70 px-4 py-3 text-xs text-slate-100"><code>{launchpad.packetPath}</code></pre>
-              </div>
-              <div>
-                <div className="mb-2 text-[11px] uppercase tracking-[0.18em] text-slate-500">
-                  handoff-brief.json
-                </div>
-                <pre className="overflow-x-auto rounded-[18px] border border-white/10 bg-slate-950/70 px-4 py-3 text-xs text-slate-100"><code>{launchpad.handoffJsonPath}</code></pre>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="mt-4 rounded-[20px] border border-white/10 bg-white/6 px-4 py-4 text-sm leading-7 text-slate-200">
-          {launchpad.packetInstruction}
-        </div>
-      </div>
-    </Panel>
-  );
-}
 
 function EpisodeList({
   locale,
@@ -554,7 +386,19 @@ export default async function LocaleHome({
         </Panel>
       </section>
 
-      <ContinuityLaunchpad locale={locale} launchpad={commandCenter.continuityLaunchpad} />
+      <ContinuityLaunchpad
+        locale={locale}
+        title={locale === "zh" ? "Continue From Brief or File" : "Continue From Brief or File"}
+        eyebrow="Launchpad"
+        launchpad={commandCenter.continuityLaunchpad}
+        emptyMessage={
+          locale === "zh"
+            ? "当前还没有可继续的主线。先接入一个 Agent，让 Traceplane 先形成第一条 Episode。"
+            : "There is no live spine to continue yet. Connect one agent first so Traceplane can form the first episode."
+        }
+        secondaryHref={`/${locale}/connect`}
+        secondaryLabel={locale === "zh" ? "查看接入台" : "Open connect console"}
+      />
 
       <Panel
         title={locale === "zh" ? "First Continuity Loop" : "First Continuity Loop"}

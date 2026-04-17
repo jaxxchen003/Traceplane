@@ -2,6 +2,8 @@
 
 import { useMemo, useState } from "react";
 
+import { Panel } from "@/components/panel";
+
 type BriefingTone = "memory" | "trace" | "artifact" | "policy" | "audit" | "agent";
 
 type BriefingNode = {
@@ -29,12 +31,9 @@ export function GraphBriefing({
   );
 
   return (
-    <section className="rounded-[30px] border border-white/10 bg-[linear-gradient(180deg,rgba(15,23,42,0.84),rgba(2,6,23,0.92))] p-5 shadow-[0_30px_90px_rgba(2,6,23,0.34)] backdrop-blur-xl">
-      <div className="mb-2 text-[11px] uppercase tracking-[0.28em] text-slate-400">Graph Briefing</div>
-      <h2 className="mb-4 text-lg font-semibold text-white">{title}</h2>
-
+    <Panel title={title} eyebrow="Graph Briefing">
       {nodes.length === 0 ? (
-        <div className="rounded-[22px] border border-white/10 bg-white/5 px-4 py-4 text-sm text-slate-400">
+        <div className="tp-soft-card rounded-[22px] px-4 py-4 text-sm text-slate-400">
           {emptyLabel}
         </div>
       ) : (
@@ -51,7 +50,7 @@ export function GraphBriefing({
                   className={`block w-full rounded-[22px] border px-4 py-4 text-left transition ${
                     active
                       ? "border-cyan-300/28 bg-cyan-400/10"
-                      : "border-white/10 bg-white/5 hover:border-white/16 hover:bg-white/7"
+                      : "tp-soft-card hover:border-white/16 hover:bg-white/7"
                   }`}
                 >
                   <div className="text-[10px] uppercase tracking-[0.24em] text-slate-500">{node.tone}</div>
@@ -62,7 +61,7 @@ export function GraphBriefing({
             })}
           </div>
 
-          <div className="rounded-[24px] border border-white/10 bg-white/5 px-5 py-5">
+          <div className="tp-soft-card rounded-[24px] px-5 py-5">
             {selectedNode ? (
               <>
                 <div className="text-[10px] uppercase tracking-[0.24em] text-cyan-200/80">
@@ -80,6 +79,6 @@ export function GraphBriefing({
           </div>
         </div>
       )}
-    </section>
+    </Panel>
   );
 }

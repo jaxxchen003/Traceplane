@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { ActionLink, ContinuityCard, PromptBlock } from "@/components/continuity-primitives";
 import { ProjectControlPanel } from "@/components/demo-control-panel";
 import { GraphBriefing } from "@/components/graph-briefing";
 import { GraphTheater } from "@/components/graph-theater";
@@ -212,59 +213,43 @@ export default async function ProjectOverviewPage({
           <Panel title={locale === "zh" ? "Best Next Handoff" : "Best Next Handoff"} eyebrow="Continue From Here">
             {handoffCandidate ? (
               <div className="space-y-4 text-sm leading-7 text-slate-300">
-                <div className="rounded-[20px] border border-cyan-400/16 bg-cyan-400/8 px-4 py-4">
-                  <div className="text-[11px] uppercase tracking-[0.18em] text-cyan-200/80">
-                    {locale === "zh" ? "优先继续的主线" : "Best spine to continue"}
-                  </div>
-                  <div className="mt-2 text-lg font-semibold text-white">{handoffCandidate.title}</div>
-                  <div className="mt-2">{handoffCandidate.summary}</div>
-                </div>
+                <ContinuityCard
+                  label={locale === "zh" ? "优先继续的主线" : "Best spine to continue"}
+                  title={handoffCandidate.title}
+                  detail={handoffCandidate.summary}
+                  tone="cyan"
+                />
 
                 <div className="grid gap-3 md:grid-cols-2">
-                  <div className="rounded-[20px] border border-white/10 bg-white/5 px-4 py-4">
-                    <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-                      {locale === "zh" ? "当前执行者" : "Current actor"}
-                    </div>
-                    <div className="mt-2 text-base font-medium text-white">{handoffCandidate.primaryAgent}</div>
-                  </div>
-                  <div className="rounded-[20px] border border-white/10 bg-white/5 px-4 py-4">
-                    <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-                      {locale === "zh" ? "产物数量" : "Artifacts"}
-                    </div>
-                    <div className="mt-2 text-base font-medium text-white">{handoffCandidate.artifactCount}</div>
-                  </div>
+                  <ContinuityCard
+                    label={locale === "zh" ? "当前执行者" : "Current actor"}
+                    title={handoffCandidate.primaryAgent}
+                  />
+                  <ContinuityCard
+                    label={locale === "zh" ? "产物数量" : "Artifacts"}
+                    title={handoffCandidate.artifactCount}
+                  />
                 </div>
 
-                <div className="rounded-[20px] border border-emerald-400/16 bg-emerald-400/8 px-4 py-4 text-white">
-                  {locale === "zh"
-                    ? "打开这条 Episode，直接读取 handoff brief，把它交给下一位 Agent 继续。"
-                    : "Open this episode, read the handoff brief, and give it to the next agent to continue."}
-                </div>
+                <ContinuityCard
+                  label={locale === "zh" ? "交接动作" : "Handoff action"}
+                  detail={
+                    locale === "zh"
+                      ? "打开这条 Episode，直接读取 handoff brief，把它交给下一位 Agent 继续。"
+                      : "Open this episode, read the handoff brief, and give it to the next agent to continue."
+                  }
+                  tone="emerald"
+                />
 
-                {handoffStarter ? (
-                  <div className="rounded-[20px] border border-white/10 bg-black/30 px-4 py-4">
-                    <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-                      {locale === "zh" ? "Project Handoff Starter" : "Project Handoff Starter"}
-                    </div>
-                    <pre className="mt-3 overflow-x-auto whitespace-pre-wrap break-words rounded-2xl border border-white/8 bg-slate-950/80 p-4 text-[12px] leading-6 text-slate-200">
-                      {handoffStarter}
-                    </pre>
-                  </div>
-                ) : null}
+                {handoffStarter ? <PromptBlock label={locale === "zh" ? "Project Handoff Starter" : "Project Handoff Starter"} content={handoffStarter} /> : null}
 
                 <div className="flex flex-wrap gap-2 pt-1">
-                  <Link
-                    href={`/${locale}/projects/${project.id}/episodes/${handoffCandidate.id}`}
-                    className="inline-flex rounded-full border border-cyan-300/30 bg-cyan-400/10 px-4 py-2 text-xs font-medium text-cyan-100"
-                  >
+                  <ActionLink href={`/${locale}/projects/${project.id}/episodes/${handoffCandidate.id}`}>
                     {locale === "zh" ? "打开 handoff brief" : "Open handoff brief"}
-                  </Link>
-                  <Link
-                    href={`/${locale}/connect`}
-                    className="inline-flex rounded-full border border-white/10 bg-white/6 px-4 py-2 text-xs font-medium text-slate-200"
-                  >
+                  </ActionLink>
+                  <ActionLink href={`/${locale}/connect`} tone="secondary">
                     {locale === "zh" ? "连接下一个 Agent" : "Connect the next agent"}
-                  </Link>
+                  </ActionLink>
                 </div>
               </div>
             ) : (

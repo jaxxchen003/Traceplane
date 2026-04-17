@@ -14,12 +14,12 @@ export function ArtifactPreview({
   content: string;
 }) {
   if (!content) {
-    return <div className="rounded-[24px] border border-dashed border-white/16 px-5 py-8 text-sm text-slate-500">No preview content</div>;
+    return <div className="tp-empty-state rounded-[24px] px-5 py-8 text-sm text-slate-500">No preview content</div>;
   }
 
   if (type === "JSON") {
     return (
-      <pre className="overflow-x-auto rounded-[24px] bg-slate-950 p-5 text-sm leading-7 text-slate-100">
+      <pre className="tp-code-block overflow-x-auto rounded-[24px] p-5 text-sm leading-7">
         {tryFormatJson(content)}
       </pre>
     );
@@ -28,7 +28,7 @@ export function ArtifactPreview({
   if (type === "MARKDOWN") {
     const lines = content.split("\n").filter((line) => line.trim().length > 0);
     return (
-      <article className="rounded-[24px] bg-white/5 p-6 shadow-[inset_0_0_0_1px_rgba(148,163,184,0.12)]">
+      <article className="tp-soft-card rounded-[24px] p-6">
         <div className="space-y-3">
           {lines.map((line, index) =>
             line.startsWith("#") ? (
@@ -51,7 +51,7 @@ export function ArtifactPreview({
   }
 
   return (
-    <pre className="overflow-x-auto rounded-[24px] bg-slate-950 p-5 text-sm leading-7 text-slate-100">
+    <pre className="tp-code-block overflow-x-auto rounded-[24px] p-5 text-sm leading-7">
       {content}
     </pre>
   );

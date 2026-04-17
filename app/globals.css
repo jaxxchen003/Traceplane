@@ -3,25 +3,41 @@
 :root {
   --font-sans: "Avenir Next", "Segoe UI", "Helvetica Neue", sans-serif;
   --font-mono: "IBM Plex Mono", "SFMono-Regular", monospace;
+  --tp-bg-top: #08131d;
+  --tp-bg-mid: #0b1824;
+  --tp-bg-bottom: #040814;
+  --tp-shell-top: rgba(14, 25, 38, 0.9);
+  --tp-shell-bottom: rgba(4, 9, 18, 0.96);
+  --tp-surface: rgba(255, 255, 255, 0.05);
+  --tp-surface-strong: rgba(5, 10, 19, 0.58);
+  --tp-line: rgba(148, 163, 184, 0.15);
+  --tp-line-strong: rgba(148, 163, 184, 0.22);
+  --tp-ink-strong: #f8fafc;
+  --tp-ink-soft: #cbd5e1;
+  --tp-ink-muted: #94a3b8;
+  --tp-accent-cyan: #67e8f9;
+  --tp-accent-emerald: #34d399;
+  --tp-accent-amber: #fbbf24;
+  --tp-accent-rose: #fb7185;
   color-scheme: dark;
 }
 
 html {
   font-family: var(--font-sans);
   background:
-    radial-gradient(circle at top left, rgba(56, 189, 248, 0.18), transparent 22%),
-    radial-gradient(circle at top right, rgba(245, 158, 11, 0.14), transparent 24%),
-    linear-gradient(180deg, #071120 0%, #091827 42%, #030712 100%);
+    radial-gradient(circle at top left, rgba(103, 232, 249, 0.18), transparent 22%),
+    radial-gradient(circle at top right, rgba(251, 191, 36, 0.14), transparent 24%),
+    linear-gradient(180deg, var(--tp-bg-top) 0%, var(--tp-bg-mid) 42%, var(--tp-bg-bottom) 100%);
 }
 
 body {
   margin: 0;
-  min-height: 100vh;
-  color: #e2e8f0;
+  min-height: 100dvh;
+  color: var(--tp-ink-soft);
   background:
-    radial-gradient(circle at top left, rgba(56, 189, 248, 0.1), transparent 18%),
-    radial-gradient(circle at 78% 0%, rgba(245, 158, 11, 0.08), transparent 24%),
-    linear-gradient(180deg, rgba(9, 15, 27, 0.94), rgba(2, 6, 23, 0.98));
+    radial-gradient(circle at top left, rgba(103, 232, 249, 0.12), transparent 18%),
+    radial-gradient(circle at 82% 0%, rgba(251, 191, 36, 0.08), transparent 24%),
+    linear-gradient(180deg, rgba(8, 19, 29, 0.96), rgba(4, 8, 20, 0.98));
 }
 
 a {
@@ -40,4 +56,88 @@ pre {
 
 * {
   box-sizing: border-box;
+}
+
+.tp-panel-shell {
+  border: 1px solid var(--tp-line);
+  background: linear-gradient(180deg, var(--tp-shell-top), var(--tp-shell-bottom));
+  box-shadow:
+    0 28px 90px rgba(2, 6, 23, 0.34),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(22px);
+}
+
+.tp-kicker {
+  color: rgba(148, 163, 184, 0.82);
+  font-size: 11px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+}
+
+.tp-soft-card {
+  border: 1px solid var(--tp-line);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.03));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.tp-deep-card {
+  border: 1px solid var(--tp-line);
+  background: linear-gradient(180deg, rgba(6, 11, 19, 0.72), rgba(2, 6, 23, 0.88));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.tp-empty-state {
+  border: 1px dashed var(--tp-line-strong);
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.tp-launchpad-shell {
+  border: 1px solid rgba(103, 232, 249, 0.12);
+  background:
+    radial-gradient(circle at top left, rgba(103, 232, 249, 0.13), transparent 30%),
+    linear-gradient(180deg, rgba(10, 20, 32, 0.84), rgba(2, 6, 23, 0.96));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 24px 80px rgba(2, 6, 23, 0.28);
+}
+
+.tp-code-block {
+  border: 1px solid var(--tp-line);
+  background: rgba(2, 6, 23, 0.78);
+  color: var(--tp-ink-strong);
+}
+
+.tp-action-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  border: 1px solid rgba(103, 232, 249, 0.24);
+  background: rgba(103, 232, 249, 0.1);
+  color: #d8fbff;
+  transition:
+    transform 220ms cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 220ms cubic-bezier(0.16, 1, 0.3, 1),
+    background-color 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.tp-action-link:hover {
+  transform: translateY(-1px);
+  border-color: rgba(103, 232, 249, 0.4);
+  background: rgba(103, 232, 249, 0.14);
+}
+
+.tp-action-link:active {
+  transform: translateY(0);
+}
+
+.tp-action-link--secondary {
+  border-color: var(--tp-line);
+  background: rgba(255, 255, 255, 0.055);
+  color: #e2e8f0;
+}
+
+.tp-action-link--secondary:hover {
+  border-color: rgba(148, 163, 184, 0.26);
+  background: rgba(255, 255, 255, 0.08);
 }

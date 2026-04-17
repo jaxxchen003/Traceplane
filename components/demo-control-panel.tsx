@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import type { ReactNode } from "react";
 import { useState, useTransition } from "react";
 
 import { FormCard } from "@/components/form-card";
@@ -23,11 +24,15 @@ type MemoryOption = {
 };
 
 function fieldClass() {
-  return "w-full rounded-2xl border border-white/10 bg-slate-950/70 px-3 py-2.5 text-sm text-slate-100 outline-none transition focus:border-cyan-300/40";
+  return "w-full rounded-2xl border border-white/10 bg-[linear-gradient(180deg,rgba(2,6,23,0.82),rgba(8,15,32,0.72))] px-3 py-2.5 text-sm text-slate-100 outline-none transition focus:border-cyan-300/40";
 }
 
 function labelClass() {
   return "mb-1 block text-xs uppercase tracking-[0.14em] text-slate-400";
+}
+
+function checkItemClass() {
+  return "tp-soft-card flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-slate-200";
 }
 
 function messageClass(message: string) {
@@ -37,7 +42,7 @@ function messageClass(message: string) {
 }
 
 function buttonClass() {
-  return "rounded-full border border-cyan-400/30 bg-cyan-400/12 px-4 py-2 text-sm font-medium text-cyan-50 transition hover:border-cyan-300/45 hover:bg-cyan-400/18 disabled:opacity-60";
+  return "tp-action-link px-4 py-2 text-sm font-medium disabled:opacity-60";
 }
 
 function normalizeI18n(zh: string, en: string) {
@@ -45,6 +50,133 @@ function normalizeI18n(zh: string, en: string) {
     zh: zh.trim(),
     en: en.trim() || zh.trim()
   };
+}
+
+function CheckboxGrid({
+  items,
+  selected,
+  onToggle
+}: {
+  items: Array<{ id: string; label: string }>;
+  selected: string[];
+  onToggle: (id: string) => void;
+}) {
+  return (
+    <div className="grid gap-2 md:grid-cols-2">
+      {items.map((item) => (
+        <label key={item.id} className={checkItemClass()}>
+          <input
+            type="checkbox"
+            checked={selected.includes(item.id)}
+            onChange={() => onToggle(item.id)}
+          />
+          <span>{item.label}</span>
+        </label>
+      ))}
+    </div>
+  );
+}
+
+function SubmitRow({
+  message,
+  fallback,
+  pending,
+  pendingLabel,
+  submitLabel
+}: {
+  message: string;
+  fallback: string;
+  pending: boolean;
+  pendingLabel: string;
+  submitLabel: string;
+}) {
+  return (
+    <div className="flex items-center justify-between gap-3">
+      <div className={`text-xs ${message ? messageClass(message) : "text-slate-500"}`}>
+        {message || fallback}
+      </div>
+      <button type="submit" className={buttonClass()} disabled={pending}>
+        {pending ? pendingLabel : submitLabel}
+      </button>
+    </div>
+  );
+}
+
+function FieldGroup({
+  label,
+  children
+}: {
+  label: string;
+  children: ReactNode;
+}) {
+  return (
+    <div>
+      <label className={labelClass()}>{label}</label>
+      {children}
+    </div>
+  );
+}
+
+function BilingualInputPair({
+  zhLabel,
+  enLabel,
+  zhValue,
+  enValue,
+  onZhChange,
+  onEnChange,
+  requiredZh = false
+}: {
+  zhLabel: string;
+  enLabel: string;
+  zhValue: string;
+  enValue: string;
+  onZhChange: (value: string) => void;
+  onEnChange: (value: string) => void;
+  requiredZh?: boolean;
+}) {
+  return (
+    <div className="grid gap-3 md:grid-cols-2">
+      <FieldGroup label={zhLabel}>
+        <input className={fieldClass()} value={zhValue} onChange={(event) => onZhChange(event.target.value)} required={requiredZh} />
+      </FieldGroup>
+      <FieldGroup label={enLabel}>
+        <input className={fieldClass()} value={enValue} onChange={(event) => onEnChange(event.target.value)} />
+      </FieldGroup>
+    </div>
+  );
+}
+
+function BilingualTextareaPair({
+  zhLabel,
+  enLabel,
+  zhValue,
+  enValue,
+  onZhChange,
+  onEnChange,
+  minHeightClass = "min-h-20",
+  requiredZh = false
+}: {
+  zhLabel: string;
+  enLabel: string;
+  zhValue: string;
+  enValue: string;
+  onZhChange: (value: string) => void;
+  onEnChange: (value: string) => void;
+  minHeightClass?: string;
+  requiredZh?: boolean;
+}) {
+  const areaClass = `${fieldClass()} ${minHeightClass}`;
+
+  return (
+    <div className="grid gap-3 md:grid-cols-2">
+      <FieldGroup label={zhLabel}>
+        <textarea className={areaClass} value={zhValue} onChange={(event) => onZhChange(event.target.value)} required={requiredZh} />
+      </FieldGroup>
+      <FieldGroup label={enLabel}>
+        <textarea className={areaClass} value={enValue} onChange={(event) => onEnChange(event.target.value)} />
+      </FieldGroup>
+    </div>
+  );
 }
 
 export function ProjectControlPanel({
@@ -144,61 +276,50 @@ export function ProjectControlPanel({
             <option value="SUMMARIZE">SUMMARIZE</option>
           </select>
         </div>
-        <div className="grid gap-3 md:grid-cols-2">
-          <div>
-            <label className={labelClass()}>{dict.controls.titleZh}</label>
-            <input className={fieldClass()} value={form.titleZh} onChange={(event) => setForm((current) => ({ ...current, titleZh: event.target.value }))} required />
-          </div>
-          <div>
-            <label className={labelClass()}>{dict.controls.titleEn}</label>
-            <input className={fieldClass()} value={form.titleEn} onChange={(event) => setForm((current) => ({ ...current, titleEn: event.target.value }))} />
-          </div>
-        </div>
-        <div className="grid gap-3 md:grid-cols-2">
-          <div>
-            <label className={labelClass()}>{dict.controls.summaryZh}</label>
-            <textarea className={`${fieldClass()} min-h-24`} value={form.summaryZh} onChange={(event) => setForm((current) => ({ ...current, summaryZh: event.target.value }))} />
-          </div>
-          <div>
-            <label className={labelClass()}>{dict.controls.summaryEn}</label>
-            <textarea className={`${fieldClass()} min-h-24`} value={form.summaryEn} onChange={(event) => setForm((current) => ({ ...current, summaryEn: event.target.value }))} />
-          </div>
-        </div>
-        <div className="grid gap-3 md:grid-cols-2">
-          <div>
-            <label className={labelClass()}>{dict.controls.goalZh}</label>
-            <textarea className={`${fieldClass()} min-h-24`} value={form.goalZh} onChange={(event) => setForm((current) => ({ ...current, goalZh: event.target.value }))} />
-          </div>
-          <div>
-            <label className={labelClass()}>{dict.controls.goalEn}</label>
-            <textarea className={`${fieldClass()} min-h-24`} value={form.goalEn} onChange={(event) => setForm((current) => ({ ...current, goalEn: event.target.value }))} />
-          </div>
-        </div>
-        <div className="grid gap-3 md:grid-cols-2">
-          <div>
-            <label className={labelClass()}>{dict.controls.successCriteriaZh}</label>
-            <textarea
-              className={`${fieldClass()} min-h-24`}
-              value={form.successCriteriaZh}
-              onChange={(event) => setForm((current) => ({ ...current, successCriteriaZh: event.target.value }))}
-            />
-          </div>
-          <div>
-            <label className={labelClass()}>{dict.controls.successCriteriaEn}</label>
-            <textarea
-              className={`${fieldClass()} min-h-24`}
-              value={form.successCriteriaEn}
-              onChange={(event) => setForm((current) => ({ ...current, successCriteriaEn: event.target.value }))}
-            />
-          </div>
-        </div>
+        <BilingualInputPair
+          zhLabel={dict.controls.titleZh}
+          enLabel={dict.controls.titleEn}
+          zhValue={form.titleZh}
+          enValue={form.titleEn}
+          onZhChange={(value) => setForm((current) => ({ ...current, titleZh: value }))}
+          onEnChange={(value) => setForm((current) => ({ ...current, titleEn: value }))}
+          requiredZh
+        />
+        <BilingualTextareaPair
+          zhLabel={dict.controls.summaryZh}
+          enLabel={dict.controls.summaryEn}
+          zhValue={form.summaryZh}
+          enValue={form.summaryEn}
+          onZhChange={(value) => setForm((current) => ({ ...current, summaryZh: value }))}
+          onEnChange={(value) => setForm((current) => ({ ...current, summaryEn: value }))}
+          minHeightClass="min-h-24"
+        />
+        <BilingualTextareaPair
+          zhLabel={dict.controls.goalZh}
+          enLabel={dict.controls.goalEn}
+          zhValue={form.goalZh}
+          enValue={form.goalEn}
+          onZhChange={(value) => setForm((current) => ({ ...current, goalZh: value }))}
+          onEnChange={(value) => setForm((current) => ({ ...current, goalEn: value }))}
+          minHeightClass="min-h-24"
+        />
+        <BilingualTextareaPair
+          zhLabel={dict.controls.successCriteriaZh}
+          enLabel={dict.controls.successCriteriaEn}
+          zhValue={form.successCriteriaZh}
+          enValue={form.successCriteriaEn}
+          onZhChange={(value) => setForm((current) => ({ ...current, successCriteriaZh: value }))}
+          onEnChange={(value) => setForm((current) => ({ ...current, successCriteriaEn: value }))}
+          minHeightClass="min-h-24"
+        />
         <div className="flex items-center justify-between gap-3 pt-1">
-          <div className={`text-xs ${message ? messageClass(message) : "text-slate-500"}`}>
-            {message || dict.controls.refreshHint}
-          </div>
-          <button type="submit" className={buttonClass()} disabled={isPending}>
-            {isPending ? dict.controls.creating : dict.controls.submit}
-          </button>
+          <SubmitRow
+            message={message}
+            fallback={dict.controls.refreshHint}
+            pending={isPending}
+            pendingLabel={dict.controls.creating}
+            submitLabel={dict.controls.submit}
+          />
         </div>
       </form>
     </FormCard>
@@ -320,8 +441,7 @@ export function EpisodeControlPanel({
           }}
         >
           <div className="grid gap-3 md:grid-cols-2">
-            <div>
-              <label className={labelClass()}>{dict.controls.actorAgent}</label>
+            <FieldGroup label={dict.controls.actorAgent}>
               <select className={fieldClass()} value={memoryForm.agentId} onChange={(event) => setMemoryForm((current) => ({ ...current, agentId: event.target.value }))}>
                 {agents.map((agent) => (
                   <option key={agent.id} value={agent.id}>
@@ -329,42 +449,38 @@ export function EpisodeControlPanel({
                   </option>
                 ))}
               </select>
-            </div>
+            </FieldGroup>
             <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className={labelClass()}>{dict.controls.type}</label>
+              <FieldGroup label={dict.controls.type}>
                 <select className={fieldClass()} value={memoryForm.type} onChange={(event) => setMemoryForm((current) => ({ ...current, type: event.target.value }))}>
                   <option value="SEMANTIC">SEMANTIC</option>
                   <option value="EPISODIC">EPISODIC</option>
                   <option value="PROCEDURAL">PROCEDURAL</option>
                 </select>
-              </div>
-              <div>
-                <label className={labelClass()}>{dict.controls.importance}</label>
+              </FieldGroup>
+              <FieldGroup label={dict.controls.importance}>
                 <input className={fieldClass()} type="number" min="1" max="10" value={memoryForm.importance} onChange={(event) => setMemoryForm((current) => ({ ...current, importance: event.target.value }))} />
-              </div>
+              </FieldGroup>
             </div>
           </div>
-          <div className="grid gap-3 md:grid-cols-2">
-            <div>
-              <label className={labelClass()}>{dict.controls.titleZh}</label>
-              <input className={fieldClass()} value={memoryForm.titleZh} onChange={(event) => setMemoryForm((current) => ({ ...current, titleZh: event.target.value }))} required />
-            </div>
-            <div>
-              <label className={labelClass()}>{dict.controls.titleEn}</label>
-              <input className={fieldClass()} value={memoryForm.titleEn} onChange={(event) => setMemoryForm((current) => ({ ...current, titleEn: event.target.value }))} />
-            </div>
-          </div>
-          <div className="grid gap-3 md:grid-cols-2">
-            <div>
-              <label className={labelClass()}>{dict.controls.contentZh}</label>
-              <textarea className={`${fieldClass()} min-h-20`} value={memoryForm.contentZh} onChange={(event) => setMemoryForm((current) => ({ ...current, contentZh: event.target.value }))} required />
-            </div>
-            <div>
-              <label className={labelClass()}>{dict.controls.contentEn}</label>
-              <textarea className={`${fieldClass()} min-h-20`} value={memoryForm.contentEn} onChange={(event) => setMemoryForm((current) => ({ ...current, contentEn: event.target.value }))} />
-            </div>
-          </div>
+        <BilingualInputPair
+          zhLabel={dict.controls.titleZh}
+          enLabel={dict.controls.titleEn}
+          zhValue={memoryForm.titleZh}
+          enValue={memoryForm.titleEn}
+          onZhChange={(value) => setMemoryForm((current) => ({ ...current, titleZh: value }))}
+          onEnChange={(value) => setMemoryForm((current) => ({ ...current, titleEn: value }))}
+          requiredZh
+        />
+        <BilingualTextareaPair
+          zhLabel={dict.controls.contentZh}
+          enLabel={dict.controls.contentEn}
+          zhValue={memoryForm.contentZh}
+          enValue={memoryForm.contentEn}
+          onZhChange={(value) => setMemoryForm((current) => ({ ...current, contentZh: value }))}
+          onEnChange={(value) => setMemoryForm((current) => ({ ...current, contentEn: value }))}
+          requiredZh
+        />
           <div className="grid gap-3 md:grid-cols-2">
             <div>
               <label className={labelClass()}>{dict.controls.source}</label>
@@ -380,14 +496,13 @@ export function EpisodeControlPanel({
               </select>
             </div>
           </div>
-          <div className="flex items-center justify-between gap-3">
-            <div className={`text-xs ${memoryMessage ? messageClass(memoryMessage) : "text-slate-500"}`}>
-              {memoryMessage || dict.controls.refreshHint}
-            </div>
-            <button type="submit" className={buttonClass()} disabled={isPending}>
-              {isPending ? dict.controls.creating : dict.controls.submit}
-            </button>
-          </div>
+          <SubmitRow
+            message={memoryMessage}
+            fallback={dict.controls.refreshHint}
+            pending={isPending}
+            pendingLabel={dict.controls.creating}
+            submitLabel={dict.controls.submit}
+          />
         </form>
       </FormCard>
 
@@ -461,64 +576,51 @@ export function EpisodeControlPanel({
             <label className={labelClass()}>{dict.controls.toolName}</label>
             <input className={fieldClass()} value={traceForm.toolName} onChange={(event) => setTraceForm((current) => ({ ...current, toolName: event.target.value }))} />
           </div>
+          <BilingualInputPair
+            zhLabel={dict.controls.titleZh}
+            enLabel={dict.controls.titleEn}
+            zhValue={traceForm.titleZh}
+            enValue={traceForm.titleEn}
+            onZhChange={(value) => setTraceForm((current) => ({ ...current, titleZh: value }))}
+            onEnChange={(value) => setTraceForm((current) => ({ ...current, titleEn: value }))}
+            requiredZh
+          />
+          <BilingualTextareaPair
+            zhLabel={dict.controls.shortResultZh}
+            enLabel={dict.controls.shortResultEn}
+            zhValue={traceForm.shortResultZh}
+            enValue={traceForm.shortResultEn}
+            onZhChange={(value) => setTraceForm((current) => ({ ...current, shortResultZh: value }))}
+            onEnChange={(value) => setTraceForm((current) => ({ ...current, shortResultEn: value }))}
+            requiredZh
+          />
           <div className="grid gap-3 md:grid-cols-2">
-            <div>
-              <label className={labelClass()}>{dict.controls.titleZh}</label>
-              <input className={fieldClass()} value={traceForm.titleZh} onChange={(event) => setTraceForm((current) => ({ ...current, titleZh: event.target.value }))} required />
-            </div>
-            <div>
-              <label className={labelClass()}>{dict.controls.titleEn}</label>
-              <input className={fieldClass()} value={traceForm.titleEn} onChange={(event) => setTraceForm((current) => ({ ...current, titleEn: event.target.value }))} />
-            </div>
-          </div>
-          <div className="grid gap-3 md:grid-cols-2">
-            <div>
-              <label className={labelClass()}>{dict.controls.shortResultZh}</label>
-              <textarea className={`${fieldClass()} min-h-20`} value={traceForm.shortResultZh} onChange={(event) => setTraceForm((current) => ({ ...current, shortResultZh: event.target.value }))} required />
-            </div>
-            <div>
-              <label className={labelClass()}>{dict.controls.shortResultEn}</label>
-              <textarea className={`${fieldClass()} min-h-20`} value={traceForm.shortResultEn} onChange={(event) => setTraceForm((current) => ({ ...current, shortResultEn: event.target.value }))} />
-            </div>
-          </div>
-          <div className="grid gap-3 md:grid-cols-2">
-            <div>
-              <label className={labelClass()}>{dict.controls.decisionZh}</label>
+            <FieldGroup label={dict.controls.decisionZh}>
               <textarea className={`${fieldClass()} min-h-20`} value={traceForm.decisionZh} onChange={(event) => setTraceForm((current) => ({ ...current, decisionZh: event.target.value }))} />
-            </div>
-            <div>
-              <label className={labelClass()}>{dict.controls.resultZh}</label>
+            </FieldGroup>
+            <FieldGroup label={dict.controls.resultZh}>
               <textarea className={`${fieldClass()} min-h-20`} value={traceForm.resultZh} onChange={(event) => setTraceForm((current) => ({ ...current, resultZh: event.target.value }))} />
-            </div>
+            </FieldGroup>
           </div>
-          <div>
-            <label className={labelClass()}>{dict.controls.linkedMemoryIds}</label>
-            <div className="grid gap-2 md:grid-cols-2">
-              {memories.map((memory) => (
-                <label key={memory.id} className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-200">
-                  <input
-                    type="checkbox"
-                    checked={traceForm.linkedMemoryIds.includes(memory.id)}
-                    onChange={() =>
-                      setTraceForm((current) => ({
-                        ...current,
-                        linkedMemoryIds: toggleSelection(current.linkedMemoryIds, memory.id)
-                      }))
-                    }
-                  />
-                  <span>{memory.label}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-          <div className="flex items-center justify-between gap-3">
-            <div className={`text-xs ${traceMessage ? messageClass(traceMessage) : "text-slate-500"}`}>
-              {traceMessage || dict.controls.refreshHint}
-            </div>
-            <button type="submit" className={buttonClass()} disabled={isPending}>
-              {isPending ? dict.controls.creating : dict.controls.submit}
-            </button>
-          </div>
+          <FieldGroup label={dict.controls.linkedMemoryIds}>
+            <CheckboxGrid
+              items={memories}
+              selected={traceForm.linkedMemoryIds}
+              onToggle={(id) =>
+                setTraceForm((current) => ({
+                  ...current,
+                  linkedMemoryIds: toggleSelection(current.linkedMemoryIds, id)
+                }))
+              }
+            />
+          </FieldGroup>
+          <SubmitRow
+            message={traceMessage}
+            fallback={dict.controls.refreshHint}
+            pending={isPending}
+            pendingLabel={dict.controls.creating}
+            submitLabel={dict.controls.submit}
+          />
         </form>
       </FormCard>
 
@@ -569,26 +671,25 @@ export function EpisodeControlPanel({
               <input className={fieldClass()} value={artifactForm.artifactKey} onChange={(event) => setArtifactForm((current) => ({ ...current, artifactKey: event.target.value }))} required />
             </div>
           </div>
-          <div className="grid gap-3 md:grid-cols-2">
-            <div>
-              <label className={labelClass()}>{dict.controls.titleZh}</label>
-              <input className={fieldClass()} value={artifactForm.titleZh} onChange={(event) => setArtifactForm((current) => ({ ...current, titleZh: event.target.value }))} required />
-            </div>
-            <div>
-              <label className={labelClass()}>{dict.controls.titleEn}</label>
-              <input className={fieldClass()} value={artifactForm.titleEn} onChange={(event) => setArtifactForm((current) => ({ ...current, titleEn: event.target.value }))} />
-            </div>
-          </div>
-          <div className="grid gap-3 md:grid-cols-2">
-            <div>
-              <label className={labelClass()}>{dict.controls.contentZh}</label>
-              <textarea className={`${fieldClass()} min-h-24`} value={artifactForm.contentZh} onChange={(event) => setArtifactForm((current) => ({ ...current, contentZh: event.target.value }))} required />
-            </div>
-            <div>
-              <label className={labelClass()}>{dict.controls.contentEn}</label>
-              <textarea className={`${fieldClass()} min-h-24`} value={artifactForm.contentEn} onChange={(event) => setArtifactForm((current) => ({ ...current, contentEn: event.target.value }))} />
-            </div>
-          </div>
+          <BilingualInputPair
+            zhLabel={dict.controls.titleZh}
+            enLabel={dict.controls.titleEn}
+            zhValue={artifactForm.titleZh}
+            enValue={artifactForm.titleEn}
+            onZhChange={(value) => setArtifactForm((current) => ({ ...current, titleZh: value }))}
+            onEnChange={(value) => setArtifactForm((current) => ({ ...current, titleEn: value }))}
+            requiredZh
+          />
+          <BilingualTextareaPair
+            zhLabel={dict.controls.contentZh}
+            enLabel={dict.controls.contentEn}
+            zhValue={artifactForm.contentZh}
+            enValue={artifactForm.contentEn}
+            onZhChange={(value) => setArtifactForm((current) => ({ ...current, contentZh: value }))}
+            onEnChange={(value) => setArtifactForm((current) => ({ ...current, contentEn: value }))}
+            minHeightClass="min-h-24"
+            requiredZh
+          />
           <div className="grid gap-3 md:grid-cols-3">
             <div>
               <label className={labelClass()}>{dict.controls.fileType}</label>
@@ -628,34 +729,25 @@ export function EpisodeControlPanel({
               ))}
             </select>
           </div>
-          <div>
-            <label className={labelClass()}>{dict.controls.linkedMemoryIds}</label>
-            <div className="grid gap-2 md:grid-cols-2">
-              {memories.map((memory) => (
-                <label key={memory.id} className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-200">
-                  <input
-                    type="checkbox"
-                    checked={artifactForm.linkedMemoryIds.includes(memory.id)}
-                    onChange={() =>
-                      setArtifactForm((current) => ({
-                        ...current,
-                        linkedMemoryIds: toggleSelection(current.linkedMemoryIds, memory.id)
-                      }))
-                    }
-                  />
-                  <span>{memory.label}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-          <div className="flex items-center justify-between gap-3">
-            <div className={`text-xs ${artifactMessage ? messageClass(artifactMessage) : "text-slate-500"}`}>
-              {artifactMessage || dict.controls.refreshHint}
-            </div>
-            <button type="submit" className={buttonClass()} disabled={isPending}>
-              {isPending ? dict.controls.creating : dict.controls.submit}
-            </button>
-          </div>
+          <FieldGroup label={dict.controls.linkedMemoryIds}>
+            <CheckboxGrid
+              items={memories}
+              selected={artifactForm.linkedMemoryIds}
+              onToggle={(id) =>
+                setArtifactForm((current) => ({
+                  ...current,
+                  linkedMemoryIds: toggleSelection(current.linkedMemoryIds, id)
+                }))
+              }
+            />
+          </FieldGroup>
+          <SubmitRow
+            message={artifactMessage}
+            fallback={dict.controls.refreshHint}
+            pending={isPending}
+            pendingLabel={dict.controls.creating}
+            submitLabel={dict.controls.submit}
+          />
         </form>
       </FormCard>
     </div>

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { ActionLink, ContinuityCard, MetricCard, PromptBlock, TimelineEntry, TokenList } from "@/components/continuity-primitives";
 import { EpisodeControlPanel } from "@/components/demo-control-panel";
 import { GraphBriefing } from "@/components/graph-briefing";
 import { GraphTheater } from "@/components/graph-theater";
@@ -212,108 +213,70 @@ export default async function EpisodeReviewPage({
         <div className="space-y-4">
           <Panel title={locale === "zh" ? "Next Agent Handoff" : "Next Agent Handoff"} eyebrow="Brief">
             <div className="space-y-4 text-sm leading-7 text-slate-300">
-              <div className="rounded-[20px] border border-cyan-400/16 bg-cyan-400/8 px-4 py-4">
-                <div className="text-[11px] uppercase tracking-[0.18em] text-cyan-100/80">
-                  {locale === "zh" ? "最新一步" : "Latest step"}
-                </div>
-                <div className="mt-2 text-base font-semibold text-white">{episode.handoffSummary.latestStepTitle}</div>
-                <div className="mt-2">{episode.handoffSummary.latestResult}</div>
-              </div>
+              <ContinuityCard
+                label={locale === "zh" ? "最新一步" : "Latest step"}
+                title={episode.handoffSummary.latestStepTitle}
+                detail={episode.handoffSummary.latestResult}
+                tone="cyan"
+              />
 
               <div className="grid gap-3 md:grid-cols-2">
-                <div className="rounded-[20px] border border-white/10 bg-white/5 px-4 py-4">
-                  <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-                    {locale === "zh" ? "最新产物" : "Latest artifact"}
-                  </div>
-                  <div className="mt-2 text-sm font-medium text-white">
-                    {episode.handoffSummary.latestArtifactTitle}
-                  </div>
-                </div>
-                <div className="rounded-[20px] border border-white/10 bg-white/5 px-4 py-4">
-                  <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-                    {locale === "zh" ? "可交接状态" : "Handoff state"}
-                  </div>
-                  <div className="mt-2 text-sm font-medium text-white">
-                    {episode.handoffSummary.readyForHandoff
+                <MetricCard
+                  label={locale === "zh" ? "最新产物" : "Latest artifact"}
+                  value={episode.handoffSummary.latestArtifactTitle}
+                />
+                <MetricCard
+                  label={locale === "zh" ? "可交接状态" : "Handoff state"}
+                  value={
+                    episode.handoffSummary.readyForHandoff
                       ? locale === "zh"
                         ? "可以直接交给下一位 Agent"
                         : "Ready to hand to the next agent"
                       : locale === "zh"
                         ? "还不适合交接"
-                        : "Not ready for handoff yet"}
-                  </div>
-                </div>
+                        : "Not ready for handoff yet"
+                  }
+                />
               </div>
 
-              <div className="rounded-[20px] border border-emerald-400/16 bg-emerald-400/8 px-4 py-4">
-                <div className="text-[11px] uppercase tracking-[0.18em] text-emerald-100/80">
-                  {locale === "zh" ? "下一步建议" : "Next action"}
-                </div>
-                <div className="mt-2 text-white">{episode.handoffSummary.nextAction}</div>
-              </div>
+              <ContinuityCard
+                label={locale === "zh" ? "下一步建议" : "Next action"}
+                detail={episode.handoffSummary.nextAction}
+                tone="emerald"
+              />
 
               {episode.handoffSummary.memoryTitles.length > 0 ? (
-                <div className="rounded-[20px] border border-white/10 bg-white/5 px-4 py-4">
-                  <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-                    {locale === "zh" ? "交接时优先带上" : "Bring into handoff"}
-                  </div>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {episode.handoffSummary.memoryTitles.map((title: string) => (
-                      <span
-                        key={title}
-                        className="rounded-full border border-white/10 bg-white/6 px-3 py-1 text-xs text-slate-200"
-                      >
-                        {title}
-                      </span>
-                    ))}
-                  </div>
-                </div>
+                <ContinuityCard label={locale === "zh" ? "交接时优先带上" : "Bring into handoff"}>
+                  <TokenList items={episode.handoffSummary.memoryTitles} />
+                </ContinuityCard>
               ) : null}
 
               {episode.handoffSummary.cautionItems.length > 0 ? (
-                <div className="rounded-[20px] border border-amber-400/16 bg-amber-400/8 px-4 py-4">
-                  <div className="text-[11px] uppercase tracking-[0.18em] text-amber-100/80">
-                    {locale === "zh" ? "交接注意" : "Cautions"}
-                  </div>
+                <ContinuityCard label={locale === "zh" ? "交接注意" : "Cautions"} tone="amber">
                   <ul className="mt-3 space-y-2">
                     {episode.handoffSummary.cautionItems.map((item: string) => (
                       <li key={item}>{item}</li>
                     ))}
                   </ul>
-                </div>
+                </ContinuityCard>
               ) : null}
 
-              <div className="rounded-[20px] border border-white/10 bg-black/30 px-4 py-4">
-                <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-                  {locale === "zh" ? "Agent Continuation Packet" : "Agent Continuation Packet"}
-                </div>
-                <pre className="mt-3 overflow-x-auto whitespace-pre-wrap break-words rounded-2xl border border-white/8 bg-slate-950/80 p-4 text-[12px] leading-6 text-slate-200">
-                  {episode.continuationPacket}
-                </pre>
-              </div>
+              <PromptBlock
+                label={locale === "zh" ? "Agent Continuation Packet" : "Agent Continuation Packet"}
+                content={episode.continuationPacket}
+              />
             </div>
           </Panel>
 
           <Panel title={dict.episode.auditSummary} eyebrow={dict.common.auditTrail}>
             <div className="grid gap-3 text-sm text-slate-300">
-              <div className="rounded-[20px] border border-cyan-400/16 bg-cyan-400/8 px-4 py-4">
-                {episode.auditSummary.readCount} reads
-              </div>
-              <div className="rounded-[20px] border border-emerald-400/16 bg-emerald-400/8 px-4 py-4">
-                {episode.auditSummary.writeCount} writes
-              </div>
-              <div className="rounded-[20px] border border-rose-400/16 bg-rose-400/8 px-4 py-4">
-                {episode.auditSummary.permissionDeniedCount} denials
-              </div>
-              <div className="rounded-[20px] border border-amber-400/16 bg-amber-400/8 px-4 py-4">
-                {episode.auditSummary.policyHitCount} policy hits
-              </div>
-              <Link
-                href={`/${locale}/audit?episodeId=${episode.id}`}
-                className="mt-2 inline-flex rounded-full border border-white/10 bg-white/6 px-4 py-2 font-medium text-cyan-100"
-              >
+              <MetricCard label="Reads" value={`${episode.auditSummary.readCount} reads`} tone="cyan" />
+              <MetricCard label="Writes" value={`${episode.auditSummary.writeCount} writes`} tone="emerald" />
+              <MetricCard label="Denials" value={`${episode.auditSummary.permissionDeniedCount} denials`} tone="rose" />
+              <MetricCard label="Policy" value={`${episode.auditSummary.policyHitCount} policy hits`} tone="amber" />
+              <ActionLink href={`/${locale}/audit?episodeId=${episode.id}`} tone="secondary">
                 {dict.common.viewAudit}
-              </Link>
+              </ActionLink>
             </div>
           </Panel>
         </div>
@@ -338,59 +301,39 @@ export default async function EpisodeReviewPage({
                 errorSummary: string | null;
                 policyHitReason: string | null;
                 permissionDeniedReason: string | null;
-              }) => (
-                <div key={item.id} className="rounded-[24px] border border-white/10 bg-white/5 px-5 py-5">
-                  <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-                    <div>
-                      <div className="mb-2 flex items-center gap-3">
-                        <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-                          Step {item.stepIndex}
-                        </div>
-                        <StatusBadge label={dict.statuses[item.status]} raw={item.status} />
-                      </div>
-                      <h2 className="text-lg font-semibold text-white">{item.stepTitle}</h2>
-                      <p className="mt-2 text-sm leading-7 text-slate-300">{item.shortResult}</p>
-                    </div>
-                    <div className="min-w-[220px] text-sm text-slate-300">
-                      <div>{item.actor}</div>
-                      <div>{formatDate(item.eventTime, locale)}</div>
-                      {item.toolName ? <div>{item.toolName}</div> : null}
-                    </div>
-                  </div>
-                  <div className="mt-4 grid gap-3 text-sm text-slate-300 lg:grid-cols-2">
-                    {item.inputSummary ? (
-                      <div>
-                        <span className="font-medium text-white">Input:</span> {item.inputSummary}
-                      </div>
-                    ) : null}
-                    {item.decisionSummary ? (
-                      <div>
-                        <span className="font-medium text-white">Decision:</span> {item.decisionSummary}
-                      </div>
-                    ) : null}
-                    {item.resultSummary ? (
-                      <div>
-                        <span className="font-medium text-white">Result:</span> {item.resultSummary}
-                      </div>
-                    ) : null}
-                    {item.errorSummary ? (
-                      <div className="text-rose-300">
-                        <span className="font-medium">Error:</span> {item.errorSummary}
-                      </div>
-                    ) : null}
-                    {item.policyHitReason ? (
-                      <div className="text-amber-200">
-                        <span className="font-medium">Policy:</span> {item.policyHitReason}
-                      </div>
-                    ) : null}
-                    {item.permissionDeniedReason ? (
-                      <div className="text-rose-300">
-                        <span className="font-medium">Denied:</span> {item.permissionDeniedReason}
-                      </div>
-                    ) : null}
-                  </div>
-                </div>
-              ))}
+              }) => {
+                const details: Array<{
+                  label: string;
+                  value: string;
+                  tone?: "default" | "warn" | "danger";
+                }> = [];
+
+                if (item.inputSummary) details.push({ label: "Input", value: item.inputSummary });
+                if (item.decisionSummary) details.push({ label: "Decision", value: item.decisionSummary });
+                if (item.resultSummary) details.push({ label: "Result", value: item.resultSummary });
+                if (item.errorSummary) details.push({ label: "Error", value: item.errorSummary, tone: "danger" });
+                if (item.policyHitReason) details.push({ label: "Policy", value: item.policyHitReason, tone: "warn" });
+                if (item.permissionDeniedReason) details.push({ label: "Denied", value: item.permissionDeniedReason, tone: "danger" });
+
+                return (
+                  <TimelineEntry
+                    key={item.id}
+                    index={item.stepIndex}
+                    statusLabel={dict.statuses[item.status]}
+                    statusRaw={item.status}
+                    title={item.stepTitle}
+                    summary={item.shortResult}
+                    meta={
+                      <>
+                        <div>{item.actor}</div>
+                        <div>{formatDate(item.eventTime, locale)}</div>
+                        {item.toolName ? <div>{item.toolName}</div> : null}
+                      </>
+                    }
+                    details={details}
+                  />
+                );
+              })}
             </div>
           </Panel>
 
@@ -437,7 +380,7 @@ export default async function EpisodeReviewPage({
                   toNodeType: string;
                   toNodeId: string;
                 }) => (
-                  <div key={edge.id} className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+                  <div key={edge.id} className="tp-soft-card rounded-2xl px-4 py-3">
                     <span className="font-medium text-white">{edge.edgeType}</span>
                     <span className="mx-2 text-slate-500">·</span>
                     <span>{edge.fromNodeType}:{edge.fromNodeId.slice(-6)}</span>
@@ -474,29 +417,22 @@ export default async function EpisodeReviewPage({
           >
             <div className="space-y-4">
               <div className="grid gap-3 sm:grid-cols-2">
-                <div className="rounded-[24px] border border-cyan-400/18 bg-cyan-400/8 px-4 py-4">
-                  <div className="text-[11px] uppercase tracking-[0.18em] text-cyan-100/70">
-                    {locale === "zh" ? "Cloud Mode" : "Cloud Mode"}
-                  </div>
-                  <div className="mt-2 text-lg font-semibold text-cyan-50">{episode.runtimeSummary.cloudMode}</div>
-                  <div className="mt-2 text-sm text-cyan-100/70">
-                    {episode.runtimeSummary.databaseProvider} · {episode.runtimeSummary.objectStorageProvider}
-                  </div>
-                </div>
-                <div className="rounded-[24px] border border-amber-400/18 bg-amber-400/8 px-4 py-4">
-                  <div className="text-[11px] uppercase tracking-[0.18em] text-amber-100/70">
-                    {locale === "zh" ? "Capture Mode" : "Capture Mode"}
-                  </div>
-                  <div className="mt-2 text-lg font-semibold text-amber-50">{episode.provenanceSummary.mode}</div>
-                  <div className="mt-2 text-sm text-amber-100/70">{episode.provenanceSummary.host}</div>
-                </div>
+                <MetricCard
+                  label={locale === "zh" ? "Cloud Mode" : "Cloud Mode"}
+                  value={episode.runtimeSummary.cloudMode}
+                  detail={`${episode.runtimeSummary.databaseProvider} · ${episode.runtimeSummary.objectStorageProvider}`}
+                  tone="cyan"
+                />
+                <MetricCard
+                  label={locale === "zh" ? "Capture Mode" : "Capture Mode"}
+                  value={episode.provenanceSummary.mode}
+                  detail={episode.provenanceSummary.host}
+                  tone="amber"
+                />
               </div>
 
-              <div className="rounded-[24px] border border-white/10 bg-white/5 px-4 py-4">
+              <ContinuityCard label={locale === "zh" ? "Storage Status" : "Storage Status"}>
                 <div className="mb-3 flex items-center justify-between gap-3">
-                  <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-                    {locale === "zh" ? "Storage Status" : "Storage Status"}
-                  </div>
                   <StatusBadge
                     label={
                       episode.runtimeSummary.projectionExists
@@ -511,32 +447,14 @@ export default async function EpisodeReviewPage({
                   />
                 </div>
                 <div className="grid gap-3 sm:grid-cols-3">
-                  <div className="rounded-2xl border border-white/8 bg-black/20 px-3 py-3">
-                    <div className="text-[11px] uppercase tracking-[0.14em] text-slate-500">
-                      {locale === "zh" ? "Artifacts" : "Artifacts"}
-                    </div>
-                    <div className="mt-2 text-2xl font-semibold text-white">{episode.storageSummary.totalArtifacts}</div>
-                  </div>
-                  <div className="rounded-2xl border border-white/8 bg-cyan-400/8 px-3 py-3">
-                    <div className="text-[11px] uppercase tracking-[0.14em] text-cyan-100/70">R2</div>
-                    <div className="mt-2 text-2xl font-semibold text-cyan-50">{episode.storageSummary.r2ArtifactCount}</div>
-                  </div>
-                  <div className="rounded-2xl border border-white/8 bg-amber-400/8 px-3 py-3">
-                    <div className="text-[11px] uppercase tracking-[0.14em] text-amber-100/70">
-                      {locale === "zh" ? "Inline" : "Inline"}
-                    </div>
-                    <div className="mt-2 text-2xl font-semibold text-amber-50">
-                      {episode.storageSummary.inlineArtifactCount}
-                    </div>
-                  </div>
+                  <MetricCard label={locale === "zh" ? "Artifacts" : "Artifacts"} value={episode.storageSummary.totalArtifacts} className="tp-deep-card" />
+                  <MetricCard label="R2" value={episode.storageSummary.r2ArtifactCount} tone="cyan" />
+                  <MetricCard label={locale === "zh" ? "Inline" : "Inline"} value={episode.storageSummary.inlineArtifactCount} tone="amber" />
                 </div>
-              </div>
+              </ContinuityCard>
 
-              <div className="rounded-[24px] border border-white/10 bg-[linear-gradient(135deg,rgba(14,165,233,0.08),rgba(250,204,21,0.04),rgba(15,23,42,0.42))] px-4 py-4">
+              <ContinuityCard label={locale === "zh" ? "Projection + Review" : "Projection + Review"} className="bg-[linear-gradient(135deg,rgba(14,165,233,0.08),rgba(250,204,21,0.04),rgba(15,23,42,0.42))]">
                 <div className="mb-3 flex items-center justify-between gap-3">
-                  <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-                    {locale === "zh" ? "Projection + Review" : "Projection + Review"}
-                  </div>
                   <StatusBadge
                     label={episode.reviewOutcome ?? "PENDING"}
                     raw={episode.reviewOutcome ?? "PENDING"}
@@ -556,43 +474,19 @@ export default async function EpisodeReviewPage({
                     <span className="break-all text-slate-200">{episode.runtimeSummary.projectionPath}</span>
                   </div>
                   <div className="grid gap-3 sm:grid-cols-3">
-                    <div className="rounded-2xl border border-white/10 bg-black/20 px-3 py-3">
-                      <div className="text-[11px] uppercase tracking-[0.14em] text-slate-500">
-                        {locale === "zh" ? "Trace Events" : "Trace Events"}
-                      </div>
-                      <div className="mt-2 text-lg font-semibold text-white">
-                        {episode.provenanceSummary.signals.traceEventCount}
-                      </div>
-                    </div>
-                    <div className="rounded-2xl border border-white/10 bg-black/20 px-3 py-3">
-                      <div className="text-[11px] uppercase tracking-[0.14em] text-slate-500">
-                        {locale === "zh" ? "Hook Capture" : "Hook Capture"}
-                      </div>
-                      <div className="mt-2 text-lg font-semibold text-white">
-                        {episode.provenanceSummary.signals.hasHookCapture ? "Yes" : "No"}
-                      </div>
-                    </div>
-                    <div className="rounded-2xl border border-white/10 bg-black/20 px-3 py-3">
-                      <div className="text-[11px] uppercase tracking-[0.14em] text-slate-500">
-                        {locale === "zh" ? "Imported" : "Imported"}
-                      </div>
-                      <div className="mt-2 text-lg font-semibold text-white">
-                        {episode.provenanceSummary.signals.isImported ? "Yes" : "No"}
-                      </div>
-                    </div>
+                    <MetricCard label={locale === "zh" ? "Trace Events" : "Trace Events"} value={episode.provenanceSummary.signals.traceEventCount} className="tp-deep-card" />
+                    <MetricCard label={locale === "zh" ? "Hook Capture" : "Hook Capture"} value={episode.provenanceSummary.signals.hasHookCapture ? "Yes" : "No"} className="tp-deep-card" />
+                    <MetricCard label={locale === "zh" ? "Imported" : "Imported"} value={episode.provenanceSummary.signals.isImported ? "Yes" : "No"} className="tp-deep-card" />
                   </div>
                 </div>
-              </div>
+              </ContinuityCard>
             </div>
           </Panel>
 
           <Panel title={dict.common.summary} eyebrow={dict.episode.goal}>
             <div className="space-y-4 text-sm leading-7 text-slate-300">
               <div>{episode.goal}</div>
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                <div className="mb-2 text-[11px] uppercase tracking-[0.18em] text-slate-500">{dict.episode.finalOutcome}</div>
-                <div className="text-white">{episode.finalOutcome}</div>
-              </div>
+              <ContinuityCard label={dict.episode.finalOutcome} detail={episode.finalOutcome} />
               <div>
                 <div className="mb-2 text-[11px] uppercase tracking-[0.18em] text-slate-500">{dict.common.participatingAgents}</div>
                 <div>{episode.participatingAgents.join(" · ")}</div>
@@ -610,13 +504,7 @@ export default async function EpisodeReviewPage({
                 sensitivity: string;
                 usedInStepCount: number;
               }) => (
-                <div key={memory.id} className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4">
-                  <div className="font-medium text-white">{memory.title}</div>
-                  <div className="mt-1 text-sm leading-7 text-slate-300">{memory.content}</div>
-                  <div className="mt-3 text-xs uppercase tracking-[0.16em] text-slate-500">
-                    {memory.type} · {memory.sensitivity} · {memory.usedInStepCount} steps
-                  </div>
-                </div>
+                <ContinuityCard key={memory.id} label={`${memory.type} · ${memory.sensitivity} · ${memory.usedInStepCount} steps`} title={memory.title} detail={memory.content} />
               ))}
             </div>
           </Panel>
@@ -633,7 +521,7 @@ export default async function EpisodeReviewPage({
                 <Link
                   key={artifact.id}
                   href={`/${locale}/artifacts/${artifact.id}`}
-                  className="block rounded-2xl border border-white/10 bg-white/5 px-4 py-4 hover:border-cyan-300/30"
+                  className="tp-soft-card block rounded-2xl px-4 py-4 hover:border-cyan-300/30"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div>
