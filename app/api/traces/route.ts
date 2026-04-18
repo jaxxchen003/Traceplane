@@ -20,10 +20,10 @@ export async function POST(request: Request) {
 
   const stepIndex =
     typeof body.stepIndex === "number"
-      ? body.stepIndex
-      : episode.traceEvents.length > 0
-        ? Math.max(...episode.traceEvents.map((item: { stepIndex: number }) => item.stepIndex)) + 1
-        : 1;
+    ? body.stepIndex
+    : episode.traceEvents.length > 0
+    ? Math.max(...episode.traceEvents.map((item: { stepIndex: number }) => item.stepIndex)) + 1
+    : 1;
 
   const trace = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     const created = await tx.traceEvent.create({
@@ -43,6 +43,7 @@ export async function POST(request: Request) {
         errorSummaryI18n: body.errorSummaryI18n ?? null,
         policyHitReasonI18n: body.policyHitReasonI18n ?? null,
         permissionDeniedI18n: body.permissionDeniedI18n ?? null,
+        snapshot: body.snapshot ?? null, // 物理注入 snapshot 字段
         eventTime: new Date()
       }
     });

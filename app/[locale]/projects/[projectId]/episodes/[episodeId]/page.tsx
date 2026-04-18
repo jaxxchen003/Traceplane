@@ -1,16 +1,19 @@
-import Link from "next/link";
-import { notFound } from "next/navigation";
+import Link from \"next/link\";
+import { notFound } from \"next/navigation\";
 
-import { ActionLink, ContinuityCard, MetricCard, PromptBlock, TimelineEntry, TokenList } from "@/components/continuity-primitives";
-import { EpisodeControlPanel } from "@/components/demo-control-panel";
-import { GraphBriefing } from "@/components/graph-briefing";
-import { GraphTheater } from "@/components/graph-theater";
-import { Panel } from "@/components/panel";
-import { RelationshipFlow } from "@/components/relationship-flow";
-import { StatusBadge } from "@/components/status-badge";
-import { formatDate, formatDuration } from "@/lib/format";
-import { getEpisodeReview, getProjectAgents } from "@/lib/demo-data";
-import { getDictionary, isLocale } from "@/lib/i18n";
+import { ActionLink, ContinuityCard, MetricCard, PromptBlock, TimelineEntry, TokenList } from \"@/components/continuity-primitives\";
+import { EpisodeControlPanel } from \"@/components/demo-control-panel\";
+import { GraphBriefing } from \"@/components/graph-briefing\";
+import { GraphTheater } from \"@/components/graph-theater\";
+import { Panel } from \"@/components/panel\";
+import { RelationshipFlow } from \"@/components/relationship-flow\";
+import { StatusBadge } from \"@/components/status-badge\";
+import { StateInspector } from \"@/components/state-inspector\";
+import { formatDate, formatDuration } from \"@/lib/format\";
+import { getEpisodeReview, getProjectAgents } from \"@/lib/demo-data\";
+import { getDictionary, isLocale } from \"@/lib/i18n\";
+import { useState } from \"react\";
+
 
 export default async function EpisodeReviewPage({
   params
@@ -284,58 +287,19 @@ export default async function EpisodeReviewPage({
 
       <div className="grid gap-6 xl:grid-cols-[1.6fr_0.9fr]">
         <div className="space-y-6">
-          <Panel title={dict.common.timeline} eyebrow={dict.episode.title}>
-            <div className="space-y-4">
-              {episode.timeline.map((item: {
-                id: string;
-                stepIndex: number;
-                status: string;
-                stepTitle: string;
-                shortResult: string;
-                actor: string;
-                eventTime: Date;
-                toolName: string | null;
-                inputSummary: string | null;
-                decisionSummary: string | null;
-                resultSummary: string | null;
-                errorSummary: string | null;
-                policyHitReason: string | null;
-                permissionDeniedReason: string | null;
-              }) => {
-                const details: Array<{
-                  label: string;
-                  value: string;
-                  tone?: "default" | "warn" | "danger";
-                }> = [];
+import { TimelineDebugWrapper } from \"@/components/timeline-debug-wrapper\";
 
-                if (item.inputSummary) details.push({ label: "Input", value: item.inputSummary });
-                if (item.decisionSummary) details.push({ label: "Decision", value: item.decisionSummary });
-                if (item.resultSummary) details.push({ label: "Result", value: item.resultSummary });
-                if (item.errorSummary) details.push({ label: "Error", value: item.errorSummary, tone: "danger" });
-                if (item.policyHitReason) details.push({ label: "Policy", value: item.policyHitReason, tone: "warn" });
-                if (item.permissionDeniedReason) details.push({ label: "Denied", value: item.permissionDeniedReason, tone: "danger" });
+// ... (inside EpisodeReviewPage render)
+// Replace the existing timeline section:
+<<PanelPanel title={dict.common.timeline} eyebrow={dict.episode.title}>
+  <<TimelineTimelineDebugWrapper 
+    timeline={episode.timeline} 
+    episodeId={episode.id} 
+    locale={locale} 
+    dict={dict} 
+  />
+</Panel>
 
-                return (
-                  <TimelineEntry
-                    key={item.id}
-                    index={item.stepIndex}
-                    statusLabel={dict.statuses[item.status]}
-                    statusRaw={item.status}
-                    title={item.stepTitle}
-                    summary={item.shortResult}
-                    meta={
-                      <>
-                        <div>{item.actor}</div>
-                        <div>{formatDate(item.eventTime, locale)}</div>
-                        {item.toolName ? <div>{item.toolName}</div> : null}
-                      </>
-                    }
-                    details={details}
-                  />
-                );
-              })}
-            </div>
-          </Panel>
 
           <Panel title={dict.episode.relationshipMap} eyebrow="Edges">
             <div className="space-y-4">

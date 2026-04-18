@@ -135,37 +135,38 @@ model ProjectAgent {
 }
 
 model Episode {
-  id               String         @id @default(cuid())
-  projectId        String
-  primaryAgentId   String
-  parentEpisodeId  String?
-  titleI18n        Json
-  summaryI18n      Json?
-  goalI18n         Json?
+  id String @id @default(cuid())
+  projectId String
+  primaryAgentId String
+  parentEpisodeId String?
+  forkPointTraceId String?
+  titleI18n Json
+  summaryI18n Json?
+  goalI18n Json?
   successCriteriaI18n Json?
   finalOutcomeI18n Json?
-  primaryActor     String?
-  workType         WorkType       @default(GENERATE)
-  relationIntent   EdgeType?
-  status           EpisodeStatus
+  primaryActor String?
+  workType WorkType @default(GENERATE)
+  relationIntent EdgeType?
+  status EpisodeStatus
   blockedReasonI18n Json?
   failureReasonI18n Json?
-  reviewOutcome    ReviewOutcome?
-  policyVersion    String
-  startedAt        DateTime
-  endedAt          DateTime?
-  createdAt        DateTime       @default(now())
-  updatedAt        DateTime       @updatedAt
-  project          Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  primaryAgent     Agent          @relation("PrimaryAgentEpisodes", fields: [primaryAgentId], references: [id], onDelete: Cascade)
-  parentEpisode    Episode?       @relation("EpisodeToEpisode", fields: [parentEpisodeId], references: [id], onDelete: SetNull)
-  childEpisodes    Episode[]      @relation("EpisodeToEpisode")
-  episodeAgents    EpisodeAgent[]
-  memoryItems      MemoryItem[]
-  traceEvents      TraceEvent[]
-  artifacts        Artifact[]
-  auditEvents      AuditEvent[]
-  accessGrants     AccessGrant[]
+  reviewOutcome ReviewOutcome?
+  policyVersion String
+  startedAt DateTime
+  endedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  primaryAgent Agent @relation("PrimaryAgentEpisodes", fields: [primaryAgentId], references: [id], onDelete: Cascade)
+  parentEpisode Episode? @relation("EpisodeToEpisode", fields: [parentEpisodeId], references: [id], onDelete: SetNull)
+  childEpisodes Episode[] @relation("EpisodeToEpisode")
+  episodeAgents EpisodeAgent[]
+  memoryItems MemoryItem[]
+  traceEvents TraceEvent[]
+  artifacts Artifact[]
+  auditEvents AuditEvent[]
+  accessGrants AccessGrant[]
 }
 
 model EpisodeAgent {
@@ -196,28 +197,29 @@ model MemoryItem {
 }
 
 model TraceEvent {
-  id                     String       @id @default(cuid())
-  episodeId              String
-  actorAgentId           String?
-  stepIndex              Int
-  eventType              String
-  toolName               String?
-  stepTitleI18n          Json
-  status                 TraceStatus
-  shortResultI18n        Json
-  inputSummaryI18n       Json?
-  decisionSummaryI18n    Json?
+  id String @id @default(cuid())
+  episodeId String
+  actorAgentId String?
+  stepIndex Int
+  eventType String
+  toolName String?
+  stepTitleI18n Json
+  status TraceStatus
+  shortResultI18n Json
+  inputSummaryI18n Json?
+  decisionSummaryI18n Json?
   toolPayloadSummaryI18n Json?
-  resultSummaryI18n      Json?
-  errorSummaryI18n       Json?
-  policyHitReasonI18n    Json?
-  permissionDeniedI18n   Json?
-  eventTime              DateTime
-  createdAt              DateTime     @default(now())
-  episode                Episode      @relation(fields: [episodeId], references: [id], onDelete: Cascade)
-  actorAgent             Agent?       @relation(fields: [actorAgentId], references: [id], onDelete: SetNull)
-  sourceArtifacts        Artifact[]   @relation("SourceTraceEvent")
-  auditEvents            AuditEvent[]
+  resultSummaryI18n Json?
+  errorSummaryI18n Json?
+  policyHitReasonI18n Json?
+  permissionDeniedI18n Json?
+  snapshot Json?
+  eventTime DateTime
+  createdAt DateTime @default(now())
+  episode Episode @relation(fields: [episodeId], references: [id], onDelete: Cascade)
+  actorAgent Agent? @relation(fields: [actorAgentId], references: [id], onDelete: SetNull)
+  sourceArtifacts Artifact[] @relation("SourceTraceEvent")
+  auditEvents AuditEvent[]
 }
 
 model Artifact {
