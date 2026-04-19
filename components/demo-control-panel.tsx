@@ -37,8 +37,8 @@ function checkItemClass() {
 
 function messageClass(message: string) {
   return message.toLowerCase().includes("fail") || message.toLowerCase().includes("error")
-    ? "text-rose-300"
-    : "text-emerald-300";
+    ? "text-signal-error"
+    : "text-signal-success";
 }
 
 function buttonClass() {
