@@ -27,7 +27,7 @@ export function TimelineDebugWrapper({
   timeline,
   episodeId,
   locale,
-  dict
+  dict,
 }: {
   timeline: TraceItem[];
   episodeId: string;
@@ -36,9 +36,9 @@ export function TimelineDebugWrapper({
 }) {
   const [selectedTraceId, setSelectedTraceId] = useState<string | null>(null);
 
-  const selectedTrace = timeline.find(t => t.id === selectedTraceId);
+  const selectedTrace = timeline.find((t) => t.id === selectedTraceId);
 
-  const currentIndex = timeline.findIndex(t => t.id === selectedTraceId);
+  const currentIndex = timeline.findIndex((t) => t.id === selectedTraceId);
   const actualPrevTrace = currentIndex > 0 ? timeline[currentIndex - 1] : null;
 
   return (
@@ -46,17 +46,31 @@ export function TimelineDebugWrapper({
       <div className="space-y-4">
         {timeline.map((item) => {
           const details = [];
-          if (item.inputSummary) details.push({ label: "Input", value: item.inputSummary });
-          if (item.decisionSummary) details.push({ label: "Decision", value: item.decisionSummary });
-          if (item.resultSummary) details.push({ label: "Result", value: item.resultSummary });
-          if (item.errorSummary) details.push({ label: "Error", value: item.errorSummary, tone: "danger" });
-          if (item.policyHitReason) details.push({ label: "Policy", value: item.policyHitReason, tone: "warn" });
-          if (item.permissionDeniedReason) details.push({ label: "Denied", value: item.permissionDeniedReason, tone: "danger" });
+          if (item.inputSummary)
+            details.push({ label: "Input", value: item.inputSummary });
+          if (item.decisionSummary)
+            details.push({ label: "Decision", value: item.decisionSummary });
+          if (item.resultSummary)
+            details.push({ label: "Result", value: item.resultSummary });
+          if (item.errorSummary)
+            details.push({ label: "Error", value: item.errorSummary, tone: "danger" as const });
+          if (item.policyHitReason)
+            details.push({ label: "Policy", value: item.policyHitReason, tone: "warn" as const });
+          if (item.permissionDeniedReason)
+            details.push({
+              label: "Denied",
+              value: item.permissionDeniedReason,
+              tone: "danger" as const,
+            });
 
           return (
             <div
               key={item.id}
-              className={`cursor-pointer transition-all rounded-xl ${selectedTraceId === item.id ? 'ring-2 ring-emerald-500 bg-emerald-500/5' : 'hover:bg-slate-800/30'}`}
+              className={`cursor-pointer transition-all ${
+                selectedTraceId === item.id
+                  ? "ring-2 ring-accent bg-accent-dim"
+                  : "hover:bg-void-800/50"
+              }`}
               onClick={() => setSelectedTraceId(item.id)}
             >
               <TimelineEntry
@@ -90,7 +104,7 @@ export function TimelineDebugWrapper({
               locale={locale}
             />
           ) : (
-            <div className="h-64 flex items-center justify-center text-slate-500 text-sm italic">
+            <div className="h-64 flex items-center justify-center text-ink-faint text-sm italic">
               Select a trace node to inspect its state and diff.
             </div>
           )}
