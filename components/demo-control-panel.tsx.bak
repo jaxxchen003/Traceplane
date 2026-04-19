@@ -24,15 +24,15 @@ type MemoryOption = {
 };
 
 function fieldClass() {
-  return "w-full rounded border border-white/10 bg-[linear-gradient(180deg,rgba(2,6,23,0.82),rgba(8,15,32,0.72))] px-3 py-2.5 text-sm text-ink outline-none transition focus:border-accent";
+  return "w-full rounded-2xl border border-white/10 bg-[linear-gradient(180deg,rgba(2,6,23,0.82),rgba(8,15,32,0.72))] px-3 py-2.5 text-sm text-slate-100 outline-none transition focus:border-cyan-300/40";
 }
 
 function labelClass() {
-  return "mb-1 block text-xs uppercase tracking-[0.14em] text-ink-faint";
+  return "mb-1 block text-xs uppercase tracking-[0.14em] text-slate-400";
 }
 
 function checkItemClass() {
-  return "bg-void-800 border border-void-600 rounded flex items-center gap-2 rounded px-3 py-2 text-sm text-ink-muted";
+  return "tp-soft-card flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-slate-200";
 }
 
 function messageClass(message: string) {
@@ -42,7 +42,7 @@ function messageClass(message: string) {
 }
 
 function buttonClass() {
-  return "inline-flex items-center px-4 py-2 text-sm font-medium rounded bg-accent text-white hover:bg-accent-glow px-4 py-2 text-sm font-medium disabled:opacity-60";
+  return "tp-action-link px-4 py-2 text-sm font-medium disabled:opacity-60";
 }
 
 function normalizeI18n(zh: string, en: string) {
@@ -92,7 +92,7 @@ function SubmitRow({
 }) {
   return (
     <div className="flex items-center justify-between gap-3">
-      <div className={`text-xs ${message ? messageClass(message) : "text-ink-ghost"}`}>
+      <div className={`text-xs ${message ? messageClass(message) : "text-slate-500"}`}>
         {message || fallback}
       </div>
       <button type="submit" className={buttonClass()} disabled={pending}>

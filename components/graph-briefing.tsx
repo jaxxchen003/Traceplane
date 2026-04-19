@@ -14,10 +14,37 @@ type BriefingNode = {
   detail: string;
 };
 
+const toneStyles: Record<BriefingTone, { border: string; label: string }> = {
+  memory: {
+    border: "border-signal-info/30 bg-signal-info/5",
+    label: "text-signal-info",
+  },
+  trace: {
+    border: "border-signal-success/30 bg-signal-success/5",
+    label: "text-signal-success",
+  },
+  artifact: {
+    border: "border-signal-warning/30 bg-signal-warning/5",
+    label: "text-signal-warning",
+  },
+  policy: {
+    border: "border-signal-warning/30 bg-signal-warning/5",
+    label: "text-signal-warning",
+  },
+  audit: {
+    border: "border-signal-error/30 bg-signal-error/5",
+    label: "text-signal-error",
+  },
+  agent: {
+    border: "border-accent/30 bg-accent-dim",
+    label: "text-accent",
+  },
+};
+
 export function GraphBriefing({
   title,
   nodes,
-  emptyLabel
+  emptyLabel,
 }: {
   title: string;
   nodes: BriefingNode[];
@@ -33,7 +60,7 @@ export function GraphBriefing({
   return (
     <Panel title={title} eyebrow="Graph Briefing">
       {nodes.length === 0 ? (
-        <div className="tp-soft-card rounded-[22px] px-4 py-4 text-sm text-slate-400">
+        <div className="border border-dashed border-void-600 rounded px-4 py-4 text-sm text-ink-faint">
           {emptyLabel}
         </div>
       ) : (
@@ -41,40 +68,41 @@ export function GraphBriefing({
           <div className="space-y-2">
             {nodes.map((node) => {
               const active = selectedNode?.id === node.id;
+              const styles = toneStyles[node.tone];
 
               return (
                 <button
                   key={node.id}
                   type="button"
                   onClick={() => setSelectedId(node.id)}
-                  className={`block w-full rounded-[22px] border px-4 py-4 text-left transition ${
+                  className={`block w-full rounded border px-4 py-4 text-left transition ${
                     active
-                      ? "border-cyan-300/28 bg-cyan-400/10"
-                      : "tp-soft-card hover:border-white/16 hover:bg-white/7"
+                      ? styles.border
+                      : "bg-void-800 border-void-600 hover:border-void-500"
                   }`}
                 >
-                  <div className="text-[10px] uppercase tracking-[0.24em] text-slate-500">{node.tone}</div>
-                  <div className="mt-2 text-sm font-semibold text-white">{node.label}</div>
-                  {node.meta ? <div className="mt-1 text-xs text-slate-400">{node.meta}</div> : null}
+                  <div className="text-[10px] uppercase tracking-wider text-ink-ghost">{node.tone}</div>
+                  <div className="mt-2 text-sm font-semibold text-ink">{node.label}</div>
+                  {node.meta ? <div className="mt-1 text-xs text-ink-faint">{node.meta}</div> : null}
                 </button>
               );
             })}
           </div>
 
-          <div className="tp-soft-card rounded-[24px] px-5 py-5">
+          <div className="bg-void-800 border border-void-600 rounded px-5 py-5">
             {selectedNode ? (
               <>
-                <div className="text-[10px] uppercase tracking-[0.24em] text-cyan-200/80">
+                <div className={`text-[10px] uppercase tracking-wider ${toneStyles[selectedNode.tone].label}`}>
                   {selectedNode.tone}
                 </div>
-                <div className="mt-2 text-xl font-semibold text-white">{selectedNode.label}</div>
+                <div className="mt-2 text-xl font-semibold text-ink">{selectedNode.label}</div>
                 {selectedNode.meta ? (
-                  <div className="mt-2 text-sm text-slate-400">{selectedNode.meta}</div>
+                  <div className="mt-2 text-sm text-ink-faint">{selectedNode.meta}</div>
                 ) : null}
-                <div className="mt-5 text-sm leading-7 text-slate-300">{selectedNode.detail}</div>
+                <div className="mt-5 text-sm leading-7 text-ink-muted">{selectedNode.detail}</div>
               </>
             ) : (
-              <div className="text-sm text-slate-400">{emptyLabel}</div>
+              <div className="text-sm text-ink-faint">{emptyLabel}</div>
             )}
           </div>
         </div>

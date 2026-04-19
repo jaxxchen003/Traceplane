@@ -26,9 +26,9 @@ export default async function ArtifactDetailPage({
       <section className="tp-panel-shell rounded-[34px] px-6 py-7">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div>
-            <div className="text-[11px] uppercase tracking-[0.24em] text-cyan-200/80">{dict.artifact.title}</div>
+            <div className="text-[11px] uppercase tracking-[0.24em] text-signal-info-200/80">{dict.artifact.title}</div>
             <h1 className="mt-2 text-3xl font-semibold text-white">{artifact.title}</h1>
-            <p className="mt-3 text-sm text-slate-300">
+            <p className="mt-3 text-sm text-ink-muted">
               {artifact.type} · v{artifact.currentVersion} · {artifact.createdBy}
             </p>
           </div>
@@ -73,7 +73,7 @@ export default async function ArtifactDetailPage({
 
               <ContinuityCard
                 label={locale === "zh" ? "Projection Surface" : "Projection Surface"}
-                className="text-sm text-slate-300"
+                className="text-sm text-ink-muted"
               >
                 <div className="mb-3 flex items-center justify-between gap-3">
                   <StatusBadge
@@ -83,7 +83,7 @@ export default async function ArtifactDetailPage({
                 </div>
                 <div className="space-y-2">
                   <div><span className="font-medium text-white">{locale === "zh" ? "Cloud Mode:" : "Cloud Mode:"}</span> {artifact.runtimeSummary.cloudMode}</div>
-                  <div><span className="font-medium text-white">{locale === "zh" ? "Projection Root:" : "Projection Root:"}</span> <span className="break-all text-slate-200">{artifact.runtimeSummary.projectionRoot}</span></div>
+                  <div><span className="font-medium text-white">{locale === "zh" ? "Projection Root:" : "Projection Root:"}</span> <span className="break-all text-ink-muted">{artifact.runtimeSummary.projectionRoot}</span></div>
                   <div className="grid gap-3 pt-2 sm:grid-cols-2">
                     <MetricCard label={locale === "zh" ? "Source Traces" : "Source Traces"} value={artifact.provenanceSummary.traceCount} className="tp-deep-card" />
                     <MetricCard label={locale === "zh" ? "Source Memories" : "Source Memories"} value={artifact.provenanceSummary.memoryCount} className="tp-deep-card" />
@@ -96,18 +96,18 @@ export default async function ArtifactDetailPage({
           <Panel title={dict.common.versionHistory} eyebrow="Versions">
             <div className="space-y-3">
               {artifact.versions.map((version: { id: string; version: number; generatedBy: string; createdAt: Date }) => (
-                <ContinuityCard key={version.id} label={`v${version.version}`} detail={version.generatedBy} className="text-sm text-slate-300">
-                  <div className="mt-1 text-slate-500">{formatDate(version.createdAt, locale)}</div>
+                <ContinuityCard key={version.id} label={`v${version.version}`} detail={version.generatedBy} className="text-sm text-ink-muted">
+                  <div className="mt-1 text-ink-ghost">{formatDate(version.createdAt, locale)}</div>
                 </ContinuityCard>
               ))}
             </div>
           </Panel>
 
           <Panel title={dict.common.provenance} eyebrow={dict.artifact.sourceEpisode}>
-            <div className="space-y-4 text-sm text-slate-300">
+            <div className="space-y-4 text-sm text-ink-muted">
               <LabeledValue label={dict.artifact.sourceEpisode} value={artifact.sourceEpisodeTitle} />
               <div>
-                <div className="mb-1 text-[11px] uppercase tracking-[0.18em] text-slate-500">Trace</div>
+                <div className="mb-1 text-[11px] uppercase tracking-[0.18em] text-ink-ghost">Trace</div>
                 <div className="space-y-2">
                   {artifact.sourceTraces.map((trace: { id: string; stepIndex: number; title: string }) => (
                     <div key={trace.id} className="tp-soft-card rounded-xl px-3 py-2">
@@ -117,7 +117,7 @@ export default async function ArtifactDetailPage({
                 </div>
               </div>
               <div>
-                <div className="mb-1 text-[11px] uppercase tracking-[0.18em] text-slate-500">{dict.common.memories}</div>
+                <div className="mb-1 text-[11px] uppercase tracking-[0.18em] text-ink-ghost">{dict.common.memories}</div>
                 <div className="space-y-2">
                   {artifact.sourceMemories.map((memory: { id: string; title: string }) => (
                     <div key={memory.id} className="tp-soft-card rounded-xl px-3 py-2">
@@ -130,7 +130,7 @@ export default async function ArtifactDetailPage({
           </Panel>
 
           <Panel title={dict.common.reuse} eyebrow={dict.artifact.consumedBy}>
-            <div className="space-y-3 text-sm text-slate-300">
+            <div className="space-y-3 text-sm text-ink-muted">
               <div>
                 {artifact.consumedByAgents.length > 0 ? artifact.consumedByAgents.length : 0} downstream agent references
               </div>

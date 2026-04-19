@@ -212,7 +212,7 @@ export default async function ProjectOverviewPage({
         <div className="space-y-4">
           <Panel title={locale === "zh" ? "Best Next Handoff" : "Best Next Handoff"} eyebrow="Continue From Here">
             {handoffCandidate ? (
-              <div className="space-y-4 text-sm leading-7 text-slate-300">
+              <div className="space-y-4 text-sm leading-7 text-ink-muted">
                 <ContinuityCard
                   label={locale === "zh" ? "优先继续的主线" : "Best spine to continue"}
                   title={handoffCandidate.title}
@@ -253,27 +253,27 @@ export default async function ProjectOverviewPage({
                 </div>
               </div>
             ) : (
-              <div className="text-sm text-slate-400">{dict.projectOverview.noEpisodes}</div>
+              <div className="text-sm text-ink-faint">{dict.projectOverview.noEpisodes}</div>
             )}
           </Panel>
 
           <Panel title={dict.common.riskSummary} eyebrow={dict.common.risk}>
-            <div className="grid gap-3 text-sm text-slate-300">
-              <div className="rounded-[20px] border border-rose-400/16 bg-rose-400/8 px-4 py-4">
+            <div className="grid gap-3 text-sm text-ink-muted">
+              <div className="rounded-[20px] border border-signal-error-400/16 bg-signal-error-400/8 px-4 py-4">
                 {project.riskSummary.permissionDeniedCount} permission denials
               </div>
-              <div className="rounded-[20px] border border-amber-400/16 bg-amber-400/8 px-4 py-4">
+              <div className="rounded-[20px] border border-signal-warning-400/16 bg-signal-warning-400/8 px-4 py-4">
                 {project.riskSummary.policyHitCount} policy hits
               </div>
               <div className="rounded-[20px] border border-fuchsia-400/16 bg-fuchsia-400/8 px-4 py-4">
                 {project.riskSummary.failedEpisodeCount} failed episodes
               </div>
-              <div className="rounded-[20px] border border-cyan-400/16 bg-cyan-400/8 px-4 py-4">
+              <div className="rounded-[20px] border border-signal-info-400/16 bg-signal-info-400/8 px-4 py-4">
                 {project.riskSummary.pendingApprovalCount} pending approvals
               </div>
               <Link
                 href={`/${locale}/audit?projectId=${project.id}`}
-                className="mt-2 inline-flex rounded-full border border-white/10 bg-white/6 px-4 py-2 font-medium text-cyan-100"
+                className="mt-2 inline-flex rounded-full border border-white/10 bg-white/6 px-4 py-2 font-medium text-signal-info-100"
               >
                 {dict.common.viewAudit}
               </Link>
@@ -285,33 +285,33 @@ export default async function ProjectOverviewPage({
       <section className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
         <Panel title={locale === "zh" ? "Project Runtime Posture" : "Project Runtime Posture"} eyebrow="Runtime">
           <div className="grid gap-3 md:grid-cols-2">
-            <div className="rounded-[20px] border border-cyan-400/16 bg-cyan-400/8 px-4 py-4">
-              <div className="text-[11px] uppercase tracking-[0.18em] text-cyan-200/80">
+            <div className="rounded-[20px] border border-signal-info-400/16 bg-signal-info-400/8 px-4 py-4">
+              <div className="text-[11px] uppercase tracking-[0.18em] text-signal-info-200/80">
                 {locale === "zh" ? "云端模式" : "Cloud mode"}
               </div>
               <div className="mt-2 text-base font-medium text-white">{project.runtimeSummary.cloudMode}</div>
             </div>
-            <div className="rounded-[20px] border border-emerald-400/16 bg-emerald-400/8 px-4 py-4">
-              <div className="text-[11px] uppercase tracking-[0.18em] text-emerald-200/80">
+            <div className="rounded-[20px] border border-signal-success-400/16 bg-signal-success-400/8 px-4 py-4">
+              <div className="text-[11px] uppercase tracking-[0.18em] text-signal-success-200/80">
                 {locale === "zh" ? "对象存储" : "Object storage"}
               </div>
               <div className="mt-2 text-base font-medium text-white">{project.runtimeSummary.objectStorageProvider}</div>
             </div>
             <div className="rounded-[20px] border border-white/10 bg-white/5 px-4 py-4">
-              <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
+              <div className="text-[11px] uppercase tracking-[0.18em] text-ink-ghost">
                 {locale === "zh" ? "R2 覆盖" : "R2 coverage"}
               </div>
               <div className="mt-2 text-2xl font-semibold text-white">
                 {project.runtimeSummary.r2ArtifactCount}
               </div>
-              <div className="mt-1 text-sm text-slate-400">
+              <div className="mt-1 text-sm text-ink-faint">
                 {locale === "zh"
                   ? `其余 ${project.runtimeSummary.inlineArtifactCount} 个产物仍以内联方式存在`
                   : `${project.runtimeSummary.inlineArtifactCount} artifacts still remain inline`}
               </div>
             </div>
             <div className="rounded-[20px] border border-white/10 bg-white/5 px-4 py-4">
-              <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
+              <div className="text-[11px] uppercase tracking-[0.18em] text-ink-ghost">
                 {locale === "zh" ? "本地投影" : "Local projection"}
               </div>
               <div className="mt-2 text-base font-medium text-white">
@@ -323,32 +323,32 @@ export default async function ProjectOverviewPage({
                     ? "尚未检测到项目本地投影"
                     : "Project projection not detected"}
               </div>
-              <div className="mt-1 text-sm text-slate-400">{project.runtimeSummary.projectionRoot}</div>
+              <div className="mt-1 text-sm text-ink-faint">{project.runtimeSummary.projectionRoot}</div>
             </div>
           </div>
         </Panel>
 
         <Panel title={locale === "zh" ? "Continuity Summary" : "Continuity Summary"} eyebrow="Episode Network">
-          <div className="grid gap-3 text-sm text-slate-300">
-            <div className="rounded-[20px] border border-cyan-400/16 bg-cyan-400/8 px-4 py-4">
-              <div className="text-[11px] uppercase tracking-[0.18em] text-cyan-200/80">
+          <div className="grid gap-3 text-sm text-ink-muted">
+            <div className="rounded-[20px] border border-signal-info-400/16 bg-signal-info-400/8 px-4 py-4">
+              <div className="text-[11px] uppercase tracking-[0.18em] text-signal-info-200/80">
                 {locale === "zh" ? "关系更新" : "Relationship updates"}
               </div>
               <div className="mt-2 text-2xl font-semibold text-white">{project.continuitySummary.dependsOnCount}</div>
             </div>
-            <div className="rounded-[20px] border border-amber-400/16 bg-amber-400/8 px-4 py-4">
-              <div className="text-[11px] uppercase tracking-[0.18em] text-amber-200/80">
+            <div className="rounded-[20px] border border-signal-warning-400/16 bg-signal-warning-400/8 px-4 py-4">
+              <div className="text-[11px] uppercase tracking-[0.18em] text-signal-warning-200/80">
                 {locale === "zh" ? "Review 压力" : "Review pressure"}
               </div>
               <div className="mt-2 text-2xl font-semibold text-white">{project.continuitySummary.reviewPressureCount}</div>
             </div>
-            <div className="rounded-[20px] border border-rose-400/16 bg-rose-400/8 px-4 py-4">
-              <div className="text-[11px] uppercase tracking-[0.18em] text-rose-200/80">
+            <div className="rounded-[20px] border border-signal-error-400/16 bg-signal-error-400/8 px-4 py-4">
+              <div className="text-[11px] uppercase tracking-[0.18em] text-signal-error-200/80">
                 {locale === "zh" ? "失败链路" : "Failed spines"}
               </div>
               <div className="mt-2 text-2xl font-semibold text-white">{project.continuitySummary.failedEpisodesCount}</div>
             </div>
-            <div className="rounded-[20px] border border-white/10 bg-white/5 px-4 py-4 text-slate-300">
+            <div className="rounded-[20px] border border-white/10 bg-white/5 px-4 py-4 text-ink-muted">
               {locale === "zh"
                 ? "Project 不再只是项目详情，它要把 host 接入、存储覆盖率和 episode continuity 压成一个能指导 handoff 的总览面。"
                 : "Project Overview should compress host adoption, storage coverage, and episode continuity into one surface that guides the next handoff."}
@@ -371,9 +371,9 @@ export default async function ProjectOverviewPage({
                 <div className="flex items-center justify-between gap-3">
                   <div>
                     <div className="font-semibold text-white">{agent.name}</div>
-                    <div className="mt-1 text-sm text-slate-300">{agent.role}</div>
+                    <div className="mt-1 text-sm text-ink-muted">{agent.role}</div>
                   </div>
-                  <div className="text-right text-sm text-slate-300">
+                  <div className="text-right text-sm text-ink-muted">
                     <div>{agent.episodesInvolvedCount} episodes</div>
                     <div>{agent.artifactsGeneratedCount} artifacts</div>
                   </div>
@@ -392,12 +392,12 @@ export default async function ProjectOverviewPage({
               generatedByAgent: string;
               episodeTitle: string;
             }) => (
-              <Link key={artifact.id} href={`/${locale}/artifacts/${artifact.id}`} className="rounded-[22px] border border-white/10 bg-white/5 px-4 py-4 hover:border-cyan-300/30">
+              <Link key={artifact.id} href={`/${locale}/artifacts/${artifact.id}`} className="rounded-[22px] border border-white/10 bg-white/5 px-4 py-4 hover:border-signal-info-300/30">
                 <div className="font-medium text-white">{artifact.title}</div>
-                <div className="mt-1 text-sm text-slate-300">
+                <div className="mt-1 text-sm text-ink-muted">
                   {artifact.type} · {artifact.generatedByAgent}
                 </div>
-                <div className="mt-2 text-xs uppercase tracking-[0.15em] text-slate-500">{artifact.episodeTitle}</div>
+                <div className="mt-2 text-xs uppercase tracking-[0.15em] text-ink-ghost">{artifact.episodeTitle}</div>
               </Link>
             ))}
           </div>
@@ -424,7 +424,7 @@ export default async function ProjectOverviewPage({
               <Link
                 key={episode.id}
                 href={`/${locale}/projects/${project.id}/episodes/${episode.id}`}
-                className="rounded-[26px] border border-white/10 bg-white/5 px-5 py-5 transition hover:-translate-y-0.5 hover:border-cyan-300/30 hover:bg-white/7"
+                className="rounded-[26px] border border-white/10 bg-white/5 px-5 py-5 transition hover:-translate-y-0.5 hover:border-signal-info-300/30 hover:bg-white/7"
               >
                 <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
                   <div>
@@ -432,13 +432,13 @@ export default async function ProjectOverviewPage({
                       <h2 className="text-lg font-semibold text-white">{episode.title}</h2>
                       <StatusBadge label={dict.statuses[episode.status]} raw={episode.status} />
                     </div>
-                    <p className="max-w-2xl text-sm leading-7 text-slate-300">{episode.summary}</p>
+                    <p className="max-w-2xl text-sm leading-7 text-ink-muted">{episode.summary}</p>
                   </div>
-                  <div className="min-w-[220px] text-sm text-slate-300">
+                  <div className="min-w-[220px] text-sm text-ink-muted">
                     <div>{episode.primaryAgent}</div>
                     <div>{formatDate(episode.updatedAt, locale)}</div>
                     <div>{episode.artifactCount} artifacts</div>
-                    {episode.riskFlag ? <div className="mt-1 font-semibold text-rose-300">Risk flagged</div> : null}
+                    {episode.riskFlag ? <div className="mt-1 font-semibold text-signal-error-300">Risk flagged</div> : null}
                   </div>
                 </div>
               </Link>

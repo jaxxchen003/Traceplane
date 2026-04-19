@@ -139,7 +139,7 @@ export default async function ProjectsPage({
         </Panel>
 
         <Panel title={locale === "zh" ? "Operator Notes" : "Operator Notes"} eyebrow="Agent First">
-          <div className="space-y-4 text-sm leading-7 text-slate-300">
+          <div className="space-y-4 text-sm leading-7 text-ink-muted">
             <p>{dict.projectList.subtitle}</p>
             <p>
               {locale === "zh"
@@ -167,7 +167,7 @@ export default async function ProjectsPage({
             <Link
               key={project.id}
               href={`/${locale}/projects/${project.id}`}
-              className="tp-soft-card block rounded-[28px] px-5 py-5 transition hover:-translate-y-0.5 hover:border-cyan-300/30 hover:bg-white/7"
+              className="tp-soft-card block rounded-[28px] px-5 py-5 transition hover:-translate-y-0.5 hover:border-signal-info-300/30 hover:bg-white/7"
             >
               <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                 <div>
@@ -175,9 +175,9 @@ export default async function ProjectsPage({
                     <h2 className="text-xl font-semibold text-white">{project.name}</h2>
                     <StatusBadge label={dict.statuses[project.status]} raw={project.status} />
                   </div>
-                  <p className="max-w-2xl text-sm leading-7 text-slate-300">{project.description}</p>
+                  <p className="max-w-2xl text-sm leading-7 text-ink-muted">{project.description}</p>
                 </div>
-                <div className="grid min-w-[280px] grid-cols-2 gap-3 text-sm text-slate-300">
+                <div className="grid min-w-[280px] grid-cols-2 gap-3 text-sm text-ink-muted">
                   <LabeledValue label={dict.common.policyVersion} value={project.activePolicyVersion} />
                   <LabeledValue label={dict.common.status} value={formatDate(project.lastActiveAt, locale)} />
                   <LabeledValue label={locale === "zh" ? "Agents" : "Agents"} value={`${project.agentCount} agents`} />
@@ -186,7 +186,7 @@ export default async function ProjectsPage({
                   <LabeledValue
                     label={locale === "zh" ? "Risks" : "Risks"}
                     value={`${project.riskEventCount} risk events`}
-                    className={project.riskEventCount > 0 ? "text-rose-300" : undefined}
+                    className={project.riskEventCount > 0 ? "text-signal-error-300" : undefined}
                   />
                 </div>
               </div>

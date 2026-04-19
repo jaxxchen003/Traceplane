@@ -158,7 +158,7 @@ export default async function EpisodeReviewPage({
 
         <div className="space-y-4">
           <Panel title={locale === "zh" ? "Next Agent Handoff" : "Next Agent Handoff"} eyebrow="Brief">
-            <div className="space-y-4 text-sm leading-7 text-slate-300">
+            <div className="space-y-4 text-sm leading-7 text-ink-muted">
               <ContinuityCard
                 label={locale === "zh" ? "最新一步" : "Latest step"}
                 title={episode.handoffSummary.latestStepTitle}
@@ -199,7 +199,7 @@ export default async function EpisodeReviewPage({
           </Panel>
 
           <Panel title={dict.episode.auditSummary} eyebrow={dict.common.auditTrail}>
-            <div className="grid gap-3 text-sm text-slate-300">
+            <div className="grid gap-3 text-sm text-ink-muted">
               <MetricCard label="Reads" value={`${episode.auditSummary.readCount} reads`} tone="cyan" />
               <MetricCard label="Writes" value={`${episode.auditSummary.writeCount} writes`} tone="emerald" />
               <MetricCard label="Denials" value={`${episode.auditSummary.permissionDeniedCount} denials`} tone="rose" />
@@ -230,13 +230,13 @@ export default async function EpisodeReviewPage({
                 traces={episode.timeline.map((t: any) => ({ id: t.id, label: `Step ${t.stepIndex} · ${t.stepTitle}`, meta: t.actor }))}
                 artifacts={episode.artifacts.map((a: any) => ({ id: a.id, label: a.title, meta: `${a.type} · v${a.version}` }))}
               />
-              <div className="grid gap-3 text-sm text-slate-300">
+              <div className="grid gap-3 text-sm text-ink-muted">
                 {episode.relationships.map((edge: any) => (
                   <div key={edge.id} className="tp-soft-card rounded-2xl px-4 py-3">
                     <span className="font-medium text-white">{edge.edgeType}</span>
-                    <span className="mx-2 text-slate-500">·</span>
+                    <span className="mx-2 text-ink-ghost">·</span>
                     <span>{edge.fromNodeType}:{edge.fromNodeId.slice(-6)}</span>
-                    <span className="mx-2 text-slate-500">→</span>
+                    <span className="mx-2 text-ink-ghost">→</span>
                     <span>{edge.toNodeType}:{edge.toNodeId.slice(-6)}</span>
                   </div>
                 ))}
@@ -277,9 +277,9 @@ export default async function EpisodeReviewPage({
                 <div className="mb-3 flex items-center justify-between gap-3">
                   <StatusBadge label={episode.reviewOutcome ?? "PENDING"} raw={episode.reviewOutcome ?? "PENDING"} />
                 </div>
-                <div className="space-y-3 text-sm leading-7 text-slate-300">
+                <div className="space-y-3 text-sm leading-7 text-ink-muted">
                   <div><span className="font-medium text-white">Projection Root: </span>{episode.runtimeSummary.projectionRoot}</div>
-                  <div><span className="font-medium text-white">Episode Path: </span><span className="break-all text-slate-200">{episode.runtimeSummary.projectionPath}</span></div>
+                  <div><span className="font-medium text-white">Episode Path: </span><span className="break-all text-ink-muted">{episode.runtimeSummary.projectionPath}</span></div>
                   <div className="grid gap-3 sm:grid-cols-3">
                     <MetricCard label="Trace Events" value={episode.provenanceSummary.signals.traceEventCount} className="tp-deep-card" />
                     <MetricCard label="Hook Capture" value={episode.provenanceSummary.signals.hasHookCapture ? "Yes" : "No"} className="tp-deep-card" />
@@ -291,11 +291,11 @@ export default async function EpisodeReviewPage({
           </Panel>
 
           <Panel title={dict.common.summary} eyebrow={dict.episode.goal}>
-            <div className="space-y-4 text-sm leading-7 text-slate-300">
+            <div className="space-y-4 text-sm leading-7 text-ink-muted">
               <div>{episode.goal}</div>
               <ContinuityCard label={dict.episode.finalOutcome} detail={episode.finalOutcome} />
               <div>
-                <div className="mb-2 text-[11px] uppercase tracking-[0.18em] text-slate-500">{dict.common.participatingAgents}</div>
+                <div className="mb-2 text-[11px] uppercase tracking-[0.18em] text-ink-ghost">{dict.common.participatingAgents}</div>
                 <div>{episode.participatingAgents.join(" · ")}</div>
               </div>
             </div>
@@ -304,9 +304,9 @@ export default async function EpisodeReviewPage({
           <Panel title={dict.common.memories} eyebrow="Memory">
             <div className="space-y-3">
               {episode.memories.map((memory: any) => (
-                <div key={memory.id} className="tp-soft-card rounded-2xl px-4 py-3 text-sm text-slate-300">
+                <div key={memory.id} className="tp-soft-card rounded-2xl px-4 py-3 text-sm text-ink-muted">
                   <div className="font-medium text-white">{memory.title}</div>
-                  <div className="text-xs text-slate-500">{memory.type} · {memory.sensitivity}</div>
+                  <div className="text-xs text-ink-ghost">{memory.type} · {memory.sensitivity}</div>
                 </div>
               ))}
             </div>

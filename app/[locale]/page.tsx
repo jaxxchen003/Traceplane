@@ -49,7 +49,7 @@ function EpisodeList({
   return (
     <Panel title={title} eyebrow={eyebrow}>
       {items.length === 0 ? (
-        <div className="rounded-[24px] border border-dashed border-white/10 bg-white/4 px-5 py-8 text-sm text-slate-400">
+        <div className="rounded-[24px] border border-dashed border-white/10 bg-white/4 px-5 py-8 text-sm text-ink-faint">
           {emptyLabel}
         </div>
       ) : (
@@ -65,28 +65,28 @@ function EpisodeList({
                     <h3 className="text-lg font-semibold text-white">{item.title}</h3>
                     <StatusBadge label={dict.statuses[item.status]} raw={item.status} />
                   </div>
-                  <p className="text-sm leading-7 text-slate-300">{item.goal || item.summary}</p>
-                  <div className="mt-3 rounded-[18px] border border-white/10 bg-black/20 px-3 py-3 text-sm leading-6 text-slate-200">
-                    <div className="text-[10px] uppercase tracking-[0.18em] text-cyan-200/70">{item.queueHint}</div>
+                  <p className="text-sm leading-7 text-ink-muted">{item.goal || item.summary}</p>
+                  <div className="mt-3 rounded-[18px] border border-white/10 bg-black/20 px-3 py-3 text-sm leading-6 text-ink-muted">
+                    <div className="text-[10px] uppercase tracking-[0.18em] text-signal-info-200/70">{item.queueHint}</div>
                     <div className="mt-2">{item.nextMove}</div>
                   </div>
-                  <div className="mt-3 flex flex-wrap gap-2 text-xs uppercase tracking-[0.16em] text-slate-500">
+                  <div className="mt-3 flex flex-wrap gap-2 text-xs uppercase tracking-[0.16em] text-ink-ghost">
                     <span>{item.primaryActor}</span>
                     <span>{projectLabel}: {item.projectName}</span>
                     <span>{item.artifactCount} artifacts</span>
                     <span>{item.handoffReady ? (locale === "zh" ? "可交接" : "handoff-ready") : (locale === "zh" ? "继续中" : "live-spine")}</span>
                   </div>
                 </div>
-                <div className="min-w-[220px] space-y-3 text-sm text-slate-300">
+                <div className="min-w-[220px] space-y-3 text-sm text-ink-muted">
                   <div>{formatDate(item.updatedAt, locale)}</div>
                   <div className="flex flex-wrap gap-2">
                     {item.permissionDeniedCount > 0 ? (
-                      <span className="rounded-full border border-rose-400/20 bg-rose-400/10 px-3 py-1 text-xs text-rose-200">
+                      <span className="rounded-full border border-signal-error-400/20 bg-signal-error-400/10 px-3 py-1 text-xs text-signal-error-200">
                         {item.permissionDeniedCount} denials
                       </span>
                     ) : null}
                     {item.policyHitCount > 0 ? (
-                      <span className="rounded-full border border-amber-400/20 bg-amber-400/10 px-3 py-1 text-xs text-amber-200">
+                      <span className="rounded-full border border-signal-warning-400/20 bg-signal-warning-400/10 px-3 py-1 text-xs text-signal-warning-200">
                         {item.policyHitCount} policy hits
                       </span>
                     ) : null}
@@ -94,13 +94,13 @@ function EpisodeList({
                   <div className="flex flex-wrap gap-2 pt-2">
                     <Link
                       href={`/${locale}/projects/${item.projectId}/episodes/${item.id}`}
-                      className="inline-flex rounded-full border border-cyan-300/30 bg-cyan-400/10 px-4 py-2 text-xs font-medium text-cyan-100"
+                      className="inline-flex rounded-full border border-signal-info-300/30 bg-signal-info-400/10 px-4 py-2 text-xs font-medium text-signal-info-100"
                     >
                       {ctaLabel}
                     </Link>
                     <Link
                       href={`/${locale}/projects/${item.projectId}`}
-                      className="inline-flex rounded-full border border-white/10 bg-white/6 px-4 py-2 text-xs font-medium text-slate-200"
+                      className="inline-flex rounded-full border border-white/10 bg-white/6 px-4 py-2 text-xs font-medium text-ink-muted"
                     >
                       {dict.dashboard.openProject}
                     </Link>
@@ -208,23 +208,23 @@ export default async function LocaleHome({
 
           <div className="mt-5 rounded-[24px] border border-white/10 bg-[linear-gradient(180deg,rgba(15,23,42,0.58),rgba(2,6,23,0.88))] px-5 py-5">
             <div className="flex flex-wrap items-center gap-3">
-              <div className="rounded-full border border-amber-400/24 bg-amber-400/10 px-3 py-1 text-[10px] uppercase tracking-[0.18em] text-amber-100">
+              <div className="rounded-full border border-signal-warning-400/24 bg-signal-warning-400/10 px-3 py-1 text-[10px] uppercase tracking-[0.18em] text-signal-warning-100">
                 {locale === "zh" ? "产品形态" : "Product posture"}
               </div>
-              <div className="rounded-full border border-cyan-400/24 bg-cyan-400/10 px-3 py-1 text-[10px] uppercase tracking-[0.18em] text-cyan-100">
+              <div className="rounded-full border border-signal-info-400/24 bg-signal-info-400/10 px-3 py-1 text-[10px] uppercase tracking-[0.18em] text-signal-info-100">
                 {locale === "zh" ? "云端为主" : "Cloud first"}
               </div>
-              <div className="rounded-full border border-emerald-400/24 bg-emerald-400/10 px-3 py-1 text-[10px] uppercase tracking-[0.18em] text-emerald-100">
+              <div className="rounded-full border border-signal-success-400/24 bg-signal-success-400/10 px-3 py-1 text-[10px] uppercase tracking-[0.18em] text-signal-success-100">
                 {locale === "zh" ? "本地投影" : "Local projection"}
               </div>
             </div>
-            <p className="mt-4 text-sm leading-7 text-slate-300">
+            <p className="mt-4 text-sm leading-7 text-ink-muted">
               {locale === "zh"
                 ? "正式产品的权威状态在云端工作平面中，本地目录只是同步投影和 agent 友好的 working copy。这样一个 Agent 做完后，下一个 Agent 才能沿着同一条 spine 接着做。"
                 : "The source of truth lives in the cloud work plane. Local files are projections and agent-friendly working copies so the next agent can continue along the same spine."}
             </p>
 
-            <div className="mt-4 rounded-[20px] border border-white/10 bg-black/20 px-4 py-4 text-sm leading-7 text-slate-300">
+            <div className="mt-4 rounded-[20px] border border-white/10 bg-black/20 px-4 py-4 text-sm leading-7 text-ink-muted">
               <span className="font-medium text-white">
                 {locale === "zh" ? "当前判定：" : "Current verdict:"}
               </span>{" "}
@@ -242,8 +242,8 @@ export default async function LocaleHome({
             </div>
 
             {runtimeSurface.runtime.cloud.readiness.blockers.length > 0 ? (
-              <div className="mt-4 rounded-[20px] border border-amber-400/20 bg-amber-400/10 px-4 py-4 text-sm text-amber-50">
-                <div className="text-[11px] uppercase tracking-[0.18em] text-amber-200/80">
+              <div className="mt-4 rounded-[20px] border border-signal-warning-400/20 bg-signal-warning-400/10 px-4 py-4 text-sm text-signal-warning-50">
+                <div className="text-[11px] uppercase tracking-[0.18em] text-signal-warning-200/80">
                   {locale === "zh" ? "云端阻塞项" : "Cloud blockers"}
                 </div>
                 <ul className="mt-3 space-y-2">
@@ -255,8 +255,8 @@ export default async function LocaleHome({
             ) : null}
 
             {runtimeSurface.runtime.cloud.activationBlockers.length > 0 ? (
-              <div className="mt-4 rounded-[20px] border border-rose-400/20 bg-rose-400/10 px-4 py-4 text-sm text-rose-50">
-                <div className="text-[11px] uppercase tracking-[0.18em] text-rose-200/80">
+              <div className="mt-4 rounded-[20px] border border-signal-error-400/20 bg-signal-error-400/10 px-4 py-4 text-sm text-signal-error-50">
+                <div className="text-[11px] uppercase tracking-[0.18em] text-signal-error-200/80">
                   {locale === "zh" ? "云端激活阻塞" : "Cloud activation blockers"}
                 </div>
                 <ul className="mt-3 space-y-2">
@@ -279,9 +279,9 @@ export default async function LocaleHome({
           </Panel>
 
           <Panel title={locale === "zh" ? "Local Projection" : "Local Projection"} eyebrow="~/Traceplane">
-            <div className="space-y-4 text-sm leading-7 text-slate-300">
+            <div className="space-y-4 text-sm leading-7 text-ink-muted">
               <div className="rounded-[22px] border border-white/10 bg-white/5 px-4 py-4">
-                <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
+                <div className="text-[11px] uppercase tracking-[0.18em] text-ink-ghost">
                   {locale === "zh" ? "目录状态" : "Directory status"}
                 </div>
                 <div className="mt-2 text-base font-medium text-white">
@@ -293,12 +293,12 @@ export default async function LocaleHome({
                       ? "尚未检测到本地投影目录"
                       : "Projection root not detected"}
                 </div>
-                <div className="mt-2 text-sm text-slate-400">{runtimeSurface.localProjection.rootPath}</div>
+                <div className="mt-2 text-sm text-ink-faint">{runtimeSurface.localProjection.rootPath}</div>
               </div>
 
               <div className="grid gap-3 md:grid-cols-2">
                 <div className="rounded-[20px] border border-white/10 bg-white/5 px-4 py-4">
-                  <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
+                  <div className="text-[11px] uppercase tracking-[0.18em] text-ink-ghost">
                     {locale === "zh" ? "本地工作区" : "Projected workspaces"}
                   </div>
                   <div className="mt-2 text-2xl font-semibold text-white">
@@ -306,7 +306,7 @@ export default async function LocaleHome({
                   </div>
                 </div>
                 <div className="rounded-[20px] border border-white/10 bg-white/5 px-4 py-4">
-                  <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
+                  <div className="text-[11px] uppercase tracking-[0.18em] text-ink-ghost">
                     {locale === "zh" ? "R2 覆盖产物" : "R2-backed artifacts"}
                   </div>
                   <div className="mt-2 text-2xl font-semibold text-white">
@@ -334,34 +334,34 @@ export default async function LocaleHome({
       <section className="grid gap-4 xl:grid-cols-[1.25fr_0.75fr]">
         <Panel title={workspace?.name ?? brand.tenantDemoName} eyebrow="Attention Model">
           <div className="grid gap-4 lg:grid-cols-3">
-            <div className="rounded-[24px] border border-cyan-400/16 bg-cyan-400/8 px-4 py-4">
-              <div className="text-[11px] uppercase tracking-[0.18em] text-cyan-200/80">
+            <div className="rounded-[24px] border border-signal-info-400/16 bg-signal-info-400/8 px-4 py-4">
+              <div className="text-[11px] uppercase tracking-[0.18em] text-signal-info-200/80">
                 {dict.dashboard.readyToContinue}
               </div>
               <div className="mt-3 text-3xl font-semibold text-white">{commandCenter.stats.readyToContinue}</div>
-              <div className="mt-2 text-sm leading-6 text-slate-300">
+              <div className="mt-2 text-sm leading-6 text-ink-muted">
                 {locale === "zh"
                   ? "这些主线已经具备 brief 或产物，下一位 Agent 可以直接接上。"
                   : "These spines already have a brief or artifact, so the next agent can continue immediately."}
               </div>
             </div>
-            <div className="rounded-[24px] border border-rose-400/16 bg-rose-400/8 px-4 py-4">
-              <div className="text-[11px] uppercase tracking-[0.18em] text-rose-200/80">
+            <div className="rounded-[24px] border border-signal-error-400/16 bg-signal-error-400/8 px-4 py-4">
+              <div className="text-[11px] uppercase tracking-[0.18em] text-signal-error-200/80">
                 {dict.dashboard.contextRepair}
               </div>
               <div className="mt-3 text-3xl font-semibold text-white">{commandCenter.stats.contextRepair}</div>
-              <div className="mt-2 text-sm leading-6 text-slate-300">
+              <div className="mt-2 text-sm leading-6 text-ink-muted">
                 {locale === "zh"
                   ? "先把缺失上下文、权限拒绝和失败点修好，再恢复接力。"
                   : "Repair missing context, denials, and failure points before resuming the handoff."}
               </div>
             </div>
-            <div className="rounded-[24px] border border-emerald-400/16 bg-emerald-400/8 px-4 py-4">
-              <div className="text-[11px] uppercase tracking-[0.18em] text-emerald-200/80">
+            <div className="rounded-[24px] border border-signal-success-400/16 bg-signal-success-400/8 px-4 py-4">
+              <div className="text-[11px] uppercase tracking-[0.18em] text-signal-success-200/80">
                 {dict.dashboard.liveHandoffs}
               </div>
               <div className="mt-3 text-3xl font-semibold text-white">{commandCenter.stats.liveHandoffs}</div>
-              <div className="mt-2 text-sm leading-6 text-slate-300">
+              <div className="mt-2 text-sm leading-6 text-ink-muted">
                 {locale === "zh"
                   ? "这些主线正在跑，但还没到适合交接的时刻。"
                   : "These spines are moving, but they are not yet ready for a clean handoff."}
@@ -371,7 +371,7 @@ export default async function LocaleHome({
         </Panel>
 
         <Panel title={locale === "zh" ? "Home Principle" : "Home Principle"} eyebrow="Episode First">
-          <div className="space-y-4 text-sm leading-7 text-slate-300">
+          <div className="space-y-4 text-sm leading-7 text-ink-muted">
             <p>
               {locale === "zh"
                 ? "这个首页先回答下一位 Agent 应该从哪里接，不先回答系统里有多少项目。Project 仍然存在，但它退到归属和汇总层。"
@@ -443,9 +443,9 @@ export default async function LocaleHome({
               key={item.step}
               className="rounded-[24px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02))] px-5 py-5"
             >
-              <div className="text-[11px] uppercase tracking-[0.22em] text-cyan-200/80">{item.step}</div>
+              <div className="text-[11px] uppercase tracking-[0.22em] text-signal-info-200/80">{item.step}</div>
               <h3 className="mt-3 text-lg font-semibold text-white">{item.title}</h3>
-              <p className="mt-3 text-sm leading-7 text-slate-300">{item.body}</p>
+              <p className="mt-3 text-sm leading-7 text-ink-muted">{item.body}</p>
             </div>
           ))}
         </div>

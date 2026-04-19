@@ -31,14 +31,14 @@ function AuditEventRow({
       <td className="rounded-l-2xl px-3 py-4">
         <div className="space-y-2">
           <StatusBadge label={event.result} raw={event.result} />
-          <div className="text-xs text-slate-500">{formatDate(event.occurredAt, locale)}</div>
+          <div className="text-xs text-ink-ghost">{formatDate(event.occurredAt, locale)}</div>
         </div>
       </td>
-      <td className="px-3 py-4 text-sm text-slate-200">{event.action}</td>
-      <td className="px-3 py-4 text-sm text-slate-200">{event.actorType} · {event.actorId.slice(-6)}</td>
-      <td className="px-3 py-4 text-sm text-slate-200">{event.targetType} · {event.targetId.slice(-8)}</td>
-      <td className="px-3 py-4 text-sm text-slate-200">{event.permissionDecision ?? "allow"}</td>
-      <td className="rounded-r-2xl px-3 py-4 text-sm text-slate-200">
+      <td className="px-3 py-4 text-sm text-ink-muted">{event.action}</td>
+      <td className="px-3 py-4 text-sm text-ink-muted">{event.actorType} · {event.actorId.slice(-6)}</td>
+      <td className="px-3 py-4 text-sm text-ink-muted">{event.targetType} · {event.targetId.slice(-8)}</td>
+      <td className="px-3 py-4 text-sm text-ink-muted">{event.permissionDecision ?? "allow"}</td>
+      <td className="rounded-r-2xl px-3 py-4 text-sm text-ink-muted">
         {event.policyHitReason || event.denyReason || "—"}
       </td>
     </tr>
@@ -65,9 +65,9 @@ export default async function AuditPage({
   return (
     <div className="space-y-6">
       <section className="tp-panel-shell rounded-[34px] px-6 py-7 text-white">
-        <div className="text-[11px] uppercase tracking-[0.26em] text-cyan-200/80">{dict.audit.title}</div>
+        <div className="text-[11px] uppercase tracking-[0.26em] text-signal-info-200/80">{dict.audit.title}</div>
         <h1 className="mt-3 text-3xl font-semibold">{dict.common.auditTrail}</h1>
-        <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-300">{dict.audit.subtitle}</p>
+        <p className="mt-3 max-w-3xl text-sm leading-7 text-ink-muted">{dict.audit.subtitle}</p>
       </section>
 
       <section className="grid gap-4 xl:grid-cols-[1.05fr_0.95fr]">
@@ -81,7 +81,7 @@ export default async function AuditPage({
         </Panel>
 
         <Panel title={locale === "zh" ? "Audit Runtime State" : "Audit Runtime State"} eyebrow="Control Surface">
-          <div className="grid gap-3 text-sm text-slate-300 sm:grid-cols-2">
+          <div className="grid gap-3 text-sm text-ink-muted sm:grid-cols-2">
             <MetricCard
               label={locale === "zh" ? "Cloud Mode" : "Cloud Mode"}
               value={runtimeSummary.cloudMode}
@@ -99,7 +99,7 @@ export default async function AuditPage({
       <Panel title={dict.audit.title} eyebrow="Audit">
         <div className="overflow-x-auto">
           <table className="min-w-full border-separate border-spacing-y-3 text-left">
-            <thead className="text-xs uppercase tracking-[0.16em] text-slate-500">
+            <thead className="text-xs uppercase tracking-[0.16em] text-ink-ghost">
               <tr>
                 <th className="px-3">{dict.common.status}</th>
                 <th className="px-3">{dict.audit.action}</th>
@@ -126,7 +126,7 @@ export default async function AuditPage({
             </tbody>
           </table>
           {events.length === 0 ? (
-            <ContinuityCard label={dict.audit.title} detail={dict.audit.noEvents} className="mt-4 text-sm text-slate-400" />
+            <ContinuityCard label={dict.audit.title} detail={dict.audit.noEvents} className="mt-4 text-sm text-ink-faint" />
           ) : null}
         </div>
       </Panel>

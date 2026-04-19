@@ -55,9 +55,9 @@ export function ContinuityLaunchpad({
             label={locale === "zh" ? "直接打开 brief" : "Open the brief directly"}
             title={launchpad.episodeTitle}
             detail={launchpad.nextMove}
-            className="bg-void-900 border border-void-600 rounded"
+            className="tp-deep-card"
           >
-            <p className="mt-2 text-sm text-ink-faint">{launchpad.projectName}</p>
+            <p className="mt-2 text-sm text-slate-400">{launchpad.projectName}</p>
             <div className="mt-5 flex flex-wrap gap-2">
               <ActionLink href={launchpad.briefHref}>
                 {locale === "zh" ? "打开 episode brief" : "Open episode brief"}
@@ -67,7 +67,7 @@ export function ContinuityLaunchpad({
 
           <ContinuityCard
             label={locale === "zh" ? "把本地 packet 交给下一个 Agent" : "Pass the local packet to the next agent"}
-            className="bg-void-800 border border-void-600 rounded"
+            className="tp-soft-card"
           >
             <div className="mt-3 flex flex-wrap items-center gap-2">
               <SurfacePill tone={launchpad.packetExists ? "emerald" : "neutral"}>
@@ -78,7 +78,7 @@ export function ContinuityLaunchpad({
                     : "awaiting projection"}
               </SurfacePill>
             </div>
-            <div className="mt-4 space-y-3 text-sm text-ink-muted">
+            <div className="mt-4 space-y-3 text-sm text-slate-300">
               <CodePathBlock label="continuation-packet.txt" code={launchpad.packetPath} />
               <CodePathBlock label="handoff-brief.json" code={launchpad.handoffJsonPath} />
             </div>
@@ -90,7 +90,7 @@ export function ContinuityLaunchpad({
             detail={launchpad.packetInstruction}
             tone="amber"
           >
-            <div className="bg-void-900 border border-void-600 rounded mt-3 rounded px-3 py-3 text-sm leading-7 text-ink-muted">
+            <div className="tp-deep-card mt-3 rounded-[18px] px-3 py-3 text-sm leading-7 text-slate-200">
               {launchpad.modeLabel}
             </div>
           </ContinuityCard>
@@ -112,9 +112,9 @@ export function ContinuityLaunchpad({
             label={locale === "zh" ? "继续当前 brief" : "Continue from the brief"}
             title={launchpad.episodeTitle}
             detail={launchpad.nextMove}
-            className="bg-void-900 border border-void-600 rounded"
+            className="tp-deep-card"
           >
-            <p className="mt-2 text-sm text-ink-faint">{launchpad.projectName}</p>
+            <p className="mt-2 text-sm text-slate-400">{launchpad.projectName}</p>
             <div className="mt-5 flex flex-wrap gap-2">
               <ActionLink href={launchpad.briefHref}>
                 {locale === "zh" ? "打开 episode brief" : "Open episode brief"}
@@ -129,7 +129,7 @@ export function ContinuityLaunchpad({
 
           <ContinuityCard
             label={locale === "zh" ? "从本地 packet 继续" : "Continue from the local packet"}
-            className="bg-void-800 border border-void-600 rounded"
+            className="tp-soft-card"
           >
             <div className="mt-3 flex flex-wrap items-center gap-2">
               <SurfacePill tone={launchpad.packetExists ? "emerald" : "neutral"}>
@@ -140,14 +140,14 @@ export function ContinuityLaunchpad({
                     : "awaiting projection"}
               </SurfacePill>
             </div>
-            <div className="mt-4 space-y-3 text-sm text-ink-muted">
+            <div className="mt-4 space-y-3 text-sm text-slate-300">
               <CodePathBlock label="continuation-packet.txt" code={launchpad.packetPath} />
               <CodePathBlock label="handoff-brief.json" code={launchpad.handoffJsonPath} />
             </div>
           </ContinuityCard>
         </div>
 
-        <div className="bg-void-800 border border-void-600 rounded mt-4 rounded px-4 py-4 text-sm leading-7 text-ink-muted">
+        <div className="tp-soft-card mt-4 rounded-[20px] px-4 py-4 text-sm leading-7 text-slate-200">
           {launchpad.packetInstruction}
         </div>
       </div>
