@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Traceplane Premium · Sentry Data-Dense Style</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            void: {
+              950: '#030303',
+              900: '#0a0a0a',
+              800: '#111111',
+              700: '#1a1a1a',
+              600: '#222222',
+              500: '#2a2a2a',
+              400: '#333333',
+              300: '#444444',
+            },
+            ink: {
+              DEFAULT: '#fafafa',
+              muted: '#a1a1aa',
+              faint: '#71717a',
+              ghost: '#52525b',
+            },
+            accent: {
+              DEFAULT: '#6366f1',
+              glow: '#818cf8',
+              dim: 'rgba(99, 102, 241, 0.08)',
+            },
+            signal: {
+              neutral: '#71717a',
+              info: '#3b82f6',
+              warning: '#f59e0b',
+              success: '#22c55e',
+              error: '#ef4444',
+            },
+          },
+          fontFamily: {
+            sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+            mono: ['JetBrains Mono', 'SF Mono', 'Monaco', 'monospace'],
+          },
+        }
+      }
+    }
+  </script>
+  <style>
+    body { 
+      background: #030303; 
+      color: #fafafa;
+      font-family: 'Inter', sans-serif;
+    }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    
+    /* Subtle dot pattern instead of lines */
+    .bg-grid {
+      background-image: radial-gradient(circle, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
+    
+    /* Status pulse animation */
+    @keyframes status-pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    .status-pulse {
+      animation: status-pulse 2s ease-in-out infinite;
+    }
+    
+    /* Table row hover */
+    .table-row-hover:hover {
+      background: rgba(255,255,255,0.02);
+    }
+    
+    /* Scrollbar styling */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0a0a0a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #333;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #444;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-void-950">
+  <div class="bg-grid min-h-screen">
+    
+    <!-- Header -->
+    <header class="sticky top-0 z-50 border-b border-void-600 bg-void-900/80 backdrop-blur-xl">
+      <div class="max-w-[1600px] mx-auto px-6 h-14 flex items-center justify-between">
+        <div class="flex items-center gap-8">
+          <div class="flex items-center gap-3">
+            <div class="w-7 h-7 bg-accent rounded flex items-center justify-center">
+              <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+              </svg>
+            </div>
+            <span class="font-semibold text-lg tracking-tight">Traceplane</span>
+          </div>
+          <nav class="hidden md:flex items-center gap-1">
+            <a href="#" class="px-3 py-1.5 text-sm font-medium text-ink rounded hover:bg-void-700 transition-colors">Projects</a>
+            <a href="#" class="px-3 py-1.5 text-sm font-medium text-ink-muted rounded hover:bg-void-700 transition-colors">Episodes</a>
+            <a href="#" class="px-3 py-1.5 text-sm font-medium text-ink-muted rounded hover:bg-void-700 transition-colors">Agents</a>
+            <a href="#" class="px-3 py-1.5 text-sm font-medium text-ink-muted rounded hover:bg-void-700 transition-colors">Audit</a>
+          </nav>
+        </div>
+        <div class="flex items-center gap-3">
+          <button class="px-3 py-1.5 text-sm font-medium text-ink-muted hover:text-ink transition-colors">Settings</button>
+          <button class="px-4 py-1.5 bg-accent text-white text-sm font-medium rounded hover:bg-accent-glow transition-colors">New Episode</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-[1600px] mx-auto px-6 py-6">
+      
+      <!-- Project Header -->
+      <div class="mb-8">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="text-xs font-mono text-ink-faint uppercase tracking-wider">Project</span>
+        </div>
+        <div class="flex items-baseline gap-4">
+          <h1 class="text-2xl font-semibold tracking-tight">Q2 Customer Pulse</h1>
+          <span class="font-mono text-sm text-ink-faint">q2-customer-pulse</span>
+        </div>
+        <div class="mt-3 flex items-center gap-4 text-sm">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-signal-success status-pulse"></span>
+            <span class="text-signal-success">Healthy</span>
+          </div>
+          <span class="text-void-400">·</span>
+          <span class="text-ink-faint">Last update: 2m ago</span>
+        </div>
+      </div>
+
+      <!-- Metrics Grid -->
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
+        <div class="bg-void-800 border border-void-600 rounded p-4">
+          <div class="text-xs font-medium text-ink-faint uppercase tracking-wider mb-2">Episodes</div>
+          <div class="text-2xl font-semibold font-mono tabular-nums">12</div>
+          <div class="text-xs text-signal-success mt-1 flex items-center gap-1">
+            <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M7 17l5-5 5 5M12 12V3"/>
+            </svg>
+            +3 this week
+          </div>
+        </div>
+        
+        <div class="bg-void-800 border border-void-600 rounded p-4">
+          <div class="text-xs font-medium text-ink-faint uppercase tracking-wider mb-2">Active</div>
+          <div class="text-2xl font-semibold font-mono tabular-nums text-signal-info">3</div>
+          <div class="text-xs text-ink-faint mt-1">Running now</div>
+        </div>
+        
+        <div class="bg-void-800 border border-void-600 rounded p-4">
+          <div class="text-xs font-medium text-ink-faint uppercase tracking-wider mb-2">Artifacts</div>
+          <div class="text-2xl font-semibold font-mono tabular-nums">48</div>
+          <div class="text-xs text-ink-faint mt-1">R2: 32 · Local: 16</div>
+        </div>
+        
+        <div class="bg-void-800 border border-void-600 rounded p-4">
+          <div class="text-xs font-medium text-ink-faint uppercase tracking-wider mb-2">Success Rate</div>
+          <div class="text-2xl font-semibold font-mono tabular-nums text-signal-success">94.2%</div>
+          <div class="w-full h-1 bg-void-600 rounded mt-2 overflow-hidden">
+            <div class="h-full bg-signal-success rounded" style="width: 94.2%"></div>
+          </div>
+        </div>
+        
+        <div class="bg-void-800 border border-void-600 rounded p-4">
+          <div class="text-xs font-medium text-ink-faint uppercase tracking-wider mb-2">Avg Duration</div>
+          <div class="text-2xl font-semibold font-mono tabular-nums">2.4m</div>
+          <div class="text-xs text-signal-info mt-1 flex items-center gap-1">
+            <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M7 7l5 5 5-5M12 12V21"/>
+            </svg>
+            -0.3m
+          </div>
+        </div>
+        
+        <div class="bg-void-800 border border-void-600 rounded p-4">
+          <div class="text-xs font-medium text-ink-faint uppercase tracking-wider mb-2">Agents</div>
+          <div class="text-2xl font-semibold font-mono tabular-nums">3</div>
+          <div class="flex -space-x-1.5 mt-2">
+            <div class="w-5 h-5 rounded-full bg-signal-info/20 border border-void-600 flex items-center justify-center text-[10px]">C</div>
+            <div class="w-5 h-5 rounded-full bg-signal-warning/20 border border-void-600 flex items-center justify-center text-[10px]">O</div>
+            <div class="w-5 h-5 rounded-full bg-signal-success/20 border border-void-600 flex items-center justify-center text-[10px]">G</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Episode Table -->
+        <div class="lg:col-span-2">
+          <div class="bg-void-800 border border-void-600 rounded overflow-hidden">
+            <div class="px-4 py-3 border-b border-void-600 bg-void-700 flex items-center justify-between">
+              <span class="text-sm font-medium">Recent Episodes</span>
+              <div class="flex items-center gap-2">
+                <button class="px-2 py-1 text-xs font-medium bg-accent-dim text-accent rounded">All</button>
+                <button class="px-2 py-1 text-xs font-medium text-ink-faint hover:text-ink hover:bg-void-600 rounded transition-colors">Active</button>
+                <button class="px-2 py-1 text-xs font-medium text-ink-faint hover:text-ink hover:bg-void-600 rounded transition-colors">Failed</button>
+              </div>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead>
+                  <tr class="border-b border-void-600">
+                    <th class="px-4 py-2.5 text-left font-medium text-ink-faint text-xs uppercase tracking-wider">Status</th>
+                    <th class="px-4 py-2.5 text-left font-medium text-ink-faint text-xs uppercase tracking-wider">ID</th>
+                    <th class="px-4 py-2.5 text-left font-medium text-ink-faint text-xs uppercase tracking-wider">Episode</th>
+                    <th class="px-4 py-2.5 text-left font-medium text-ink-faint text-xs uppercase tracking-wider">Agent</th>
+                    <th class="px-4 py-2.5 text-left font-medium text-ink-faint text-xs uppercase tracking-wider">Duration</th>
+                    <th class="px-4 py-2.5 text-left font-medium text-ink-faint text-xs uppercase tracking-wider">Artifacts</th>
+                    <th class="px-4 py-2.5 text-left font-medium text-ink-faint text-xs uppercase tracking-wider">Time</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="border-b border-void-600/50 table-row-hover cursor-pointer">
+                    <td class="px-4 py-3">
+                      <div class="flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-signal-info status-pulse"></span>
+                        <span class="text-xs font-medium text-signal-info">active</span>
+                      </div>
+                    </td>
+                    <td class="px-4 py-3 font-mono text-xs text-ink-faint">cmn71a7o</td>
+                    <td class="px-4 py-3">
+                      <div class="font-medium">Weekly Report Generation</div>
+                      <div class="text-xs text-ink-faint">Customer feedback analysis</div>
+                    </td>
+                    <td class="px-4 py-3">
+                      <span class="inline-flex items-center gap-1.5">
+                        <span class="w-4 h-4 rounded bg-signal-info/10 flex items-center justify-center text-[10px] text-signal-info">C</span>
+                        <span class="text-ink-faint">claude</span>
+                      </span>
+                    </td>
+                    <td class="px-4 py-3 font-mono text-ink-faint">1.8m</td>
+                    <td class="px-4 py-3">
+                      <span class="inline-flex items-center justify-center w-6 h-5 bg-void-600 rounded text-xs font-mono">5</span>
+                    </td>
+                    <td class="px-4 py-3 text-xs text-ink-faint">2h ago</td>
+                  </tr>
+                  
+                  <tr class="border-b border-void-600/50 table-row-hover cursor-pointer">
+                    <td class="px-4 py-3">
+                      <div class="flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-signal-success"></span>
+                        <span class="text-xs font-medium text-signal-success">done</span>
+                      </div>
+                    </td>
+                    <td class="px-4 py-3 font-mono text-xs text-ink-faint">cmn71a7c</td>
+                    <td class="px-4 py-3">
+                      <div class="font-medium">Sensitive Document Check</div>
+                      <div class="text-xs text-ink-faint">Compliance audit</div>
+                    </td>
+                    <td class="px-4 py-3">
+                      <span class="inline-flex items-center gap-1.5">
+                        <span class="w-4 h-4 rounded bg-signal-warning/10 flex items-center justify-center text-[10px] text-signal-warning">O</span>
+                        <span class="text-ink-faint">opencode</span>
+                      </span>
+                    </td>
+                    <td class="px-4 py-3 font-mono text-ink-faint">0.4m</td>
+                    <td class="px-4 py-3">
+                      <span class="inline-flex items-center justify-center w-6 h-5 bg-void-600 rounded text-xs font-mono">2</span>
+                    </td>
+                    <td class="px-4 py-3 text-xs text-ink-faint">5h ago</td>
+                  </tr>
+                  
+                  <tr class="border-b border-void-600/50 table-row-hover cursor-pointer">
+                    <td class="px-4 py-3">
+                      <div class="flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-signal-warning"></span>
+                        <span class="text-xs font-medium text-signal-warning">paused</span>
+                      </div>
+                    </td>
+                    <td class="px-4 py-3 font-mono text-xs text-ink-faint">cmn74tcv</td>
+                    <td class="px-4 py-3">
+                      <div class="font-medium">MCP Smoke Test</div>
+                      <div class="text-xs text-ink-faint">Integration testing</div>
+                    </td>
+                    <td class="px-4 py-3">
+                      <span class="inline-flex items-center gap-1.5">
+                        <span class="w-4 h-4 rounded bg-signal-success/10 flex items-center justify-center text-[10px] text-signal-success">G</span>
+                        <span class="text-ink-faint">gemini</span>
+                      </span>
+                    </td>
+                    <td class="px-4 py-3 font-mono text-ink-faint">--</td>
+                    <td class="px-4 py-3">
+                      <span class="inline-flex items-center justify-center w-6 h-5 bg-void-600 rounded text-xs font-mono">0</span>
+                    </td>
+                    <td class="px-4 py-3 text-xs text-ink-faint">1d ago</td>
+                  </tr>
+                  
+                  <tr class="border-b border-void-600/50 table-row-hover cursor-pointer">
+                    <td class="px-4 py-3">
+                      <div class="flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-signal-success"></span>
+                        <span class="text-xs font-medium text-signal-success">done</span>
+                      </div>
+                    </td>
+                    <td class="px-4 py-3 font-mono text-xs text-ink-faint">cmn74u5q</td>
+                    <td class="px-4 py-3">
+                      <div class="font-medium">API Documentation Update</div>
+                      <div class="text-xs text-ink-faint">OpenAPI spec refresh</div>
+                    </td>
+                    <td class="px-4 py-3">
+                      <span class="inline-flex items-center gap-1.5">
+                        <span class="w-4 h-4 rounded bg-signal-info/10 flex items-center justify-center text-[10px] text-signal-info">C</span>
+                        <span class="text-ink-faint">claude</span>
+                      </span>
+                    </td>
+                    <td class="px-4 py-3 font-mono text-ink-faint">3.2m</td>
+                    <td class="px-4 py-3">
+                      <span class="inline-flex items-center justify-center w-6 h-5 bg-void-600 rounded text-xs font-mono">1</span>
+                    </td>
+                    <td class="px-4 py-3 text-xs text-ink-faint">2d ago</td>
+                  </tr>
+                  
+                  <tr class="table-row-hover cursor-pointer">
+                    <td class="px-4 py-3">
+                      <div class="flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-signal-error"></span>
+                        <span class="text-xs font-medium text-signal-error">failed</span>
+                      </div>
+                    </td>
+                    <td class="px-4 py-3 font-mono text-xs text-ink-faint">cmn75x9z</td>
+                    <td class="px-4 py-3">
+                      <div class="font-medium">Database Migration</div>
+                      <div class="text-xs text-ink-faint">Schema v2 migration</div>
+                    </td>
+                    <td class="px-4 py-3">
+                      <span class="inline-flex items-center gap-1.5">
+                        <span class="w-4 h-4 rounded bg-signal-warning/10 flex items-center justify-center text-[10px] text-signal-warning">O</span>
+                        <span class="text-ink-faint">opencode</span>
+                      </span>
+                    </td>
+                    <td class="px-4 py-3 font-mono text-ink-faint">0.1m</td>
+                    <td class="px-4 py-3">
+                      <span class="inline-flex items-center justify-center w-6 h-5 bg-void-600 rounded text-xs font-mono">0</span>
+                    </td>
+                    <td class="px-4 py-3 text-xs text-ink-faint">3d ago</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Sidebar -->
+        <div class="space-y-6">
+          
+          <!-- Event Stream -->
+          <div class="bg-void-800 border border-void-600 rounded">
+            <div class="px-4 py-3 border-b border-void-600 bg-void-700">
+              <span class="text-sm font-medium">Event Stream</span>
+            </div>
+            <div class="p-4 space-y-3">
+              <div class="flex items-start gap-3 text-sm">
+                <span class="text-ink-faint font-mono text-xs mt-0.5">14:32</span>
+                <div>
+                  <span class="text-signal-info">TRACE</span>
+                  <span class="text-ink-faint ml-2">episode.initialize</span>
+                </div>
+              </div>
+              <div class="flex items-start gap-3 text-sm">
+                <span class="text-ink-faint font-mono text-xs mt-0.5">14:32</span>
+                <div>
+                  <span class="text-signal-success">TRACE</span>
+                  <span class="text-ink-faint ml-2">tool.fetch_data</span>
+                  <span class="text-signal-success ml-2 font-mono text-xs">1.2s</span>
+                </div>
+              </div>
+              <div class="flex items-start gap-3 text-sm">
+                <span class="text-ink-faint font-mono text-xs mt-0.5">14:33</span>
+                <div>
+                  <span class="text-signal-success">TRACE</span>
+                  <span class="text-ink-faint ml-2">artifact.create</span>
+                  <span class="text-signal-success ml-2 font-mono text-xs">0.8s</span>
+                </div>
+              </div>
+              <div class="flex items-start gap-3 text-sm opacity-50">
+                <span class="text-ink-faint font-mono text-xs mt-0.5">14:33</span>
+                <div>
+                  <span class="text-ink-ghost">AUDIT</span>
+                  <span class="text-ink-faint ml-2">permission.check</span>
+                  <span class="text-signal-success ml-2">allow</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- System Health -->
+          <div class="bg-void-800 border border-void-600 rounded">
+            <div class="px-4 py-3 border-b border-void-600 bg-void-700">
+              <span class="text-sm font-medium">System Health</span>
+            </div>
+            <div class="p-4 space-y-4">
+              <div>
+                <div class="flex justify-between text-xs mb-1.5">
+                  <span class="text-ink-faint">Database</span>
+                  <span class="text-signal-success font-medium">Operational</span>
+                </div>
+                <div class="h-1 bg-void-600 rounded overflow-hidden">
+                  <div class="h-full w-full bg-signal-success rounded"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between text-xs mb-1.5">
+                  <span class="text-ink-faint">R2 Storage</span>
+                  <span class="text-signal-success font-medium">Operational</span>
+                </div>
+                <div class="h-1 bg-void-600 rounded overflow-hidden">
+                  <div class="h-full w-full bg-signal-success rounded"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between text-xs mb-1.5">
+                  <span class="text-ink-faint">Hook Bridge</span>
+                  <span class="text-signal-info font-medium">Active</span>
+                </div>
+                <div class="h-1 bg-void-600 rounded overflow-hidden">
+                  <div class="h-full w-[85%] bg-signal-info rounded"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between text-xs mb-1.5">
+                  <span class="text-ink-faint">Queue</span>
+                  <span class="text-ink-faint">0 pending</span>
+                </div>
+                <div class="h-1 bg-void-600 rounded overflow-hidden">
+                  <div class="h-full w-full bg-void-400 rounded"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Quick Actions -->
+          <div class="bg-void-800 border border-void-600 rounded">
+            <div class="px-4 py-3 border-b border-void-600 bg-void-700">
+              <span class="text-sm font-medium">Quick Actions</span>
+            </div>
+            <div class="p-2 space-y-1">
+              <button class="w-full px-3 py-2 text-sm text-left text-ink-muted hover:text-ink hover:bg-void-700 rounded transition-colors flex items-center gap-2">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 5v14M5 12h14"/>
+                </svg>
+                New Episode
+              </button>
+              <button class="w-full px-3 py-2 text-sm text-left text-ink-muted hover:text-ink hover:bg-void-700 rounded transition-colors flex items-center gap-2">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M4 12l4-4m0 0l4 4m-4-4v12"/>
+                </svg>
+                Export Data
+              </button>
+              <button class="w-full px-3 py-2 text-sm text-left text-ink-muted hover:text-ink hover:bg-void-700 rounded transition-colors flex items-center gap-2">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
+                </svg>
+                Configure
+              </button>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+      
+    </main>
+  </div>
+</body>
+</html>

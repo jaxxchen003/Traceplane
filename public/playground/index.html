@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Traceplane Design Playground · UX Style Explorer</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            surface: {
+              0: '#0a0a0a',
+              1: '#111111',
+              2: '#1a1a1a',
+              3: '#222222',
+              4: '#2a2a2a',
+            },
+            accent: {
+              DEFAULT: '#6366f1',
+              hover: '#818cf8',
+              subtle: 'rgba(99, 102, 241, 0.1)',
+            },
+            status: {
+              planned: '#6b7280',
+              active: '#3b82f6',
+              paused: '#f59e0b',
+              done: '#10b981',
+              failed: '#ef4444',
+            },
+          },
+          fontFamily: {
+            sans: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+            mono: ['SF Mono', 'Monaco', 'Cascadia Code', 'Courier New', 'monospace'],
+          },
+        }
+      }
+    }
+  </script>
+  <style>
+    body { background: #0a0a0a; color: #ffffff; }
+    .style-card { transition: all 0.3s ease; }
+    .style-card:hover { transform: translateY(-4px); }
+    .style-card.active { ring: 2px solid #6366f1; }
+    
+    /* Hide scrollbars but keep functionality */
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="min-h-screen font-sans">
+  <!-- Header -->
+  <header class="border-b border-surface-3 bg-surface-1 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-6 py-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 bg-accent rounded flex items-center justify-center">
+            <span class="text-white font-bold text-sm">TP</span>
+          </div>
+          <h1 class="text-xl font-semibold text-white">Design Playground</h1>
+        </div>
+        <div class="text-sm text-gray-400">选择您偏好的 UX 样式</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-6 py-8">
+    
+    <!-- Style Selector Cards -->
+    <section class="mb-12">
+      <h2 class="text-lg font-medium text-gray-400 mb-6 uppercase tracking-wider text-xs">选择一种设计风格</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <!-- Style 1: Linear Minimal -->
+        <div class="style-card border border-surface-3 rounded p-6 cursor-pointer bg-surface-1" onclick="showStyle('linear')">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-3 h-3 rounded-full bg-status-active"></div>
+            <h3 class="text-lg font-semibold">Linear Minimal</h3>
+          </div>
+          <p class="text-sm text-gray-400 mb-4">极简主义，类似 Linear 的精确美学。高密度信息，零装饰，专注效率。</p>
+          <div class="space-y-2 text-xs text-gray-500">
+            <div class="flex justify-between">
+              <span>信息密度</span>
+              <span class="text-status-active">高</span>
+            </div>
+            <div class="flex justify-between">
+              <span>装饰元素</span>
+              <span class="text-status-planned">极少</span>
+            </div>
+            <div class="flex justify-between">
+              <span>适合场景</span>
+              <span>效率优先</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Style 2: Notion Warm -->
+        <div class="style-card border border-surface-3 rounded p-6 cursor-pointer bg-surface-1" onclick="showStyle('notion')">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-3 h-3 rounded-full bg-status-paused"></div>
+            <h3 class="text-lg font-semibold">Notion Warm</h3>
+          </div>
+          <p class="text-sm text-gray-400 mb-4">温暖友好，类似 Notion 的协作感。适度留白，柔和色彩，适合长时工作。</p>
+          <div class="space-y-2 text-xs text-gray-500">
+            <div class="flex justify-between">
+              <span>信息密度</span>
+              <span class="text-status-active">中等</span>
+            </div>
+            <div class="flex justify-between">
+              <span>装饰元素</span>
+              <span class="text-status-active">适度</span>
+            </div>
+            <div class="flex justify-between">
+              <span>适合场景</span>
+              <span>协作友好</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Style 3: Sentry Data-Dense -->
+        <div class="style-card border border-surface-3 rounded p-6 cursor-pointer bg-surface-1" onclick="showStyle('sentry')">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-3 h-3 rounded-full bg-status-done"></div>
+            <h3 class="text-lg font-semibold">Sentry Data-Dense</h3>
+          </div>
+          <p class="text-sm text-gray-400 mb-4">数据密集型，类似 Sentry 的仪表盘风格。技术感强，metrics 丰富，适合监控场景。</p>
+          <div class="space-y-2 text-xs text-gray-500">
+            <div class="flex justify-between">
+              <span>信息密度</span>
+              <span class="text-status-done">极高</span>
+            </div>
+            <div class="flex justify-between">
+              <span>装饰元素</span>
+              <span class="text-status-failed">最少</span>
+            </div>
+            <div class="flex justify-between">
+              <span>适合场景</span>
+              <span>监控运维</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Preview Area -->
+    <section class="border border-surface-3 rounded overflow-hidden bg-surface-0">
+      <div class="border-b border-surface-3 px-6 py-4 bg-surface-1">
+        <h3 class="text-sm font-medium text-gray-400 uppercase tracking-wider">实时预览</h3>
+      </div>
+      
+      <!-- Preview Container -->
+      <div id="preview-container" class="p-6">
+        <!-- Dynamic content will be injected here -->
+        <div class="text-center py-20 text-gray-500">
+          <p>点击上方卡片选择一种设计风格进行预览</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Component Library -->
+    <section class="mt-12">
+      <h2 class="text-lg font-medium text-gray-400 mb-6 uppercase tracking-wider text-xs">组件库</h2>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        
+        <!-- Status Badges -->
+        <div class="border border-surface-3 rounded p-5 bg-surface-1">
+          <h3 class="text-sm font-medium mb-4 text-gray-400">Status Badges</h3>
+          <div class="flex flex-wrap gap-2">
+            <span class="px-2 py-1 rounded text-xs font-medium bg-status-planned/10 text-gray-400">Planned</span>
+            <span class="px-2 py-1 rounded text-xs font-medium bg-status-active/10 text-blue-400">Active</span>
+            <span class="px-2 py-1 rounded text-xs font-medium bg-status-paused/10 text-amber-400">Paused</span>
+            <span class="px-2 py-1 rounded text-xs font-medium bg-status-done/10 text-emerald-400">Done</span>
+            <span class="px-2 py-1 rounded text-xs font-medium bg-status-failed/10 text-red-400">Failed</span>
+          </div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="border border-surface-3 rounded p-5 bg-surface-1">
+          <h3 class="text-sm font-medium mb-4 text-gray-400">Buttons</h3>
+          <div class="flex flex-wrap gap-2">
+            <button class="px-4 py-2 bg-accent text-white text-sm font-medium rounded hover:bg-accent-hover transition-colors">Primary</button>
+            <button class="px-4 py-2 border border-surface-3 text-gray-300 text-sm font-medium rounded hover:border-surface-4 hover:text-white transition-colors">Secondary</button>
+            <button class="px-4 py-2 text-gray-400 text-sm font-medium rounded hover:text-white transition-colors">Ghost</button>
+          </div>
+        </div>
+
+        <!-- Cards -->
+        <div class="border border-surface-3 rounded p-5 bg-surface-1">
+          <h3 class="text-sm font-medium mb-4 text-gray-400">Card Variants</h3>
+          <div class="space-y-2">
+            <div class="p-3 bg-surface-0 border border-surface-3 rounded text-sm">Card Level 0</div>
+            <div class="p-3 bg-surface-1 border border-surface-3 rounded text-sm">Card Level 1</div>
+            <div class="p-3 bg-surface-2 border border-surface-3 rounded text-sm">Card Level 2</div>
+          </div>
+        </div>
+
+        <!-- Timeline -->
+        <div class="border border-surface-3 rounded p-5 bg-surface-1 md:col-span-2 lg:col-span-1">
+          <h3 class="text-sm font-medium mb-4 text-gray-400">Timeline Pattern</h3>
+          <div class="relative pl-4 border-l-2 border-surface-3 space-y-4">
+            <div class="relative">
+              <div class="absolute -left-[21px] w-3 h-3 rounded-full bg-surface-3 border-2 border-surface-1"></div>
+              <div class="text-sm font-medium">Episode Created</div>
+              <div class="text-xs text-gray-500">2 hours ago</div>
+            </div>
+            <div class="relative">
+              <div class="absolute -left-[21px] w-3 h-3 rounded-full bg-accent border-2 border-surface-1"></div>
+              <div class="text-sm font-medium">Step 1: Initialize</div>
+              <div class="text-xs text-gray-500">1 hour ago</div>
+            </div>
+            <div class="relative">
+              <div class="absolute -left-[21px] w-3 h-3 rounded-full bg-status-done border-2 border-surface-1"></div>
+              <div class="text-sm font-medium">Step 2: Complete</div>
+              <div class="text-xs text-gray-500">30 mins ago</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Typography -->
+        <div class="border border-surface-3 rounded p-5 bg-surface-1">
+          <h3 class="text-sm font-medium mb-4 text-gray-400">Typography</h3>
+          <div class="space-y-2">
+            <div class="text-2xl font-semibold">Display</div>
+            <div class="text-xl font-semibold">Title 1</div>
+            <div class="text-lg font-semibold">Title 2</div>
+            <div class="text-sm">Body text regular</div>
+            <div class="text-xs text-gray-500">Caption / Meta</div>
+            <div class="text-xs font-mono text-accent">ID: ep-001</div>
+          </div>
+        </div>
+
+        <!-- Data Display -->
+        <div class="border border-surface-3 rounded p-5 bg-surface-1">
+          <h3 class="text-sm font-medium mb-4 text-gray-400">Data Display</h3>
+          <div class="space-y-3">
+            <div class="flex justify-between items-center py-2 border-b border-surface-3">
+              <span class="text-sm text-gray-400">Episodes</span>
+              <span class="text-sm font-mono font-medium">12</span>
+            </div>
+            <div class="flex justify-between items-center py-2 border-b border-surface-3">
+              <span class="text-sm text-gray-400">Artifacts</span>
+              <span class="text-sm font-mono font-medium">48</span>
+            </div>
+            <div class="flex justify-between items-center py-2">
+              <span class="text-sm text-gray-400">Agents</span>
+              <span class="text-sm font-mono font-medium">3</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // Style Templates
+    const styles = {
+      linear: {
+        name: 'Linear Minimal',
+        description: '极简主义，高密度信息，零装饰',
+        css: 'bg-surface-0 border-surface-3',
+        render: () => `
+          <div class="space-y-6">
+            <!-- Header -->
+            <div class="flex items-center justify-between border-b border-surface-3 pb-4">
+              <div>
+                <h1 class="text-2xl font-semibold mb-1">Q2 Customer Pulse</h1>
+                <p class="text-sm text-gray-500">Enterprise Agent Work Graph</p>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="px-2 py-1 rounded text-xs font-medium bg-status-active/10 text-blue-400">Active</span>
+                <button class="px-3 py-1.5 bg-accent text-white text-sm font-medium rounded">New Episode</button>
+              </div>
+            </div>
+            
+            <!-- Kanban -->
+            <div class="grid grid-cols-3 gap-4">
+              <div>
+                <div class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">To Do (3)</div>
+                <div class="space-y-2">
+                  <div class="p-3 bg-surface-1 border border-surface-3 rounded">
+                    <div class="text-sm font-medium mb-1">Customer Research</div>
+                    <div class="text-xs text-gray-500">EP-001 · 2 artifacts</div>
+                  </div>
+                  <div class="p-3 bg-surface-1 border border-surface-3 rounded">
+                    <div class="text-sm font-medium mb-1">Data Analysis</div>
+                    <div class="text-xs text-gray-500">EP-002 · 0 artifacts</div>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <div class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">In Progress (2)</div>
+                <div class="space-y-2">
+                  <div class="p-3 bg-surface-1 border border-surface-3 rounded border-l-2 border-l-status-active">
+                    <div class="text-sm font-medium mb-1">Weekly Report</div>
+                    <div class="text-xs text-gray-500">EP-003 · 5 artifacts</div>
+                    <div class="mt-2 h-1 bg-surface-3 rounded overflow-hidden">
+                      <div class="h-full w-3/5 bg-status-active"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <div class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">Done (4)</div>
+                <div class="space-y-2">
+                  <div class="p-3 bg-surface-1 border border-surface-3 rounded opacity-60">
+                    <div class="text-sm font-medium mb-1">Q1 Review</div>
+                    <div class="text-xs text-gray-500 line-through">EP-000 · 12 artifacts</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Episode Detail -->
+            <div class="border border-surface-3 rounded p-4 mt-6">
+              <div class="flex items-start justify-between mb-4">
+                <div>
+                  <h2 class="text-lg font-semibold mb-1">Weekly Report Generation</h2>
+                  <div class="text-xs text-gray-500 font-mono">ID: cmn71a7ob · Agent: Claude</div>
+                </div>
+                <span class="px-2 py-1 rounded text-xs font-medium bg-status-active/10 text-blue-400">IN_PROGRESS</span>
+              </div>
+              
+              <!-- Timeline -->
+              <div class="mt-4 pt-4 border-t border-surface-3">
+                <div class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">Timeline</div>
+                <div class="relative pl-4 border-l-2 border-surface-3 space-y-4">
+                  <div class="relative">
+                    <div class="absolute -left-[21px] w-3 h-3 rounded-full bg-surface-3 border-2 border-surface-0"></div>
+                    <div class="text-sm">Initialize</div>
+                    <div class="text-xs text-gray-500">14:32:01</div>
+                  </div>
+                  <div class="relative">
+                    <div class="absolute -left-[21px] w-3 h-3 rounded-full bg-accent border-2 border-surface-0"></div>
+                    <div class="text-sm font-medium">Fetch Customer Data</div>
+                    <div class="text-xs text-gray-500">14:32:15 · 1.2s</div>
+                  </div>
+                  <div class="relative">
+                    <div class="absolute -left-[21px] w-3 h-3 rounded-full bg-status-done border-2 border-surface-0"></div>
+                    <div class="text-sm">Generate Report</div>
+                    <div class="text-xs text-gray-500">14:33:02 · 0.8s</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `
+      },
+      
+      notion: {
+        name: 'Notion Warm',
+        description: '温暖友好，适度留白，协作感强',
+        css: 'bg-surface-0 border-surface-3',
+        render: () => `
+          <div class="space-y-8">
+            <!-- Header -->
+            <div class="text-center py-8">
+              <h1 class="text-3xl font-semibold mb-3">Q2 Customer Pulse</h1>
+              <p class="text-gray-400 max-w-lg mx-auto">Track and manage your enterprise agent workflows with clarity and context.</p>
+              <div class="mt-6 flex justify-center gap-3">
+                <button class="px-5 py-2.5 bg-accent text-white text-sm font-medium rounded-lg">Create Episode</button>
+                <button class="px-5 py-2.5 border border-surface-3 text-gray-300 text-sm font-medium rounded-lg">View Docs</button>
+              </div>
+            </div>
+
+            <!-- Stats Row -->
+            <div class="grid grid-cols-4 gap-4 py-6 border-y border-surface-3">
+              <div class="text-center">
+                <div class="text-3xl font-semibold text-white mb-1">12</div>
+                <div class="text-sm text-gray-500">Active Episodes</div>
+              </div>
+              <div class="text-center">
+                <div class="text-3xl font-semibold text-status-done mb-1">48</div>
+                <div class="text-sm text-gray-500">Artifacts</div>
+              </div>
+              <div class="text-center">
+                <div class="text-3xl font-semibold text-status-active mb-1">3</div>
+                <div class="text-sm text-gray-500">Agents</div>
+              </div>
+              <div class="text-center">
+                <div class="text-3xl font-semibold text-status-paused mb-1">2</div>
+                <div class="text-sm text-gray-500">Pending Review</div>
+              </div>
+            </div>
+            
+            <!-- Content Grid -->
+            <div class="grid grid-cols-2 gap-6">
+              <!-- Episode Card -->
+              <div class="bg-surface-1 rounded-xl p-6 border border-surface-3">
+                <div class="flex items-start justify-between mb-4">
+                  <div class="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center mb-3">
+                    <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                  </div>
+                  <span class="px-3 py-1 rounded-full text-xs font-medium bg-status-active/10 text-blue-400">In Progress</span>
+                </div>
+                <h3 class="text-lg font-semibold mb-2">Weekly Report Generation</h3>
+                <p class="text-sm text-gray-400 mb-4">Generate comprehensive weekly reports from customer feedback data.</p>
+                <div class="flex items-center gap-4 text-sm text-gray-500">
+                  <span>5 artifacts</span>
+                  <span>·</span>
+                  <span>3 steps</span>
+                  <span>·</span>
+                  <span class="font-mono text-xs">cmn71a7ob</span>
+                </div>
+                <div class="mt-4 pt-4 border-t border-surface-3 flex items-center justify-between">
+                  <div class="flex -space-x-2">
+                    <div class="w-8 h-8 rounded-full bg-surface-3 border-2 border-surface-1"></div>
+                    <div class="w-8 h-8 rounded-full bg-accent/30 border-2 border-surface-1"></div>
+                  </div>
+                  <span class="text-sm text-gray-500">Updated 2 hours ago</span>
+                </div>
+              </div>
+
+              <!-- Handoff Panel -->
+              <div class="bg-surface-1 rounded-xl p-6 border border-surface-3">
+                <div class="flex items-center gap-2 mb-4">
+                  <svg class="w-5 h-5 text-status-done" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+                  </svg>
+                  <h3 class="text-lg font-semibold">Agent Handoff</h3>
+                </div>
+                <div class="space-y-4">
+                  <div class="p-4 bg-surface-0 rounded-lg border border-surface-3">
+                    <div class="text-xs text-gray-500 uppercase tracking-wider mb-2">Latest Step</div>
+                    <div class="text-sm font-medium mb-1">Generated customer report</div>
+                    <div class="text-xs text-gray-500">Ready to continue with next agent</div>
+                  </div>
+                  <div class="flex gap-2">
+                    <button class="flex-1 px-4 py-2 bg-accent text-white text-sm font-medium rounded-lg">Continue</button>
+                    <button class="px-4 py-2 border border-surface-3 text-gray-300 text-sm font-medium rounded-lg">Copy Brief</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Timeline Section -->
+            <div class="bg-surface-1 rounded-xl p-6 border border-surface-3">
+              <h3 class="text-lg font-semibold mb-6">Recent Activity</h3>
+              <div class="space-y-4">
+                <div class="flex items-start gap-4">
+                  <div class="w-8 h-8 rounded-full bg-status-done/10 flex items-center justify-center flex-shrink-0">
+                    <div class="w-2 h-2 rounded-full bg-status-done"></div>
+                  </div>
+                  <div class="flex-1 pb-4 border-b border-surface-3">
+                    <div class="flex items-center justify-between mb-1">
+                      <span class="font-medium">Step completed: Generate Report</span>
+                      <span class="text-sm text-gray-500">2 hours ago</span>
+                    </div>
+                    <p class="text-sm text-gray-400">Successfully generated weekly report with 5 sections and 12 data points.</p>
+                  </div>
+                </div>
+                <div class="flex items-start gap-4">
+                  <div class="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center flex-shrink-0">
+                    <div class="w-2 h-2 rounded-full bg-accent"></div>
+                  </div>
+                  <div class="flex-1 pb-4 border-b border-surface-3">
+                    <div class="flex items-center justify-between mb-1">
+                      <span class="font-medium">Episode created</span>
+                      <span class="text-sm text-gray-500">3 hours ago</span>
+                    </div>
+                    <p class="text-sm text-gray-400">New episode "Weekly Report Generation" created by Claude.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `
+      },
+      
+      sentry: {
+        name: 'Sentry Data-Dense',
+        description: '数据密集型，技术感强，metrics 丰富',
+        css: 'bg-surface-0 border-surface-3',
+        render: () => `
+          <div class="space-y-4">
+            <!-- Top Bar -->
+            <div class="flex items-center justify-between py-2 border-b border-surface-3">
+              <div class="flex items-center gap-6">
+                <h1 class="text-xl font-semibold">Q2 Customer Pulse</h1>
+                <div class="flex items-center gap-4 text-sm">
+                  <span class="text-gray-500">Project:</span>
+                  <span class="font-mono text-accent">q2-customer-pulse</span>
+                  <span class="text-gray-500">ID:</span>
+                  <span class="font-mono">cmn71a7o9</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="flex items-center gap-2 px-2 py-1 rounded bg-status-active/10 text-status-active text-xs">
+                  <span class="w-1.5 h-1.5 rounded-full bg-status-active animate-pulse"></span>
+                  Healthy
+                </span>
+                <button class="px-3 py-1.5 bg-accent text-white text-xs font-medium rounded">+ New</button>
+              </div>
+            </div>
+
+            <!-- Metrics Grid -->
+            <div class="grid grid-cols-6 gap-3">
+              <div class="bg-surface-1 border border-surface-3 rounded p-3">
+                <div class="text-xs text-gray-500 uppercase mb-1">Episodes</div>
+                <div class="text-2xl font-semibold font-mono">12</div>
+                <div class="text-xs text-status-done mt-1">↑ 3 this week</div>
+              </div>
+              <div class="bg-surface-1 border border-surface-3 rounded p-3">
+                <div class="text-xs text-gray-500 uppercase mb-1">Active Now</div>
+                <div class="text-2xl font-semibold font-mono text-status-active">3</div>
+                <div class="text-xs text-gray-500 mt-1">Running</div>
+              </div>
+              <div class="bg-surface-1 border border-surface-3 rounded p-3">
+                <div class="text-xs text-gray-500 uppercase mb-1">Artifacts</div>
+                <div class="text-2xl font-semibold font-mono">48</div>
+                <div class="text-xs text-gray-500 mt-1">R2: 32 · Local: 16</div>
+              </div>
+              <div class="bg-surface-1 border border-surface-3 rounded p-3">
+                <div class="text-xs text-gray-500 uppercase mb-1">Success Rate</div>
+                <div class="text-2xl font-semibold font-mono text-status-done">94.2%</div>
+                <div class="w-full h-1 bg-surface-3 rounded mt-2">
+                  <div class="h-full bg-status-done rounded" style="width: 94.2%"></div>
+                </div>
+              </div>
+              <div class="bg-surface-1 border border-surface-3 rounded p-3">
+                <div class="text-xs text-gray-500 uppercase mb-1">Avg Duration</div>
+                <div class="text-2xl font-semibold font-mono">2.4m</div>
+                <div class="text-xs text-status-active mt-1">↓ 0.3m from avg</div>
+              </div>
+              <div class="bg-surface-1 border border-surface-3 rounded p-3">
+                <div class="text-xs text-gray-500 uppercase mb-1">Last Event</div>
+                <div class="text-lg font-semibold font-mono">2m</div>
+                <div class="text-xs text-gray-500 mt-1">ago</div>
+              </div>
+            </div>
+
+            <!-- Episode Table -->
+            <div class="bg-surface-1 border border-surface-3 rounded overflow-hidden">
+              <div class="px-4 py-3 border-b border-surface-3 bg-surface-2">
+                <div class="flex items-center justify-between">
+                  <span class="text-sm font-medium">Recent Episodes</span>
+                  <div class="flex items-center gap-2 text-xs">
+                    <span class="text-gray-500">Filter:</span>
+                    <button class="px-2 py-1 rounded bg-accent/10 text-accent">All</button>
+                    <button class="px-2 py-1 rounded hover:bg-surface-3">Active</button>
+                    <button class="px-2 py-1 rounded hover:bg-surface-3">Failed</button>
+                  </div>
+                </div>
+              </div>
+              <table class="w-full text-sm">
+                <thead>
+                  <tr class="border-b border-surface-3 text-xs text-gray-500 uppercase">
+                    <th class="px-4 py-2 text-left font-medium">Status</th>
+                    <th class="px-4 py-2 text-left font-medium">ID</th>
+                    <th class="px-4 py-2 text-left font-medium">Title</th>
+                    <th class="px-4 py-2 text-left font-medium">Agent</th>
+                    <th class="px-4 py-2 text-left font-medium">Duration</th>
+                    <th class="px-4 py-2 text-left font-medium">Artifacts</th>
+                    <th class="px-4 py-2 text-left font-medium">Time</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="border-b border-surface-3 hover:bg-surface-2/50">
+                    <td class="px-4 py-3">
+                      <span class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-status-active animate-pulse"></span>
+                        <span class="text-status-active">active</span>
+                      </span>
+                    </td>
+                    <td class="px-4 py-3 font-mono text-xs text-gray-400">cmn71a7ob</td>
+                    <td class="px-4 py-3 font-medium">Weekly Report Generation</td>
+                    <td class="px-4 py-3 text-gray-400">claude</td>
+                    <td class="px-4 py-3 font-mono">1.8m</td>
+                    <td class="px-4 py-3">
+                      <span class="px-2 py-0.5 rounded bg-surface-3 text-xs">5</span>
+                    </td>
+                    <td class="px-4 py-3 text-gray-500 text-xs">2h ago</td>
+                  </tr>
+                  <tr class="border-b border-surface-3 hover:bg-surface-2/50">
+                    <td class="px-4 py-3">
+                      <span class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-status-done"></span>
+                        <span class="text-status-done">done</span>
+                      </span>
+                    </td>
+                    <td class="px-4 py-3 font-mono text-xs text-gray-400">cmn71a7oc</td>
+                    <td class="px-4 py-3 font-medium">Sensitive Document Check</td>
+                    <td class="px-4 py-3 text-gray-400">opencode</td>
+                    <td class="px-4 py-3 font-mono">0.4m</td>
+                    <td class="px-4 py-3">
+                      <span class="px-2 py-0.5 rounded bg-surface-3 text-xs">2</span>
+                    </td>
+                    <td class="px-4 py-3 text-gray-500 text-xs">5h ago</td>
+                  </tr>
+                  <tr class="hover:bg-surface-2/50">
+                    <td class="px-4 py-3">
+                      <span class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-status-paused"></span>
+                        <span class="text-status-paused">paused</span>
+                      </span>
+                    </td>
+                    <td class="px-4 py-3 font-mono text-xs text-gray-400">cmn74tcvb</td>
+                    <td class="px-4 py-3 font-medium">MCP Smoke Test</td>
+                    <td class="px-4 py-3 text-gray-400">gemini</td>
+                    <td class="px-4 py-3 font-mono">--</td>
+                    <td class="px-4 py-3">
+                      <span class="px-2 py-0.5 rounded bg-surface-3 text-xs">0</span>
+                    </td>
+                    <td class="px-4 py-3 text-gray-500 text-xs">1d ago</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Event Stream -->
+            <div class="grid grid-cols-2 gap-4">
+              <div class="bg-surface-1 border border-surface-3 rounded p-4">
+                <div class="text-xs text-gray-500 uppercase mb-3">Event Stream</div>
+                <div class="space-y-2 text-xs font-mono">
+                  <div class="flex items-center gap-3">
+                    <span class="text-gray-500">14:32:01</span>
+                    <span class="text-status-active">TRACE</span>
+                    <span class="text-gray-400">episode.initialize</span>
+                  </div>
+                  <div class="flex items-center gap-3">
+                    <span class="text-gray-500">14:32:15</span>
+                    <span class="text-status-done">TRACE</span>
+                    <span class="text-gray-400">tool.fetch_customer_data</span>
+                    <span class="text-status-done">1.2s</span>
+                  </div>
+                  <div class="flex items-center gap-3">
+                    <span class="text-gray-500">14:33:02</span>
+                    <span class="text-status-done">TRACE</span>
+                    <span class="text-gray-400">artifact.generate_report</span>
+                    <span class="text-status-done">0.8s</span>
+                  </div>
+                  <div class="flex items-center gap-3 opacity-50">
+                    <span class="text-gray-500">14:33:10</span>
+                    <span class="text-gray-500">AUDIT</span>
+                    <span class="text-gray-400">permission.check</span>
+                    <span class="text-status-done">allow</span>
+                  </div>
+                </div>
+              </div>
+              <div class="bg-surface-1 border border-surface-3 rounded p-4">
+                <div class="text-xs text-gray-500 uppercase mb-3">System Health</div>
+                <div class="space-y-3">
+                  <div>
+                    <div class="flex justify-between text-xs mb-1">
+                      <span class="text-gray-400">Database</span>
+                      <span class="text-status-done">OK</span>
+                    </div>
+                    <div class="h-1 bg-surface-3 rounded"><div class="h-full w-full bg-status-done rounded"></div></div>
+                  </div>
+                  <div>
+                    <div class="flex justify-between text-xs mb-1">
+                      <span class="text-gray-400">R2 Storage</span>
+                      <span class="text-status-done">OK</span>
+                    </div>
+                    <div class="h-1 bg-surface-3 rounded"><div class="h-full w-full bg-status-done rounded"></div></div>
+                  </div>
+                  <div>
+                    <div class="flex justify-between text-xs mb-1">
+                      <span class="text-gray-400">Hook Bridge</span>
+                      <span class="text-status-active">Active</span>
+                    </div>
+                    <div class="h-1 bg-surface-3 rounded"><div class="h-full w-3/4 bg-status-active rounded"></div></div>
+                  </div>
+                  <div>
+                    <div class="flex justify-between text-xs mb-1">
+                      <span class="text-gray-400">Queue</span>
+                      <span class="text-gray-500">0 pending</span>
+                    </div>
+                    <div class="h-1 bg-surface-3 rounded"><div class="h-full w-full bg-surface-4 rounded"></div></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `
+      }
+    };
+
+    function showStyle(styleKey) {
+      const container = document.getElementById('preview-container');
+      const style = styles[styleKey];
+      
+      // Update active state on cards
+      document.querySelectorAll('.style-card').forEach(card => {
+        card.classList.remove('active', 'border-accent');
+        card.classList.add('border-surface-3');
+      });
+      event.currentTarget.classList.add('active', 'border-accent');
+      event.currentTarget.classList.remove('border-surface-3');
+      
+      // Render preview
+      container.innerHTML = `
+        <div class="${style.css}">
+          ${style.render()}
+        </div>
+      `;
+    }
+  </script>
+</body>
+</html>

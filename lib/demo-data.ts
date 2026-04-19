@@ -24,8 +24,10 @@ async function findProjectsForList() {
 }
 
 async function findProjectForOverview(projectId: string) {
-  return prisma.project.findUnique({
-    where: { id: projectId },
+  return prisma.project.findFirst({
+    where: {
+      OR: [{ id: projectId }, { slug: projectId }]
+    },
     include: {
       workspace: true,
       projectAgents: {
