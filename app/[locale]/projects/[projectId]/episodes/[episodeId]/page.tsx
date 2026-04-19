@@ -1,20 +1,15 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { ActionLink, ContinuityCard, MetricCard, PromptBlock, TimelineEntry, TokenList } from "@/components/continuity-primitives";
-import { EpisodeControlPanel } from "@/components/demo-control-panel";
-import { GraphBriefing } from "@/components/graph-briefing";
-import { GraphTheater } from "@/components/graph-theater";
 import { Panel } from "@/components/panel";
-import { RelationshipFlow } from "@/components/relationship-flow";
 import { StatusBadge } from "@/components/status-badge";
 import { TimelineDebugWrapper } from "@/components/timeline-debug-wrapper";
-import { formatDate, formatDuration } from "@/lib/format";
+import { formatDuration } from "@/lib/format";
 import { getEpisodeReview, getProjectAgents } from "@/lib/demo-data";
 import { getDictionary, isLocale } from "@/lib/i18n";
 
 export default async function EpisodeReviewPage({
-  params
+  params,
 }: {
   params: Promise<{ locale: string; projectId: string; episodeId: string }>;
 }) {
@@ -23,296 +18,168 @@ export default async function EpisodeReviewPage({
 
   const [episode, agents] = await Promise.all([
     getEpisodeReview(episodeId, locale),
-    getProjectAgents(projectId, locale)
+    getProjectAgents(projectId, locale),
   ]);
+
   if (!episode || episode.projectId !== projectId) notFound();
 
   const dict = getDictionary(locale);
 
-  const graphNodes = [
-    {
-      id: "episode-core",
-      label: episode.title,
-      meta: locale === "zh" ? `${episode.timeline.length} 个执行事件` : `${episode.timeline.length} execution events`,
-      x: 50, y: 22, z: 0.98, tone: "agent" as const
-    },
-    ...episode.memories.slice(0, 3).map((memory: any, index: number) => ({
-      id: `memory-${memory.id}`,
-      label: memory.title,
-      meta: `${memory.type} · ${memory.sensitivity}`,
-      x: [20, 38, 78][index] ?? 22,
-      y: [34, 56, 40][index] ?? 36,
-      z: 0.78 - index * 0.1,
-      tone: "memory" as const
-    })),
-    ...episode.timeline.slice(0, 3).map((trace: any, index: number) => ({
-      id: `trace-${trace.id}`,
-      label: `Step ${trace.stepIndex}`,
-      meta: `${trace.stepTitle} · ${trace.actor}`,
-      x: [46, 62, 76][index] ?? 48,
-      y: [52, 66, 52][index] ?? 58,
-      z: 0.7 - index * 0.08,
-      tone: "trace" as const
-    })),
-    ...episode.artifacts.slice(0, 2).map((artifact: any, index: number) => ({
-      id: `artifact-${artifact.id}`,
-      label: artifact.title,
-      meta: `${artifact.type} · v${artifact.version}`,
-      x: index === 0 ? 28 : 70,
-      y: 82,
-      z: 0.52,
-      tone: "artifact" as const
-    })),
-    {
-      id: "policy-node",
-      label: "Policy Envelope",
-      meta: episode.policyVersion,
-      x: 84, y: 26, z: 0.72, tone: "policy" as const
-    },
-    {
-      id: "audit-node",
-      label: "Audit Signals",
-      meta: locale === "zh" ? `${episode.auditSummary.policyHitCount + episode.auditSummary.permissionDeniedCount} 个命中` : `${episode.auditSummary.policyHitCount + episode.auditSummary.permissionDeniedCount} hits`,
-      x: 14, y: 70, z: 0.62, tone: "audit" as const
-    }
-  ];
-
-  const graphEdges = [
-    ...episode.memories.slice(0, 3).map((memory: any) => ({
-      from: `memory-${memory.id}`,
-      to: "episode-core",
-      emphasis: "soft" as const
-    })),
-    ...episode.timeline.slice(0, 3).map((trace: any) => ({
-      from: "episode-core",
-      to: `trace-${trace.id}`,
-      emphasis: "strong" as const
-    })),
-    ...episode.artifacts.slice(0, 2).map((artifact: any) => ({
-      from: `trace-${episode.timeline[0]?.id ?? ""}`,
-      to: `artifact-${artifact.id}`,
-      emphasis: "soft" as const
-    })),
-    { from: "episode-core", to: "policy-node", emphasis: "soft" as const },
-    { from: "episode-core", to: "audit-node", emphasis: "soft" as const }
-  ].filter((edge) => !edge.from.endsWith("-"));
-
-  const briefingNodes = [
-    {
-      id: "brief-episode",
-      label: episode.title,
-      meta: episode.projectName,
-      tone: "agent" as const,
-      detail: locale === "zh" ? `${episode.summary} 这个 episode 的核心目标是：${episode.goal}。` : `${episode.summary} The core objective is: ${episode.goal}.`
-    },
-    ...episode.memories.slice(0, 3).map((memory: any) => ({
-      id: `brief-memory-${memory.id}`,
-      label: memory.title,
-      meta: `${memory.type} · ${memory.sensitivity}`,
-      tone: "memory" as const,
-      detail: memory.content
-    })),
-    ...episode.timeline.slice(0, 3).map((item: any) => ({
-      id: `brief-trace-${item.id}`,
-      label: `Step ${item.stepIndex} · ${item.stepTitle}`,
-      meta: item.actor,
-      tone: "trace" as const,
-      detail: `${item.shortResult} ${item.decisionSummary ?? ""}`.trim()
-    })),
-    ...episode.artifacts.slice(0, 2).map((artifact: any) => ({
-      id: `brief-artifact-${artifact.id}`,
-      label: artifact.title,
-      meta: `${artifact.type} · v${artifact.version}`,
-      tone: "artifact" as const,
-      detail: `Generated by ${artifact.generatedBy}.`
-    })),
-    {
-      id: "brief-audit",
-      label: "Audit Surface",
-      meta: `${episode.auditSummary.readCount} reads · ${episode.auditSummary.writeCount} writes`,
-      tone: "audit" as const,
-      detail: `Captured ${episode.auditSummary.permissionDeniedCount} denials.`
-    }
-  ];
-
   return (
     <div className="space-y-6">
-      <GraphTheater
-        title={episode.title}
-        subtitle={locale === "zh" ? "这个舞台把 memory、execution、artifacts、policy 和 audit 压到同一个视图里。" : "This stage compresses memory, execution, artifacts, policy, and audit into one view."}
-        nodes={graphNodes}
-        edges={graphEdges}
-        stats={[
-          { label: dict.common.project, value: episode.projectName },
-          { label: dict.common.policyVersion, value: episode.policyVersion },
-          { label: dict.common.duration, value: formatDuration(episode.startedAt, episode.endedAt) }
-        ]}
-      />
-
-      <section className="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
-        <GraphBriefing
-          title={locale === "zh" ? "Episode Brief" : "Episode Brief"}
-          emptyLabel={dict.common.noData}
-          nodes={briefingNodes}
-        />
-
-        <div className="space-y-4">
-          <Panel title={locale === "zh" ? "Next Agent Handoff" : "Next Agent Handoff"} eyebrow="Brief">
-            <div className="space-y-4 text-sm leading-7 text-ink-muted">
-              <ContinuityCard
-                label={locale === "zh" ? "最新一步" : "Latest step"}
-                title={episode.handoffSummary.latestStepTitle}
-                detail={episode.handoffSummary.latestResult}
-                tone="cyan"
-              />
-              <div className="grid gap-3 md:grid-cols-2">
-                <MetricCard label={locale === "zh" ? "最新产物" : "Latest artifact"} value={episode.handoffSummary.latestArtifactTitle} />
-                <MetricCard
-                  label={locale === "zh" ? "可交接状态" : "Handoff state"}
-                  value={episode.handoffSummary.readyForHandoff ? (locale === "zh" ? "可以直接交给下一位 Agent" : "Ready") : (locale === "zh" ? "还不适合交接" : "Not ready")}
-                />
-              </div>
-              <ContinuityCard
-                label={locale === "zh" ? "下一步建议" : "Next action"}
-                detail={episode.handoffSummary.nextAction}
-                tone="emerald"
-              />
-              {episode.handoffSummary.memoryTitles.length > 0 && (
-                <ContinuityCard label={locale === "zh" ? "交接时优先带上" : "Bring into handoff"}>
-                  <TokenList items={episode.handoffSummary.memoryTitles} />
-                </ContinuityCard>
-              )}
-              {episode.handoffSummary.cautionItems.length > 0 && (
-                <ContinuityCard label={locale === "zh" ? "交接注意" : "Cautions"} tone="amber">
-                  <ul className="mt-3 space-y-2">
-                    {episode.handoffSummary.cautionItems.map((item: string) => (
-                      <li key={item}>{item}</li>
-                    ))}
-                  </ul>
-                </ContinuityCard>
-              )}
-              <PromptBlock
-                label={locale === "zh" ? "Agent Continuation Packet" : "Agent Continuation Packet"}
-                content={episode.continuationPacket}
-              />
-            </div>
-          </Panel>
-
-          <Panel title={dict.episode.auditSummary} eyebrow={dict.common.auditTrail}>
-            <div className="grid gap-3 text-sm text-ink-muted">
-              <MetricCard label="Reads" value={`${episode.auditSummary.readCount} reads`} tone="cyan" />
-              <MetricCard label="Writes" value={`${episode.auditSummary.writeCount} writes`} tone="emerald" />
-              <MetricCard label="Denials" value={`${episode.auditSummary.permissionDeniedCount} denials`} tone="rose" />
-              <MetricCard label="Policy" value={`${episode.auditSummary.policyHitCount} policy hits`} tone="amber" />
-              <ActionLink href={`/${locale}/audit?episodeId=${episode.id}`} tone="secondary">
-                {dict.common.viewAudit}
-              </ActionLink>
-            </div>
-          </Panel>
+      <div className="mb-8">
+        <div className="flex items-center gap-2 mb-2">
+          <span className="text-xs font-mono text-ink-faint uppercase tracking-wider">
+            Episode
+          </span>
+          <span className="font-mono text-xs text-ink-faint">{episodeId.slice(0, 8)}</span>
         </div>
-      </section>
-
-      <div className="grid gap-6 xl:grid-cols-[1.6fr_0.9fr]">
-        <div className="space-y-6">
-          <Panel title={dict.common.timeline} eyebrow={dict.episode.title}>
-            <TimelineDebugWrapper
-              timeline={episode.timeline}
-              episodeId={episode.id}
-              locale={locale}
-              dict={dict}
-            />
-          </Panel>
-
-          <Panel title={dict.episode.relationshipMap} eyebrow="Edges">
-            <div className="space-y-4">
-              <RelationshipFlow
-                memories={episode.memories.map((m: any) => ({ id: m.id, label: m.title, meta: `${m.type} · ${m.sensitivity}` }))}
-                traces={episode.timeline.map((t: any) => ({ id: t.id, label: `Step ${t.stepIndex} · ${t.stepTitle}`, meta: t.actor }))}
-                artifacts={episode.artifacts.map((a: any) => ({ id: a.id, label: a.title, meta: `${a.type} · v${a.version}` }))}
-              />
-              <div className="grid gap-3 text-sm text-ink-muted">
-                {episode.relationships.map((edge: any) => (
-                  <div key={edge.id} className="tp-soft-card rounded-2xl px-4 py-3">
-                    <span className="font-medium text-white">{edge.edgeType}</span>
-                    <span className="mx-2 text-ink-ghost">·</span>
-                    <span>{edge.fromNodeType}:{edge.fromNodeId.slice(-6)}</span>
-                    <span className="mx-2 text-ink-ghost">→</span>
-                    <span>{edge.toNodeType}:{edge.toNodeId.slice(-6)}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </Panel>
+        <div className="flex items-baseline gap-4">
+          <h1 className="text-2xl font-semibold tracking-tight text-ink">
+            {episode.title}
+          </h1>
+          <StatusBadge label={episode.status} raw={episode.status} />
         </div>
-
-        <div className="space-y-6">
-          <Panel title={dict.controls.continueEpisode} eyebrow="Write Path">
-            <EpisodeControlPanel
-              locale={locale}
-              episodeId={episode.id}
-              projectId={projectId}
-              agents={agents}
-              traces={episode.timeline.map((item: any) => ({ id: item.id, label: `Step ${item.stepIndex} · ${item.stepTitle}` }))}
-              memories={episode.memories.map((item: any) => ({ id: item.id, label: item.title }))}
-            />
-          </Panel>
-
-          <Panel title="Runtime Provenance" eyebrow="Work Plane State">
-            <div className="space-y-4">
-              <div className="grid gap-3 sm:grid-cols-2">
-                <MetricCard label="Cloud Mode" value={episode.runtimeSummary.cloudMode} detail={`${episode.runtimeSummary.databaseProvider} · ${episode.runtimeSummary.objectStorageProvider}`} tone="cyan" />
-                <MetricCard label="Capture Mode" value={episode.provenanceSummary.mode} detail={episode.provenanceSummary.host} tone="amber" />
-              </div>
-              <ContinuityCard label="Storage Status">
-                <div className="mb-3 flex items-center justify-between gap-3">
-                  <StatusBadge label={episode.runtimeSummary.projectionExists ? "Projected" : "Pending"} raw={episode.runtimeSummary.projectionExists ? "COMPLETED" : "PLANNED"} />
-                </div>
-                <div className="grid gap-3 sm:grid-cols-3">
-                  <MetricCard label="Artifacts" value={episode.storageSummary.totalArtifacts} className="tp-deep-card" />
-                  <MetricCard label="R2" value={`${episode.storageSummary.r2ArtifactCount}`} tone="cyan" />
-                  <MetricCard label="Inline" value={episode.storageSummary.inlineArtifactCount} tone="amber" />
-                </div>
-              </ContinuityCard>
-              <ContinuityCard label="Projection + Review" className="bg-[linear-gradient(135deg,rgba(14,165,233,0.08),rgba(250,204,21,0.04),rgba(15,23,42,0.42))]">
-                <div className="mb-3 flex items-center justify-between gap-3">
-                  <StatusBadge label={episode.reviewOutcome ?? "PENDING"} raw={episode.reviewOutcome ?? "PENDING"} />
-                </div>
-                <div className="space-y-3 text-sm leading-7 text-ink-muted">
-                  <div><span className="font-medium text-white">Projection Root: </span>{episode.runtimeSummary.projectionRoot}</div>
-                  <div><span className="font-medium text-white">Episode Path: </span><span className="break-all text-ink-muted">{episode.runtimeSummary.projectionPath}</span></div>
-                  <div className="grid gap-3 sm:grid-cols-3">
-                    <MetricCard label="Trace Events" value={episode.provenanceSummary.signals.traceEventCount} className="tp-deep-card" />
-                    <MetricCard label="Hook Capture" value={episode.provenanceSummary.signals.hasHookCapture ? "Yes" : "No"} className="tp-deep-card" />
-                    <MetricCard label="Imported" value={episode.provenanceSummary.signals.isImported ? "Yes" : "No"} className="tp-deep-card" />
-                  </div>
-                </div>
-              </ContinuityCard>
-            </div>
-          </Panel>
-
-          <Panel title={dict.common.summary} eyebrow={dict.episode.goal}>
-            <div className="space-y-4 text-sm leading-7 text-ink-muted">
-              <div>{episode.goal}</div>
-              <ContinuityCard label={dict.episode.finalOutcome} detail={episode.finalOutcome} />
-              <div>
-                <div className="mb-2 text-[11px] uppercase tracking-[0.18em] text-ink-ghost">{dict.common.participatingAgents}</div>
-                <div>{episode.participatingAgents.join(" · ")}</div>
-              </div>
-            </div>
-          </Panel>
-
-          <Panel title={dict.common.memories} eyebrow="Memory">
-            <div className="space-y-3">
-              {episode.memories.map((memory: any) => (
-                <div key={memory.id} className="tp-soft-card rounded-2xl px-4 py-3 text-sm text-ink-muted">
-                  <div className="font-medium text-white">{memory.title}</div>
-                  <div className="text-xs text-ink-ghost">{memory.type} · {memory.sensitivity}</div>
-                </div>
-              ))}
-            </div>
-          </Panel>
+        <p className="mt-3 text-sm text-ink-muted max-w-2xl">{episode.goal}</p>
+        <div className="mt-3 flex items-center gap-4 text-sm">
+          <span className="text-ink-muted">{episode.projectName}</span>
+          <span className="text-void-400">·</span>
+          <span className="text-ink-faint">{formatDuration(episode.startedAt, episode.endedAt)}</span>
+          <span className="text-void-400">·</span>
+          <span className="text-ink-faint">{episode.timeline.length} traces</span>
         </div>
       </div>
+
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="bg-void-800 border border-void-600 rounded p-4">
+          <div className="text-xs font-medium text-ink-faint uppercase tracking-wider mb-2">
+            Status
+          </div>
+          <div className="text-lg font-semibold text-ink">{episode.status}</div>
+        </div>
+        <div className="bg-void-800 border border-void-600 rounded p-4">
+          <div className="text-xs font-medium text-ink-faint uppercase tracking-wider mb-2">
+            Traces
+          </div>
+          <div className="text-lg font-semibold font-mono text-ink">
+            {episode.timeline.length}
+          </div>
+        </div>
+        <div className="bg-void-800 border border-void-600 rounded p-4">
+          <div className="text-xs font-medium text-ink-faint uppercase tracking-wider mb-2">
+            Artifacts
+          </div>
+          <div className="text-lg font-semibold font-mono text-ink">
+            {episode.artifacts.length}
+          </div>
+        </div>
+        <div className="bg-void-800 border border-void-600 rounded p-4">
+          <div className="text-xs font-medium text-ink-faint uppercase tracking-wider mb-2">
+            Policy
+          </div>
+          <div className="text-sm font-semibold text-ink truncate">
+            {episode.policyVersion}
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content - Timeline */}
+      <Panel title="Execution Timeline" eyebrow="Trace Events">
+        <TimelineDebugWrapper
+          timeline={episode.timeline}
+          episodeId={episode.id}
+          locale={locale}
+          dict={dict}
+        />
+      </Panel>
+
+      {/* Handoff Panel */}
+      <Panel title="Next Agent Handoff" eyebrow="Continue">
+        <div className="space-y-4">
+          <div className="bg-void-800 border border-void-600 rounded p-4">
+            <div className="text-xs uppercase tracking-wider text-accent mb-2">
+              Latest Step
+            </div>
+            <div className="font-semibold text-ink">
+              {episode.handoffSummary.latestStepTitle}
+            </div>
+            <div className="text-sm text-ink-muted mt-1">
+              {episode.handoffSummary.latestResult}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="bg-void-800 border border-void-600 rounded p-4">
+              <div className="text-xs uppercase tracking-wider text-ink-faint mb-2">
+                Artifacts
+              </div>
+              <div className="font-semibold text-ink">
+                {episode.handoffSummary.latestArtifactTitle || "None"}
+              </div>
+            </div>
+            <div className="bg-void-800 border border-void-600 rounded p-4">
+              <div className="text-xs uppercase tracking-wider text-ink-faint mb-2">
+                Handoff Ready
+              </div>
+              <div
+                className={`font-semibold ${
+                  episode.handoffSummary.readyForHandoff
+                    ? "text-signal-success"
+                    : "text-signal-warning"
+                }`}
+              >
+                {episode.handoffSummary.readyForHandoff ? "Yes" : "No"}
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-signal-success/5 border border-signal-success/20 rounded p-4">
+            <div className="text-xs uppercase tracking-wider text-signal-success mb-2">
+              Next Action
+            </div>
+            <div className="text-sm text-ink-muted">
+              {episode.handoffSummary.nextAction}
+            </div>
+          </div>
+
+          <Link
+            href={`/${locale}/projects/${projectId}/episodes/new?forkFrom=${episodeId}`}
+            className="block w-full px-4 py-2.5 bg-accent text-white text-sm font-medium rounded hover:bg-accent-glow transition-colors text-center"
+          >
+            Fork Episode
+          </Link>
+        </div>
+      </Panel>
+
+      {/* Audit Summary */}
+      <Panel title="Audit Trail" eyebrow="Events">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="text-center p-3 bg-void-800 border border-void-600 rounded">
+            <div className="text-2xl font-semibold font-mono text-ink">
+              {episode.auditSummary.readCount}
+            </div>
+            <div className="text-xs text-ink-faint mt-1">Reads</div>
+          </div>
+          <div className="text-center p-3 bg-void-800 border border-void-600 rounded">
+            <div className="text-2xl font-semibold font-mono text-ink">
+              {episode.auditSummary.writeCount}
+            </div>
+            <div className="text-xs text-ink-faint mt-1">Writes</div>
+          </div>
+          <div className="text-center p-3 bg-void-800 border border-void-600 rounded">
+            <div className="text-2xl font-semibold font-mono text-signal-error">
+              {episode.auditSummary.permissionDeniedCount}
+            </div>
+            <div className="text-xs text-ink-faint mt-1">Denied</div>
+          </div>
+          <div className="text-center p-3 bg-void-800 border border-void-600 rounded">
+            <div className="text-2xl font-semibold font-mono text-signal-warning">
+              {episode.auditSummary.policyHitCount}
+            </div>
+            <div className="text-xs text-ink-faint mt-1">Policy</div>
+          </div>
+        </div>
+      </Panel>
     </div>
   );
 }
