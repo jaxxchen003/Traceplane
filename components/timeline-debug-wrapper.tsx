@@ -23,27 +23,27 @@ interface TraceItem {
   snapshot: any;
 }
 
-export function TimelineDebugWrapper({ 
-  timeline, 
-  episodeId, 
-  locale, 
-  dict 
-}: { 
-  timeline: TraceItem[]; 
-  episodeId: string; 
-  locale: string; 
+export function TimelineDebugWrapper({
+  timeline,
+  episodeId,
+  locale,
+  dict
+}: {
+  timeline: TraceItem[];
+  episodeId: string;
+  locale: string;
   dict: any;
 }) {
-  const [selectedTraceId, setSelectedTraceId] = useState<<stringstring | null>(null);
+  const [selectedTraceId, setSelectedTraceId] = useState<string | null>(null);
 
   const selectedTrace = timeline.find(t => t.id === selectedTraceId);
-  
+
   const currentIndex = timeline.findIndex(t => t.id === selectedTraceId);
   const actualPrevTrace = currentIndex > 0 ? timeline[currentIndex - 1] : null;
 
   return (
-    <<divdiv className="grid gap-6 xl:grid-cols-[1fr_0.9fr]">
-      <<divdiv className="space-y-4">
+    <div className="grid gap-6 xl:grid-cols-[1fr_0.9fr]">
+      <div className="space-y-4">
         {timeline.map((item) => {
           const details = [];
           if (item.inputSummary) details.push({ label: "Input", value: item.inputSummary });
@@ -54,12 +54,12 @@ export function TimelineDebugWrapper({
           if (item.permissionDeniedReason) details.push({ label: "Denied", value: item.permissionDeniedReason, tone: "danger" });
 
           return (
-            <<divdiv 
-              key={item.id} 
+            <div
+              key={item.id}
               className={`cursor-pointer transition-all rounded-xl ${selectedTraceId === item.id ? 'ring-2 ring-emerald-500 bg-emerald-500/5' : 'hover:bg-slate-800/30'}`}
               onClick={() => setSelectedTraceId(item.id)}
             >
-              <<TimelineTimelineEntry
+              <TimelineEntry
                 index={item.stepIndex}
                 statusLabel={dict.statuses[item.status]}
                 statusRaw={item.status}
@@ -79,18 +79,18 @@ export function TimelineDebugWrapper({
         })}
       </div>
 
-      <<divdiv className="space-y-6">
-        <<PanelPanel title="Surgical Inspector" eyebrow="State & Diff">
+      <div className="space-y-6">
+        <Panel title="Surgical Inspector" eyebrow="State & Diff">
           {selectedTrace ? (
-            <<StateStateInspector 
-              traceId={selectedTrace.id} 
-              snapshot={selectedTrace.snapshot} 
-              prevSnapshot={actualPrevTrace?.snapshot} 
-              episodeId={episodeId} 
-              locale={locale} 
+            <StateInspector
+              traceId={selectedTrace.id}
+              snapshot={selectedTrace.snapshot}
+              prevSnapshot={actualPrevTrace?.snapshot}
+              episodeId={episodeId}
+              locale={locale}
             />
           ) : (
-            <<divdiv className="h-64 flex items-center justify-center text-slate-500 text-sm italic">
+            <div className="h-64 flex items-center justify-center text-slate-500 text-sm italic">
               Select a trace node to inspect its state and diff.
             </div>
           )}

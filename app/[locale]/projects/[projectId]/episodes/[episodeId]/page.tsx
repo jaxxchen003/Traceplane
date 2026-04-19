@@ -28,7 +28,7 @@ export default async function EpisodeReviewPage({
   if (!episode || episode.projectId !== projectId) notFound();
 
   const dict = getDictionary(locale);
-  
+
   const graphNodes = [
     {
       id: "episode-core",
@@ -136,8 +136,8 @@ export default async function EpisodeReviewPage({
   ];
 
   return (
-    <<divdiv className="space-y-6">
-      <<GraphGraphTheater
+    <div className="space-y-6">
+      <GraphTheater
         title={episode.title}
         subtitle={locale === "zh" ? "这个舞台把 memory、execution、artifacts、policy 和 audit 压到同一个视图里。" : "This stage compresses memory, execution, artifacts, policy, and audit into one view."}
         nodes={graphNodes}
@@ -149,62 +149,62 @@ export default async function EpisodeReviewPage({
         ]}
       />
 
-      <<sectionsection className="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
-        <<GraphGraphBriefing
+      <section className="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
+        <GraphBriefing
           title={locale === "zh" ? "Episode Brief" : "Episode Brief"}
           emptyLabel={dict.common.noData}
           nodes={briefingNodes}
         />
 
-        <<divdiv className="space-y-4">
-          <<PanelPanel title={locale === "zh" ? "Next Agent Handoff" : "Next Agent Handoff"} eyebrow="Brief">
-            <<divdiv className="space-y-4 text-sm leading-7 text-slate-300">
-              <<ContinuContinuityCard
+        <div className="space-y-4">
+          <Panel title={locale === "zh" ? "Next Agent Handoff" : "Next Agent Handoff"} eyebrow="Brief">
+            <div className="space-y-4 text-sm leading-7 text-slate-300">
+              <ContinuityCard
                 label={locale === "zh" ? "最新一步" : "Latest step"}
                 title={episode.handoffSummary.latestStepTitle}
                 detail={episode.handoffSummary.latestResult}
                 tone="cyan"
               />
-              <<divdiv className="grid gap-3 md:grid-cols-2">
-                <<MetricMetricCard label={locale === "zh" ? "最新产物" : "Latest artifact"} value={episode.handoffSummary.latestArtifactTitle} />
-                <<MetricMetricCard 
-                  label={locale === "zh" ? "可交接状态" : "Handoff state"} 
-                  value={episode.handoffSummary.readyForHandoff ? (locale === "zh" ? "可以直接交给下一位 Agent" : "Ready") : (locale === "zh" ? "还不适合交接" : "Not ready")} 
+              <div className="grid gap-3 md:grid-cols-2">
+                <MetricCard label={locale === "zh" ? "最新产物" : "Latest artifact"} value={episode.handoffSummary.latestArtifactTitle} />
+                <MetricCard
+                  label={locale === "zh" ? "可交接状态" : "Handoff state"}
+                  value={episode.handoffSummary.readyForHandoff ? (locale === "zh" ? "可以直接交给下一位 Agent" : "Ready") : (locale === "zh" ? "还不适合交接" : "Not ready")}
                 />
               </div>
-              <<ContinuContinuityCard
+              <ContinuityCard
                 label={locale === "zh" ? "下一步建议" : "Next action"}
                 detail={episode.handoffSummary.nextAction}
                 tone="emerald"
               />
               {episode.handoffSummary.memoryTitles.length > 0 && (
-                <<ContinuContinuityCard label={locale === "zh" ? "交接时优先带上" : "Bring into handoff"}>
-                  <<TokenTokenList items={episode.handoffSummary.memoryTitles} />
+                <ContinuityCard label={locale === "zh" ? "交接时优先带上" : "Bring into handoff"}>
+                  <TokenList items={episode.handoffSummary.memoryTitles} />
                 </ContinuityCard>
               )}
               {episode.handoffSummary.cautionItems.length > 0 && (
-                <<ContinuContinuityCard label={locale === "zh" ? "交接注意" : "Cautions"} tone="amber">
-                  <<ulul className="mt-3 space-y-2">
+                <ContinuityCard label={locale === "zh" ? "交接注意" : "Cautions"} tone="amber">
+                  <ul className="mt-3 space-y-2">
                     {episode.handoffSummary.cautionItems.map((item: string) => (
-                      <<lili key={item}>{item}</li>
+                      <li key={item}>{item}</li>
                     ))}
                   </ul>
                 </ContinuityCard>
               )}
-              <<PromptPromptBlock
+              <PromptBlock
                 label={locale === "zh" ? "Agent Continuation Packet" : "Agent Continuation Packet"}
                 content={episode.continuationPacket}
               />
             </div>
           </Panel>
 
-          <<PanelPanel title={dict.episode.auditSummary} eyebrow={dict.common.auditTrail}>
-            <<divdiv className="grid gap-3 text-sm text-slate-300">
-              <<MetricMetricCard label="Reads" value={`${episode.auditSummary.readCount} reads`} tone="cyan" />
-              <<MetricMetricCard label="Writes" value={`${episode.auditSummary.writeCount} writes`} tone="emerald" />
-              <<MetricMetricCard label="Denials" value={`${episode.auditSummary.permissionDeniedCount} denials`} tone="rose" />
-              <<MetricMetricCard label="Policy" value={`${episode.auditSummary.policyHitCount} policy hits`} tone="amber" />
-              <<ActionActionLink href={`/${locale}/audit?episodeId=${episode.id}`} tone="secondary">
+          <Panel title={dict.episode.auditSummary} eyebrow={dict.common.auditTrail}>
+            <div className="grid gap-3 text-sm text-slate-300">
+              <MetricCard label="Reads" value={`${episode.auditSummary.readCount} reads`} tone="cyan" />
+              <MetricCard label="Writes" value={`${episode.auditSummary.writeCount} writes`} tone="emerald" />
+              <MetricCard label="Denials" value={`${episode.auditSummary.permissionDeniedCount} denials`} tone="rose" />
+              <MetricCard label="Policy" value={`${episode.auditSummary.policyHitCount} policy hits`} tone="amber" />
+              <ActionLink href={`/${locale}/audit?episodeId=${episode.id}`} tone="secondary">
                 {dict.common.viewAudit}
               </ActionLink>
             </div>
@@ -212,31 +212,31 @@ export default async function EpisodeReviewPage({
         </div>
       </section>
 
-      <<divdiv className="grid gap-6 xl:grid-cols-[1.6fr_0.9fr]">
-        <<divdiv className="space-y-6">
-          <<PanelPanel title={dict.common.timeline} eyebrow={dict.episode.title}>
-            <<TimelineTimelineDebugWrapper 
-              timeline={episode.timeline} 
-              episodeId={episode.id} 
-              locale={locale} 
-              dict={dict} 
+      <div className="grid gap-6 xl:grid-cols-[1.6fr_0.9fr]">
+        <div className="space-y-6">
+          <Panel title={dict.common.timeline} eyebrow={dict.episode.title}>
+            <TimelineDebugWrapper
+              timeline={episode.timeline}
+              episodeId={episode.id}
+              locale={locale}
+              dict={dict}
             />
           </Panel>
-          
-          <<PanelPanel title={dict.episode.relationshipMap} eyebrow="Edges">
-            <<divdiv className="space-y-4">
-              <<RelationshipRelationshipFlow
+
+          <Panel title={dict.episode.relationshipMap} eyebrow="Edges">
+            <div className="space-y-4">
+              <RelationshipFlow
                 memories={episode.memories.map((m: any) => ({ id: m.id, label: m.title, meta: `${m.type} · ${m.sensitivity}` }))}
                 traces={episode.timeline.map((t: any) => ({ id: t.id, label: `Step ${t.stepIndex} · ${t.stepTitle}`, meta: t.actor }))}
                 artifacts={episode.artifacts.map((a: any) => ({ id: a.id, label: a.title, meta: `${a.type} · v${a.version}` }))}
               />
-              <<divdiv className="grid gap-3 text-sm text-slate-300">
+              <div className="grid gap-3 text-sm text-slate-300">
                 {episode.relationships.map((edge: any) => (
-                  <<divdiv key={edge.id} className="tp-soft-card rounded-2xl px-4 py-3">
-                    <<spanspan className="font-medium text-white">{edge.edgeType}</span>
-                    <<spanspan className="mx-2 text-slate-500">·</span>
+                  <div key={edge.id} className="tp-soft-card rounded-2xl px-4 py-3">
+                    <span className="font-medium text-white">{edge.edgeType}</span>
+                    <span className="mx-2 text-slate-500">·</span>
                     <span>{edge.fromNodeType}:{edge.fromNodeId.slice(-6)}</span>
-                    <<spanspan className="mx-2 text-slate-500">→</span>
+                    <span className="mx-2 text-slate-500">→</span>
                     <span>{edge.toNodeType}:{edge.toNodeId.slice(-6)}</span>
                   </div>
                 ))}
@@ -245,9 +245,9 @@ export default async function EpisodeReviewPage({
           </Panel>
         </div>
 
-        <<divdiv className="space-y-6">
-          <<PanelPanel title={dict.controls.continueEpisode} eyebrow="Write Path">
-            <<EpisodeEpisodeControlPanel
+        <div className="space-y-6">
+          <Panel title={dict.controls.continueEpisode} eyebrow="Write Path">
+            <EpisodeControlPanel
               locale={locale}
               episodeId={episode.id}
               projectId={projectId}
@@ -257,56 +257,56 @@ export default async function EpisodeReviewPage({
             />
           </Panel>
 
-          <<PanelPanel title="Runtime Provenance" eyebrow="Work Plane State">
-            <<divdiv className="space-y-4">
-              <<divdiv className="grid gap-3 sm:grid-cols-2">
-                <<MetricMetricCard label="Cloud Mode" value={episode.runtimeSummary.cloudMode} detail={`${episode.runtimeSummary.databaseProvider} · ${episode.runtimeSummary.objectStorageProvider}`} tone="cyan" />
-                <<MetricMetricCard label="Capture Mode" value={episode.provenanceSummary.mode} detail={episode.provenanceSummary.host} tone="amber" />
+          <Panel title="Runtime Provenance" eyebrow="Work Plane State">
+            <div className="space-y-4">
+              <div className="grid gap-3 sm:grid-cols-2">
+                <MetricCard label="Cloud Mode" value={episode.runtimeSummary.cloudMode} detail={`${episode.runtimeSummary.databaseProvider} · ${episode.runtimeSummary.objectStorageProvider}`} tone="cyan" />
+                <MetricCard label="Capture Mode" value={episode.provenanceSummary.mode} detail={episode.provenanceSummary.host} tone="amber" />
               </div>
-              <<ContinuContinuityCard label="Storage Status">
-                <<divdiv className="mb-3 flex items-center justify-between gap-3">
-                  <<StatusStatusBadge label={episode.runtimeSummary.projectionExists ? "Projected" : "Pending"} raw={episode.runtimeSummary.projectionExists ? "COMPLETED" : "PLANNED"} />
+              <ContinuityCard label="Storage Status">
+                <div className="mb-3 flex items-center justify-between gap-3">
+                  <StatusBadge label={episode.runtimeSummary.projectionExists ? "Projected" : "Pending"} raw={episode.runtimeSummary.projectionExists ? "COMPLETED" : "PLANNED"} />
                 </div>
-                <<divdiv className="grid gap-3 sm:grid-cols-3">
-                  <<MetricMetricCard label="Artifacts" value={episode.storageSummary.totalArtifacts} className="tp-deep-card" />
-                  <<MetricMetricCard label="R2" value={`${episode.storageSummary.r2ArtifactCount}`} tone="cyan" />
-                  <<MetricMetricCard label="Inline" value={episode.storageSummary.inlineArtifactCount} tone="amber" />
+                <div className="grid gap-3 sm:grid-cols-3">
+                  <MetricCard label="Artifacts" value={episode.storageSummary.totalArtifacts} className="tp-deep-card" />
+                  <MetricCard label="R2" value={`${episode.storageSummary.r2ArtifactCount}`} tone="cyan" />
+                  <MetricCard label="Inline" value={episode.storageSummary.inlineArtifactCount} tone="amber" />
                 </div>
               </ContinuityCard>
-              <<ContinuContinuityCard label="Projection + Review" className="bg-[linear-gradient(135deg,rgba(14,165,233,0.08),rgba(250,204,21,0.04),rgba(15,23,42,0.42))]">
-                <<divdiv className="mb-3 flex items-center justify-between gap-3">
-                  <<StatusStatusBadge label={episode.reviewOutcome ?? "PENDING"} raw={episode.reviewOutcome ?? "PENDING"} />
+              <ContinuityCard label="Projection + Review" className="bg-[linear-gradient(135deg,rgba(14,165,233,0.08),rgba(250,204,21,0.04),rgba(15,23,42,0.42))]">
+                <div className="mb-3 flex items-center justify-between gap-3">
+                  <StatusBadge label={episode.reviewOutcome ?? "PENDING"} raw={episode.reviewOutcome ?? "PENDING"} />
                 </div>
-                <<divdiv className="space-y-3 text-sm leading-7 text-slate-300">
-                  <div><<spanspan className="font-medium text-white">Projection Root: </span>{episode.runtimeSummary.projectionRoot}</div>
-                  <div><<spanspan className="font-medium text-white">Episode Path: </span><<spanspan className="break-all text-slate-200">{episode.runtimeSummary.projectionPath}</span></div>
-                  <<divdiv className="grid gap-3 sm:grid-cols-3">
-                    <<MetricMetricCard label="Trace Events" value={episode.provenanceSummary.signals.traceEventCount} className="tp-deep-card" />
-                    <<MetricMetricCard label="Hook Capture" value={episode.provenanceSummary.signals.hasHookCapture ? "Yes" : "No"} className="tp-deep-card" />
-                    <<MetricMetricCard label="Imported" value={episode.provenanceSummary.signals.isImported ? "Yes" : "No"} className="tp-deep-card" />
+                <div className="space-y-3 text-sm leading-7 text-slate-300">
+                  <div><span className="font-medium text-white">Projection Root: </span>{episode.runtimeSummary.projectionRoot}</div>
+                  <div><span className="font-medium text-white">Episode Path: </span><span className="break-all text-slate-200">{episode.runtimeSummary.projectionPath}</span></div>
+                  <div className="grid gap-3 sm:grid-cols-3">
+                    <MetricCard label="Trace Events" value={episode.provenanceSummary.signals.traceEventCount} className="tp-deep-card" />
+                    <MetricCard label="Hook Capture" value={episode.provenanceSummary.signals.hasHookCapture ? "Yes" : "No"} className="tp-deep-card" />
+                    <MetricCard label="Imported" value={episode.provenanceSummary.signals.isImported ? "Yes" : "No"} className="tp-deep-card" />
                   </div>
                 </div>
               </ContinuityCard>
             </div>
           </Panel>
 
-          <<PanelPanel title={dict.common.summary} eyebrow={dict.episode.goal}>
-            <<divdiv className="space-y-4 text-sm leading-7 text-slate-300">
+          <Panel title={dict.common.summary} eyebrow={dict.episode.goal}>
+            <div className="space-y-4 text-sm leading-7 text-slate-300">
               <div>{episode.goal}</div>
-              <<ContinuContinuityCard label={dict.episode.finalOutcome} detail={episode.finalOutcome} />
+              <ContinuityCard label={dict.episode.finalOutcome} detail={episode.finalOutcome} />
               <div>
-                <<divdiv className="mb-2 text-[11px] uppercase tracking-[0.18em] text-slate-500">{dict.common.participatingAgents}</div>
+                <div className="mb-2 text-[11px] uppercase tracking-[0.18em] text-slate-500">{dict.common.participatingAgents}</div>
                 <div>{episode.participatingAgents.join(" · ")}</div>
               </div>
             </div>
           </Panel>
 
-          <<PanelPanel title={dict.common.memories} eyebrow="Memory">
-            <<divdiv className="space-y-3">
+          <Panel title={dict.common.memories} eyebrow="Memory">
+            <div className="space-y-3">
               {episode.memories.map((memory: any) => (
-                <<divdiv key={memory.id} className="tp-soft-card rounded-2xl px-4 py-3 text-sm text-slate-300">
-                  <<divdiv className="font-medium text-white">{memory.title}</div>
-                  <<divdiv className="text-xs text-slate-500">{memory.type} · {memory.sensitivity}</div>
+                <div key={memory.id} className="tp-soft-card rounded-2xl px-4 py-3 text-sm text-slate-300">
+                  <div className="font-medium text-white">{memory.title}</div>
+                  <div className="text-xs text-slate-500">{memory.type} · {memory.sensitivity}</div>
                 </div>
               ))}
             </div>
