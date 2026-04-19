@@ -20,7 +20,7 @@ interface TraceItem {
   errorSummary: string | null;
   policyHitReason: string | null;
   permissionDeniedReason: string | null;
-  snapshot: any;
+  snapshot?: any;
 }
 
 export function TimelineDebugWrapper({

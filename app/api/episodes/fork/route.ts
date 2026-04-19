@@ -28,18 +28,19 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Fork point Trace not found" }, { status: 404 });
     }
 
-    const newEpisode = await prisma.$transaction(async (tx) => {
-      // 1. Create the child episode
-      const created = await tx.episode.create({
-        data: {
-          projectId: parentEpisode.projectId,
-          primaryAgentId: parentEpisode.primaryAgentId,
-          parentEpisodeId: parentEpisode.id,
-          forkPointTraceId: body.traceId,
-          titleI18n: body.titleI18n ?? { 
-            zh: `分叉自: ${parentEpisode.titleI18n.zh}`, 
-            en: `Forked from: ${parentEpisode.titleI18n.en}` 
-          },
+  const newEpisode = await prisma.$transaction(async (tx) => {
+    // 1. Create the child episode
+    const parentTitle = parentEpisode.titleI18n as { zh?: string; en?: string } | null;
+    const created = await tx.episode.create({
+      data: {
+        projectId: parentEpisode.projectId,
+        primaryAgentId: parentEpisode.primaryAgentId,
+        parentEpisodeId: parentEpisode.id,
+        forkPointTraceId: body.traceId,
+        titleI18n: body.titleI18n ?? {
+          zh: `分叉自: ${parentTitle?.zh ?? "未命名"}`,
+          en: `Forked from: ${parentTitle?.en ?? "Untitled"}`
+        },
           goalI18n: body.goalI18n ?? parentEpisode.goalI18n,
           successCriteriaI18n: body.successCriteriaI18n ?? parentEpisode.successCriteriaI18n,
           status: "PLANNED",
