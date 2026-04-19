@@ -37,11 +37,7 @@ export function TimelineDebugWrapper({
   const [selectedTraceId, setSelectedTraceId] = useState<<stringstring | null>(null);
 
   const selectedTrace = timeline.find(t => t.id === selectedTraceId);
-  const prevTrace = selectedTrace 
-    ? timeline.find(t => t.id === timeline.find(item => item.id === selectedTraceId)?.id && false) // dummy
-    : null;
   
-  // Find actual previous trace for diff
   const currentIndex = timeline.findIndex(t => t.id === selectedTraceId);
   const actualPrevTrace = currentIndex > 0 ? timeline[currentIndex - 1] : null;
 
@@ -94,7 +90,7 @@ export function TimelineDebugWrapper({
               locale={locale} 
             />
           ) : (
-            <<div classNamediv className="h-64 flex items-center justify-center text-slate-500 text-sm italic">
+            <<divdiv className="h-64 flex items-center justify-center text-slate-500 text-sm italic">
               Select a trace node to inspect its state and diff.
             </div>
           )}

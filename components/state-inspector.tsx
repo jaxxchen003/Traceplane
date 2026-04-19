@@ -53,7 +53,6 @@ export function StateInspector({
         parentEpisodeId: episodeId,
         traceId: traceId,
         titleI18n: { zh: `分叉实验: ${forkInput || "未命名"}` },
-        // 实际中这里可以传递修改后的 input 覆盖快照
       })
     });
     if (res.ok) {
@@ -88,7 +87,7 @@ export function StateInspector({
           ) : (
             <<divdiv className="grid gap-2">
               {diffs.map(d => (
-                <<div keydiv key={d.key} className="p-2 text-xs rounded-lg bg-slate-800/50 border border-slate-700/50">
+                <<divdiv key={d.key} className="p-2 text-xs rounded-lg bg-slate-800/50 border border-slate-700/50">
                   <<spanspan className="font-bold text-slate-300">{d.key}</span>
                   <<divdiv className="flex items-center gap-2 mt-1">
                     <<spanspan className="text-rose-400 line-through">{String(d.oldValue)}</span>

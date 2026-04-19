@@ -185,7 +185,9 @@ export default async function EpisodeReviewPage({
               {episode.handoffSummary.cautionItems.length > 0 && (
                 <<ContinuContinuityCard label={locale === "zh" ? "交接注意" : "Cautions"} tone="amber">
                   <<ulul className="mt-3 space-y-2">
-                    {episode.handoffSummary.cautionItems.map((item: string) => (<<lili key={item}>{item}</li>))}
+                    {episode.handoffSummary.cautionItems.map((item: string) => (
+                      <<lili key={item}>{item}</li>
+                    ))}
                   </ul>
                 </ContinuityCard>
               )}
@@ -198,11 +200,11 @@ export default async function EpisodeReviewPage({
 
           <<PanelPanel title={dict.episode.auditSummary} eyebrow={dict.common.auditTrail}>
             <<divdiv className="grid gap-3 text-sm text-slate-300">
-              <<MetricMetricCard label="Reads" value={\`${episode.auditSummary.readCount} reads\`} tone="cyan" />
-              <<MetricMetricCard label="Writes" value={\`${episode.auditSummary.writeCount} writes\`} tone="emerald" />
-              <<MetricMetricCard label="Denials" value={\`${episode.auditSummary.permissionDeniedCount} denials\`} tone="rose" />
-              <<MetricMetricCard label="Policy" value={\`${episode.auditSummary.policyHitCount} policy hits\`} tone="amber" />
-              <<ActionActionLink href={\`/\${locale}/audit?episodeId=\${episode.id}\`} tone="secondary">
+              <<MetricMetricCard label="Reads" value={`${episode.auditSummary.readCount} reads`} tone="cyan" />
+              <<MetricMetricCard label="Writes" value={`${episode.auditSummary.writeCount} writes`} tone="emerald" />
+              <<MetricMetricCard label="Denials" value={`${episode.auditSummary.permissionDeniedCount} denials`} tone="rose" />
+              <<MetricMetricCard label="Policy" value={`${episode.auditSummary.policyHitCount} policy hits`} tone="amber" />
+              <<ActionActionLink href={`/${locale}/audit?episodeId=${episode.id}`} tone="secondary">
                 {dict.common.viewAudit}
               </ActionLink>
             </div>
@@ -258,16 +260,16 @@ export default async function EpisodeReviewPage({
           <<PanelPanel title="Runtime Provenance" eyebrow="Work Plane State">
             <<divdiv className="space-y-4">
               <<divdiv className="grid gap-3 sm:grid-cols-2">
-                <<MetricMetricCard label="Cloud Mode" value={episode.runtimeSummary.cloudMode} detail={\`${episode.runtimeSummary.databaseProvider} · ${episode.runtimeSummary.objectStorageProvider}\`} tone="cyan" />
+                <<MetricMetricCard label="Cloud Mode" value={episode.runtimeSummary.cloudMode} detail={`${episode.runtimeSummary.databaseProvider} · ${episode.runtimeSummary.objectStorageProvider}`} tone="cyan" />
                 <<MetricMetricCard label="Capture Mode" value={episode.provenanceSummary.mode} detail={episode.provenanceSummary.host} tone="amber" />
               </div>
-              <ContinuityCard label="Storage Status">
+              <<ContinuContinuityCard label="Storage Status">
                 <<divdiv className="mb-3 flex items-center justify-between gap-3">
                   <<StatusStatusBadge label={episode.runtimeSummary.projectionExists ? "Projected" : "Pending"} raw={episode.runtimeSummary.projectionExists ? "COMPLETED" : "PLANNED"} />
                 </div>
                 <<divdiv className="grid gap-3 sm:grid-cols-3">
                   <<MetricMetricCard label="Artifacts" value={episode.storageSummary.totalArtifacts} className="tp-deep-card" />
-                  <<MetricMetricCard label="R2" value={\`${episode.storageSummary.r2ArtifactCount}\`} tone="cyan" />
+                  <<MetricMetricCard label="R2" value={`${episode.storageSummary.r2ArtifactCount}`} tone="cyan" />
                   <<MetricMetricCard label="Inline" value={episode.storageSummary.inlineArtifactCount} tone="amber" />
                 </div>
               </ContinuityCard>
