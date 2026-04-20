@@ -20,8 +20,10 @@ export async function POST(request: Request) {
     );
   }
 
-  const project = await prisma.project.findUnique({
-    where: { id: body.projectId },
+  const project = await prisma.project.findFirst({
+    where: { 
+      OR: [{ id: body.projectId }, { slug: body.projectId }]
+    },
     include: { workspace: true }
   });
 

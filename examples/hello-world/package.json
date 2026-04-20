@@ -1,0 +1,16 @@
+{
+  "name": "traceplane-hello-world",
+  "version": "1.0.0",
+  "description": "Traceplane Hello World - Agent SDK 使用示例",
+  "type": "module",
+  "scripts": {
+    "demo": "tsx agent-demo.ts",
+    "demo:full": "tsx agent-demo-full.ts"
+  },
+  "dependencies": {
+    "@traceplane/agent-sdk": "file:../../packages/agent-sdk"
+  },
+  "devDependencies": {
+    "tsx": "^4.0.0"
+  }
+}

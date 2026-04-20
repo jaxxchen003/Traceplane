@@ -27,8 +27,11 @@
     "import:transcript": "node scripts/import-transcript.mjs",
     "normalize:opencode": "node scripts/normalize-opencode-export.mjs",
     "claude:hook:test": "node scripts/test-claude-hook-bridge.mjs",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage",
     "lint": "eslint .",
-    "ci": "npm run lint && npm run build",
+    "ci": "npm run lint && npm run build && npm run test:run",
     "db:generate": "prisma generate && prisma generate --schema prisma/schema.postgres.prisma",
     "db:push": "prisma db push",
     "db:seed": "node prisma/seed.mjs",
@@ -44,10 +47,12 @@
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.28.0",
     "@prisma/client": "^6.10.1",
+    "clsx": "^2.1.1",
     "next": "^16.2.1",
     "pg": "^8.20.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
+    "tailwind-merge": "^3.5.0",
     "zod": "^4.3.6"
   },
   "devDependencies": {

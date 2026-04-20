@@ -83,7 +83,6 @@ export default async function EpisodeReviewPage({
         </div>
       </div>
 
-      {/* Main Content - Timeline */}
       <Panel title="Execution Timeline" eyebrow="Trace Events">
         <TimelineDebugWrapper
           timeline={episode.timeline}
@@ -93,7 +92,6 @@ export default async function EpisodeReviewPage({
         />
       </Panel>
 
-      {/* Handoff Panel */}
       <Panel title="Next Agent Handoff" eyebrow="Continue">
         <div className="space-y-4">
           <div className="bg-void-800 border border-void-600 rounded p-4">
@@ -151,7 +149,6 @@ export default async function EpisodeReviewPage({
         </div>
       </Panel>
 
-      {/* Audit Summary */}
       <Panel title="Audit Trail" eyebrow="Events">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <div className="text-center p-3 bg-void-800 border border-void-600 rounded">
