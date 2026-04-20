@@ -101,7 +101,7 @@ curl -X POST http://localhost:3000/api/episodes \
 
 ```bash
 # 1. 克隆仓库
-git clone https://github.com/your-org/traceplane.git
+git clone https://github.com/jaxxchen003/Traceplane.git
 cd traceplane
 
 # 2. 安装依赖
@@ -291,7 +291,7 @@ MIT License - 详见 [LICENSE](LICENSE)
 
 ## 💬 反馈
 
-- GitHub Issues: [github.com/your-org/traceplane/issues](https://github.com/your-org/traceplane/issues)
+- GitHub Issues: [github.com/jaxxchen003/Traceplane/issues](https://github.com/jaxxchen003/Traceplane/issues)
 - Email: hello@traceplane.io
 
 ---
