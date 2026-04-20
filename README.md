@@ -4,6 +4,10 @@
 
 让多个 Agent 的工作接成一条不断档、可回看、可交接的工作主线。
 
+🌐 **官方网站**: https://traceplane.cc  
+📦 **Vercel 部署**: https://traceplane.vercel.app  
+🐙 **GitHub 仓库**: https://github.com/jaxxchen003/Traceplane
+
 ---
 
 ## 🎯 产品核心价值
