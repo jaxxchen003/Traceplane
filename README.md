@@ -30,6 +30,29 @@
 
 ---
 
+## 产品界面
+
+<table>
+<tr>
+<td width="50%"><strong>Project Overview</strong><br/>KPI 仪表盘 + Episode 列表 + 实时事件流</td>
+<td width="50%"><strong>Episode Detail</strong><br/>执行时间线 + Trace 可视化 + Artifact 追溯</td>
+</tr>
+<tr>
+<td><img src="docs/assets/platform-project-overview.png" alt="Project Overview" width="100%"/></td>
+<td><img src="docs/assets/platform-episode-detail.png" alt="Episode Detail" width="100%"/></td>
+</tr>
+<tr>
+<td width="50%"><strong>Dashboard</strong><br/>运行时健康状态 + 全局治理指标</td>
+<td width="50%"><strong>Website</strong><br/>Terminal Brutalist 官网 · 中英双语</td>
+</tr>
+<tr>
+<td><img src="docs/assets/platform-dashboard.png" alt="Dashboard" width="100%"/></td>
+<td><img src="docs/assets/website-hero.png" alt="Website" width="100%"/></td>
+</tr>
+</table>
+
+---
+
 ## 核心概念
 
 ### 🧠 Episode — Agent 的意识载体
@@ -228,7 +251,7 @@ Traceplane 采用 **MIT + Open Core** 模式：
 
 如果 Traceplane 对你有帮助，欢迎请我喝杯咖啡！
 
-[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/jaxxchen)
+[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/chrischen003)
 
 </div>
 
