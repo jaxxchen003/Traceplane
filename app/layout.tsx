@@ -17,16 +17,13 @@ export default function RootLayout({
     <html lang="zh-CN" className="dark">
       <body>
         {children}
-        {/* Google Analytics 4 - Measurement ID via env var */}
-        <script async src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || 'G-XXXXXXXXXX'}`} />
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-3K6BSYFM2V" />
         <script dangerouslySetInnerHTML={{
           __html: `
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-            gtag('config', '${process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || 'G-XXXXXXXXXX'}', {
-              page_path: window.location.pathname,
-            });
+            gtag('config', 'G-3K6BSYFM2V');
           `
         }} />
       </body>
