@@ -110,7 +110,7 @@ export default async function ArtifactDetailPage({
                 <div className="mb-1 text-[11px] uppercase tracking-[0.18em] text-ink-ghost">Trace</div>
                 <div className="space-y-2">
                   {artifact.sourceTraces.map((trace: { id: string; stepIndex: number; title: string }) => (
-                    <div key={trace.id} className="tp-soft-card rounded-xl px-3 py-2">
+                    <div key={trace.id} className="tp-soft-card rounded-lg px-3 py-2">
                       Step {trace.stepIndex} · {trace.title}
                     </div>
                   ))}
@@ -120,7 +120,7 @@ export default async function ArtifactDetailPage({
                 <div className="mb-1 text-[11px] uppercase tracking-[0.18em] text-ink-ghost">{dict.common.memories}</div>
                 <div className="space-y-2">
                   {artifact.sourceMemories.map((memory: { id: string; title: string }) => (
-                    <div key={memory.id} className="tp-soft-card rounded-xl px-3 py-2">
+                    <div key={memory.id} className="tp-soft-card rounded-lg px-3 py-2">
                       {memory.title}
                     </div>
                   ))}

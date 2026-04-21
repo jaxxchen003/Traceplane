@@ -1,62 +1,40 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-
+import { cn } from "@/lib/utils";
 import { StatusBadge } from "@/components/status-badge";
-
-function cx(...parts: Array<string | false | null | undefined>) {
-  return parts.filter(Boolean).join(" ");
-}
-
-const toneClasses = {
-  neutral: {
-    card: "bg-void-800 border border-void-600",
-    label: "text-ink-faint",
-    pill: "bg-void-700 border border-void-600 text-ink-muted",
-  },
-  cyan: {
-    card: "bg-signal-info/5 border border-signal-info/20",
-    label: "text-signal-info",
-    pill: "bg-signal-info/10 border border-signal-info/20 text-signal-info",
-  },
-  emerald: {
-    card: "bg-signal-success/5 border border-signal-success/20",
-    label: "text-signal-success",
-    pill: "bg-signal-success/10 border border-signal-success/20 text-signal-success",
-  },
-  amber: {
-    card: "bg-signal-warning/5 border border-signal-warning/20",
-    label: "text-signal-warning",
-    pill: "bg-signal-warning/10 border border-signal-warning/20 text-signal-warning",
-  },
-  rose: {
-    card: "bg-signal-error/5 border border-signal-error/20",
-    label: "text-signal-error",
-    pill: "bg-signal-error/10 border border-signal-error/20 text-signal-error",
-  },
-} as const;
-
-type Tone = keyof typeof toneClasses;
 
 export function EmptyPanelState({ children }: { children: ReactNode }) {
   return (
-    <div className="border border-dashed border-void-600 rounded px-5 py-8 text-sm text-ink-faint">
+    <div className="border border-dashed border-void-700 rounded-2xl px-5 py-8 text-sm text-zinc-500">
       {children}
     </div>
   );
 }
 
+const pillToneMap: Record<string, string> = {
+  neutral: "border-void-700 bg-void-800 text-ink-faint",
+  cyan: "border-signal-info/30 bg-signal-info/5 text-signal-info",
+  amber: "border-signal-warning/30 bg-signal-warning/5 text-signal-warning",
+  emerald: "border-signal-success/30 bg-signal-success/5 text-signal-success",
+  rose: "border-signal-error/30 bg-signal-error/5 text-signal-error",
+};
+
 export function SurfacePill({
   children,
-  tone = "neutral",
+  tone,
+  className,
 }: {
   children: ReactNode;
-  tone?: Tone;
+  tone?: "neutral" | "cyan" | "amber" | "emerald" | "rose";
+  className?: string;
 }) {
+  const toneClass = pillToneMap[tone ?? "neutral"] ?? pillToneMap.neutral;
   return (
     <span
-      className={cx(
-        "inline-flex rounded px-2 py-1 text-[10px] font-medium",
-        toneClasses[tone].pill
+      className={cn(
+        "inline-flex items-center rounded-full px-3 py-1 text-[10px] font-medium border",
+        toneClass,
+        className
       )}
     >
       {children}
@@ -73,43 +51,45 @@ export function RuntimeSignal({
   value: string;
   tone?: "neutral" | "good" | "warn";
 }) {
-  const toneClass =
-    tone === "good"
-      ? "bg-signal-success/5 border border-signal-success/20"
-      : tone === "warn"
-      ? "bg-signal-warning/5 border border-signal-warning/20"
-      : "bg-void-800 border border-void-600";
-
-  const labelTone =
-    tone === "good"
-      ? "text-signal-success"
-      : tone === "warn"
-      ? "text-signal-warning"
-      : "text-ink-faint";
+  const borderTone = tone === "good" ? "border-emerald-500/30" : tone === "warn" ? "border-amber-500/30" : "border-void-700";
+  const textTone = tone === "good" ? "text-emerald-400" : tone === "warn" ? "text-amber-400" : "text-zinc-500";
 
   return (
-    <div className={cx("rounded px-4 py-4", toneClass)}>
-      <div className={cx("text-[11px] uppercase tracking-wider", labelTone)}>{label}</div>
-      <div className="mt-2 text-sm font-medium text-ink">{value}</div>
+    <div className={cn("bg-void-900 rounded-lg px-4 py-4 border", borderTone)}>
+      <div className={cn("text-[10px] uppercase tracking-[0.2em]", textTone)}>{label}</div>
+      <div className="mt-2 text-sm font-medium text-white">{value}</div>
     </div>
   );
 }
+
+const toneMap: Record<string, { border: string; label: string; value: string }> = {
+  cyan: { border: "border-signal-info/30", label: "text-signal-info", value: "text-signal-info" },
+  amber: { border: "border-signal-warning/30", label: "text-signal-warning", value: "text-signal-warning" },
+  emerald: { border: "border-signal-success/30", label: "text-signal-success", value: "text-signal-success" },
+  rose: { border: "border-signal-error/30", label: "text-signal-error", value: "text-signal-error" },
+  neutral: { border: "border-void-700", label: "text-ink-faint", value: "text-ink" },
+};
 
 export function MetricCard({
   label,
   value,
   detail,
-  tone = "neutral",
+  tone,
   className,
 }: {
   label: string;
   value: ReactNode;
   detail?: ReactNode;
-  tone?: Tone;
+  tone?: "cyan" | "amber" | "emerald" | "rose" | "neutral";
   className?: string;
 }) {
+  const t = toneMap[tone ?? "neutral"] ?? toneMap.neutral;
   return (
-    <ContinuityCard label={label} title={value} detail={detail} tone={tone} className={className} />
+    <div className={cn("bg-void-900 rounded-lg px-5 py-5 border", t.border, className)}>
+      <div className={cn("text-[10px] uppercase tracking-[0.2em]", t.label)}>{label}</div>
+      <div className={cn("mt-2 text-2xl font-semibold", t.value)}>{value}</div>
+      {detail ? <div className="mt-1 text-xs text-ink-muted">{detail}</div> : null}
+    </div>
   );
 }
 
@@ -125,27 +105,28 @@ export function HostTile({
   note: string;
 }) {
   return (
-    <div className="bg-void-800 border border-void-600 rounded px-4 py-4">
-      <div className="flex items-center justify-between gap-3">
-        <div className="text-sm font-medium text-ink">{name}</div>
-        <SurfacePill tone="cyan">{status}</SurfacePill>
+    <div className="bg-void-900 rounded-lg px-5 py-5 border border-void-700 hover:border-indigo-500/30 transition">
+      <div className="flex items-center justify-between gap-3 mb-4">
+        <div className="text-sm font-medium text-white">{name}</div>
+        <SurfacePill className="text-indigo-400 border-indigo-500/20 bg-indigo-500/10">{status}</SurfacePill>
       </div>
-      <div className="mt-3 flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2 mb-4">
         {labels.map((label) => (
           <SurfacePill key={label}>{label}</SurfacePill>
         ))}
       </div>
-      <p className="mt-3 text-sm leading-6 text-ink-muted">{note}</p>
+      <p className="text-xs leading-6 text-zinc-400">{note}</p>
     </div>
   );
 }
+
 
 export function TokenList({
   items,
   tone = "neutral",
 }: {
   items: string[];
-  tone?: Tone;
+  tone?: "neutral" | "cyan" | "amber" | "emerald" | "rose";
 }) {
   return (
     <div className="mt-3 flex flex-wrap gap-2">
@@ -197,7 +178,7 @@ export function TimelineEntry({
   }>;
 }) {
   return (
-    <div className="bg-void-800 border border-void-600 rounded px-5 py-5">
+    <div className="bg-void-800 border border-void-700 rounded px-5 py-5">
       <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
         <div>
           <div className="mb-2 flex items-center gap-3">
@@ -233,6 +214,10 @@ export function TimelineEntry({
   );
 }
 
+function cx(...parts: Array<string | false | null | undefined>) {
+  return parts.filter(Boolean).join(" ");
+}
+
 export function ContinuityCard({
   label,
   title,
@@ -244,23 +229,22 @@ export function ContinuityCard({
   label: string;
   title?: ReactNode;
   detail?: ReactNode;
-  tone?: Tone;
+  tone?: "neutral" | "cyan" | "emerald" | "amber" | "rose";
   className?: string;
   children?: ReactNode;
 }) {
   return (
     <div
-      className={cx(
-        "rounded px-4 py-4",
-        tone === "neutral" ? toneClasses.neutral.card : toneClasses[tone].card,
+      className={cn(
+        "bg-void-900 rounded-lg px-5 py-5 border border-void-700",
         className
       )}
     >
-      <div className={cx("text-[11px] uppercase tracking-wider", toneClasses[tone].label)}>
+      <div className="text-[10px] uppercase tracking-[0.2em] text-zinc-500">
         {label}
       </div>
-      {title ? <div className="mt-3 text-lg font-semibold text-ink">{title}</div> : null}
-      {detail ? <div className="mt-2 text-sm leading-7 text-ink-muted">{detail}</div> : null}
+      {title ? <div className="mt-2 text-lg font-semibold text-white">{title}</div> : null}
+      {detail ? <div className="mt-1 text-xs text-zinc-400">{detail}</div> : null}
       {children}
     </div>
   );
@@ -276,7 +260,7 @@ export function CodePathBlock({
   return (
     <div>
       <div className="mb-2 text-[11px] uppercase tracking-wider text-ink-faint">{label}</div>
-      <pre className="bg-void-800 border border-void-600 overflow-x-auto rounded px-4 py-3 text-xs font-mono text-ink">
+      <pre className="bg-void-800 border border-void-700 overflow-x-auto rounded px-4 py-3 text-xs font-mono text-ink">
         <code>{code}</code>
       </pre>
     </div>
@@ -291,9 +275,9 @@ export function PromptBlock({
   content: string;
 }) {
   return (
-    <div className="bg-void-800 border border-void-600 rounded px-4 py-4">
+    <div className="bg-void-800 border border-void-700 rounded px-4 py-4">
       <div className="text-[11px] uppercase tracking-wider text-ink-faint">{label}</div>
-      <pre className="mt-3 overflow-x-auto whitespace-pre-wrap break-words rounded bg-void-950 border border-void-600 p-4 text-[12px] leading-6 font-mono text-ink-muted">
+      <pre className="mt-3 overflow-x-auto whitespace-pre-wrap break-words rounded bg-void-950 border border-void-700 p-4 text-[12px] leading-6 font-mono text-ink-muted">
         {content}
       </pre>
     </div>
@@ -315,7 +299,7 @@ export function ActionLink({
       className={cx(
         "inline-flex items-center px-4 py-2 text-xs font-medium rounded transition-colors",
         tone === "secondary"
-          ? "border border-void-600 text-ink-muted hover:border-void-500 hover:text-ink"
+          ? "border border-void-700 text-ink-muted hover:border-void-500 hover:text-ink"
           : "bg-accent text-white hover:bg-accent-glow"
       )}
     >

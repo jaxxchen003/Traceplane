@@ -1,30 +1,73 @@
 @import "tailwindcss";
 
-:root {
-  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    sans-serif;
-  --font-mono: "JetBrains Mono", "SF Mono", Monaco, "Cascadia Code",
-    "Courier New", monospace;
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  --color-void-950: #0c0c0f;
+  --color-void-900: #141417;
+  --color-void-800: #1c1c20;
+  --color-void-700: #27272a;
+  --color-void-600: #2e2e32;
+  --color-void-500: #3f3f46;
+  --color-void-400: #52525b;
+  --color-void-300: #71717a;
+
+  --color-ink: #e4e4e7;
+  --color-ink-muted: #a1a1aa;
+  --color-ink-faint: #71717a;
+  --color-ink-ghost: #52525b;
+  --color-ink-dim: #3f3f46;
+
+  --color-accent: #6366f1;
+  --color-accent-glow: #818cf8;
+  --color-accent-dim: rgba(99, 102, 241, 0.06);
+
+  --color-signal-neutral: #71717a;
+  --color-signal-info: #3b82f6;
+  --color-signal-warning: #f59e0b;
+  --color-signal-success: #22c55e;
+  --color-signal-error: #ef4444;
+
+  --font-sans: Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif;
+  --font-mono: "JetBrains Mono", "SF Mono", Monaco, "Cascadia Code", "Courier New", monospace;
+
+  --animate-status-pulse: status-pulse 2s ease-in-out infinite;
+}
+
+@layer base {
+  :root {
+    --bg-main: #0c0c0f;
+    --border-main: #27272a;
+    --surface: #141417;
+    --surface2: #1c1c20;
+    --radius-panel: 8px;
+  }
 }
 
 html {
   font-family: var(--font-sans);
-  background: #030303;
-  color: #fafafa;
+  background: var(--bg-main);
+  color: #e4e4e7;
 }
 
 body {
   margin: 0;
   min-height: 100dvh;
-  background: #030303;
-  color: #fafafa;
+  background: var(--bg-main);
+  color: #e4e4e7;
+}
+
+.glass {
+  background: var(--surface);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border-main);
 }
 
 .bg-dot {
   background-image: radial-gradient(
-    circle,
-    rgba(255, 255, 255, 0.03) 1px,
-    transparent 1px
+  circle,
+  rgba(255, 255, 255, 0.02) 1px,
+  transparent 1px
   );
   background-size: 24px 24px;
 }
@@ -47,19 +90,9 @@ pre {
   box-sizing: border-box;
 }
 
-/* Status pulse animation */
 @keyframes status-pulse {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-}
-
-.animate-status-pulse {
-  animation: status-pulse 2s ease-in-out infinite;
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
 }
 
 /* Scrollbar styling */
@@ -69,7 +102,7 @@ pre {
 }
 
 ::-webkit-scrollbar-track {
-  background: #0a0a0a;
+  background: var(--bg-main);
 }
 
 ::-webkit-scrollbar-thumb {
@@ -79,9 +112,4 @@ pre {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #444;
-}
-
-/* Table row hover */
-.hover-row:hover {
-  background: rgba(255, 255, 255, 0.02);
 }
