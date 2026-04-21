@@ -1,0 +1,67 @@
+# Claude Code + TracePlane 项目规则模板
+
+本文件是 TracePlane 自动追踪规则的用户示例。复制到你的项目根目录作为 `CLAUDE.md` 即可使用。
+
+## TracePlane 自动追踪规则
+
+- 当你提出**具体可执行的任务**时（实现、创建、修复、添加、重构等），自动创建 Episode
+- 任务目标提取你的意图，作为 Episode title 和 goal
+- 每次文件编辑后自动 append trace，记录修改内容
+- 每次重要决策后自动记录 Memory
+- 生成的代码文件自动注册为 Artifact
+- 任务完成时（你说"完成了"/"done"/"结束"）自动更新 Episode status 为 COMPLETED
+- 如果任务需要多个步骤，先创建 Episode 再执行
+- 优先使用自动追踪模式，除非你明确说"手动创建 Episode"
+
+## TracePlane 使用原则
+
+1. **Episode 作为工作单元** - 每个业务目标/交付物对应一个 Episode
+2. **开工前先查询** - 调用 `query_context` 了解已有上下文
+3. **关键事实写入 Memory** - 用 `write_memory` 记录重要发现和决策
+4. **关键步骤写入 Trace** - 用 `append_trace` 记录操作过程
+5. **产物注册为 Artifact** - 用 `create_artifact` 记录最终产出
+6. **状态真实变化时更新** - 不要为微步骤切换状态
+
+## Episode 创建判断
+
+**应该创建 Episode 的情况：**
+- 新的明确业务目标
+- 新的独立交付物
+- 新的审核或审批流程
+- 新的周期性工作单元
+
+**不要创建 Episode 的情况：**
+- 单次工具调用
+- 一次局部推理
+- 一条普通日志
+- 同一工作里的小改动
+
+## 状态规则
+
+使用这些主状态：`PLANNED` → `IN_PROGRESS` → `BLOCKED` / `IN_REVIEW` → `COMPLETED` / `FAILED`
+
+只有工作阶段真实变化时才切换状态。
+
+## 关系原则
+
+优先使用这些关系：
+- `DEPENDS_ON` - 依赖
+- `REVIEWS` - 审查
+- `SUPERSEDES` - 替代
+- `CONTINUES` - 继续
+- `SPLITS_FROM` - 分叉
+- `REFERENCES` - 引用
+
+如果关系不明确，不要强行建立。
+
+## 自定义
+
+根据你的项目情况调整规则：
+- 修改意图检测关键词以匹配你的工作流
+- 调整追踪粒度（更细或更粗）
+- 添加项目特定的状态转换规则
+
+## 相关资源
+
+- [TracePlane Auto-Tracker Skill](../examples/skills/traceplane-auto-tracker.md) - 完整的自动追踪 skill
+- [TracePlane 官网](https://traceplane.cc) - 更多信息

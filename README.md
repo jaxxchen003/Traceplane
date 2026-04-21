@@ -137,6 +137,44 @@ npm run mcp:host -- claude-code .mcp.json
 
 ---
 
+## 自动任务追踪（Auto-Tracker）
+
+不想每次都手动创建 Episode？安装 **Auto-Tracker Skill** 后，只需自然描述你的任务，系统自动检测意图并创建 Episode 开始追踪。
+
+### 安装
+
+```bash
+# 复制 skill 到 Claude Code 用户目录
+cp -r examples/skills/traceplane-auto-tracker.md ~/.claude/skills/
+
+# 或复制 CLAUDE.md 规则模板
+cp examples/CLAUDE.md.example CLAUDE.md
+```
+
+### 使用
+
+无需固定句式，自然表达即可：
+
+```
+你：帮我重写注册状态机的错误处理逻辑
+↓ 自动检测为实现任务
+↓ 自动创建 Episode 并开始追踪
+↓ 每次操作自动 trace
+↓ 说"完成了"自动标记 COMPLETED
+```
+
+### 两种方式对比
+
+| | Auto-Tracker Skill | CLAUDE.md 规则 |
+|---|---|---|
+| 创建时机 | Skill 检测到任务意图时自动 | Agent 判断后自动 |
+| 追踪精度 | 更精准的模式匹配 | 依赖 Agent 判断 |
+| 配置成本 | 需复制 Skill 文件 | 仅复制模板 |
+
+详见 [Auto-Tracker Skill](../examples/skills/traceplane-auto-tracker.md)
+
+---
+
 ## Agent 接入支持
 
 | Agent | SDK | MCP | 状态 |
