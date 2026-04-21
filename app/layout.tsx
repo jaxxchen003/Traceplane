@@ -15,7 +15,21 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-CN" className="dark">
-      <body>{children}</body>
+      <body>
+        {children}
+        {/* Google Analytics 4 - Measurement ID via env var */}
+        <script async src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || 'G-XXXXXXXXXX'}`} />
+        <script dangerouslySetInnerHTML={{
+          __html: `
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || 'G-XXXXXXXXXX'}', {
+              page_path: window.location.pathname,
+            });
+          `
+        }} />
+      </body>
     </html>
   );
 }
