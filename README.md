@@ -137,41 +137,20 @@ npm run mcp:host -- claude-code .mcp.json
 
 ---
 
-## 自动任务追踪（Auto-Tracker）
+## 数据与监控
 
-不想每次都手动创建 Episode？安装 **Auto-Tracker Skill** 后，只需自然描述你的任务，系统自动检测意图并创建 Episode 开始追踪。
+Traceplane 内置完整的使用分析能力，无需额外部署第三方工具。
 
-### 安装
+| 功能 | 位置 | 说明 |
+|------|------|------|
+| **Episode 统计** | `/projects` | 查看各项目的 Episode 数量、活跃度 |
+| **审计日志** | `/audit` | 权限拒绝、策略命中、关键读写事件 |
+| **实时事件流** | 项目详情页 | SSE 推送的实时执行事件 |
+| **Agent 接入状态** | `/connect` | 各 Host 的最新信号和接入状态 |
 
-```bash
-# 复制 skill 到 Claude Code 用户目录
-cp -r examples/skills/traceplane-auto-tracker.md ~/.claude/skills/
+**自托管友好**：所有数据存储在本地 SQLite/Postgres，不经过第三方服务器。
 
-# 或复制 CLAUDE.md 规则模板
-cp examples/CLAUDE.md.example CLAUDE.md
-```
-
-### 使用
-
-无需固定句式，自然表达即可：
-
-```
-你：帮我重写注册状态机的错误处理逻辑
-↓ 自动检测为实现任务
-↓ 自动创建 Episode 并开始追踪
-↓ 每次操作自动 trace
-↓ 说"完成了"自动标记 COMPLETED
-```
-
-### 两种方式对比
-
-| | Auto-Tracker Skill | CLAUDE.md 规则 |
-|---|---|---|
-| 创建时机 | Skill 检测到任务意图时自动 | Agent 判断后自动 |
-| 追踪精度 | 更精准的模式匹配 | 依赖 Agent 判断 |
-| 配置成本 | 需复制 Skill 文件 | 仅复制模板 |
-
-详见 [Auto-Tracker Skill](../examples/skills/traceplane-auto-tracker.md)
+如需接入外部分析，可配置 Google Analytics 4（`NEXT_PUBLIC_GA_MEASUREMENT_ID` in `.env`）。
 
 ---
 

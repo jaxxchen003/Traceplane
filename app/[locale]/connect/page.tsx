@@ -1,6 +1,6 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { HostSetupCard } from "@/components/host-setup-card";
 import { ContinuityLaunchpad } from "@/components/continuity-launchpad";
 import { GraphTheater } from "@/components/graph-theater";
 import { Panel } from "@/components/panel";
@@ -292,62 +292,13 @@ export default async function ConnectPage({
         layout="compact"
       />
 
-      <Panel title={locale === "zh" ? "Host Setup Matrix" : "Host Setup Matrix"} eyebrow={dict.nav.connect}>
-        <div className="grid gap-4 xl:grid-cols-3">
-          {hostCards.map((host) => (
-            <div
-              key={host.id}
-              className="rounded-[28px] border border-void-700 bg-white/5 px-5 py-5"
-            >
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <h2 className="text-xl font-semibold text-white">{host.name}</h2>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {host.level.map((tag) => (
-                      <span
-                        key={tag}
-                        className="rounded-full border border-void-700 bg-white/8 px-3 py-1 text-[11px] uppercase tracking-[0.16em] text-ink-muted"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-5 space-y-4 text-sm text-ink-muted">
-                <div className="rounded-[20px] border border-void-700 bg-white/6 px-4 py-4">
-                  <div className="text-[11px] uppercase tracking-[0.18em] text-ink-ghost">
-                    {locale === "zh" ? "最新信号" : "Latest signal"}
-                  </div>
-                  <div className="mt-2 text-sm leading-6 text-white">
-                    {connectSurface.hosts.find((item) => item.id === host.id)?.latestSignal ?? "—"}
-                  </div>
-                </div>
-                <div>
-                  <div className="mb-2 text-[11px] uppercase tracking-[0.18em] text-ink-ghost">
-                    {locale === "zh" ? "Setup" : "Setup"}
-                  </div>
-                  <pre className="overflow-x-auto rounded-[20px] border border-void-700 bg-slate-950/70 px-4 py-3 text-xs text-slate-100">
-                    <code>{host.setup}</code>
-                  </pre>
-                </div>
-                <div>
-                  <div className="mb-2 text-[11px] uppercase tracking-[0.18em] text-ink-ghost">
-                    {locale === "zh" ? "Verify" : "Verify"}
-                  </div>
-                  <pre className="overflow-x-auto rounded-[20px] border border-void-700 bg-slate-950/70 px-4 py-3 text-xs text-slate-100">
-                    <code>{host.verify}</code>
-                  </pre>
-                </div>
-                <div className="text-xs uppercase tracking-[0.16em] text-signal-info-200/80">
-                  {locale === "zh" ? "Quickstart" : "Quickstart"}: {host.quickstart}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </Panel>
+<Panel title={locale === "zh" ? "Host Setup Matrix" : "Host Setup Matrix"} eyebrow={dict.nav.connect}>
+  <div className="grid gap-4 xl:grid-cols-3">
+    {hostCards.map((host) => (
+      <HostSetupCard key={host.id} host={host} locale={locale} connectSurface={connectSurface} dict={dict} />
+    ))}
+  </div>
+</Panel>
     </div>
   );
 }
