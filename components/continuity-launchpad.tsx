@@ -55,7 +55,7 @@ export function ContinuityLaunchpad({
             label={locale === "zh" ? "直接打开 brief" : "Open the brief directly"}
             title={launchpad.episodeTitle}
             detail={launchpad.nextMove}
-            className="bg-void-900 border border-void-600 rounded"
+            className="bg-void-900 border border-void-700 rounded"
           >
             <p className="mt-2 text-sm text-ink-faint">{launchpad.projectName}</p>
             <div className="mt-5 flex flex-wrap gap-2">
@@ -67,7 +67,7 @@ export function ContinuityLaunchpad({
 
           <ContinuityCard
             label={locale === "zh" ? "把本地 packet 交给下一个 Agent" : "Pass the local packet to the next agent"}
-            className="bg-void-800 border border-void-600 rounded"
+            className="bg-void-800 border border-void-700 rounded"
           >
             <div className="mt-3 flex flex-wrap items-center gap-2">
               <SurfacePill tone={launchpad.packetExists ? "emerald" : "neutral"}>
@@ -90,7 +90,7 @@ export function ContinuityLaunchpad({
             detail={launchpad.packetInstruction}
             tone="amber"
           >
-            <div className="bg-void-900 border border-void-600 rounded mt-3 rounded px-3 py-3 text-sm leading-7 text-ink-muted">
+            <div className="bg-void-900 border border-void-700 rounded mt-3 rounded px-3 py-3 text-sm leading-7 text-ink-muted">
               {launchpad.modeLabel}
             </div>
           </ContinuityCard>
@@ -112,7 +112,7 @@ export function ContinuityLaunchpad({
             label={locale === "zh" ? "继续当前 brief" : "Continue from the brief"}
             title={launchpad.episodeTitle}
             detail={launchpad.nextMove}
-            className="bg-void-900 border border-void-600 rounded"
+            className="bg-void-900 border border-void-700 rounded"
           >
             <p className="mt-2 text-sm text-ink-faint">{launchpad.projectName}</p>
             <div className="mt-5 flex flex-wrap gap-2">
@@ -129,7 +129,7 @@ export function ContinuityLaunchpad({
 
           <ContinuityCard
             label={locale === "zh" ? "从本地 packet 继续" : "Continue from the local packet"}
-            className="bg-void-800 border border-void-600 rounded"
+            className="bg-void-800 border border-void-700 rounded"
           >
             <div className="mt-3 flex flex-wrap items-center gap-2">
               <SurfacePill tone={launchpad.packetExists ? "emerald" : "neutral"}>
@@ -147,7 +147,7 @@ export function ContinuityLaunchpad({
           </ContinuityCard>
         </div>
 
-        <div className="bg-void-800 border border-void-600 rounded mt-4 rounded px-4 py-4 text-sm leading-7 text-ink-muted">
+        <div className="bg-void-800 border border-void-700 rounded mt-4 rounded px-4 py-4 text-sm leading-7 text-ink-muted">
           {launchpad.packetInstruction}
         </div>
       </div>

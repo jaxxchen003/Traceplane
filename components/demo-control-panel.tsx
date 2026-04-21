@@ -24,7 +24,7 @@ type MemoryOption = {
 };
 
 function fieldClass() {
-  return "w-full rounded border border-white/10 bg-[linear-gradient(180deg,rgba(2,6,23,0.82),rgba(8,15,32,0.72))] px-3 py-2.5 text-sm text-ink outline-none transition focus:border-accent";
+  return "w-full rounded border border-void-700 bg-[linear-gradient(180deg,rgba(2,6,23,0.82),rgba(8,15,32,0.72))] px-3 py-2.5 text-sm text-ink outline-none transition focus:border-accent";
 }
 
 function labelClass() {
@@ -32,7 +32,7 @@ function labelClass() {
 }
 
 function checkItemClass() {
-  return "bg-void-800 border border-void-600 rounded flex items-center gap-2 rounded px-3 py-2 text-sm text-ink-muted";
+  return "bg-void-800 border border-void-700 rounded flex items-center gap-2 rounded px-3 py-2 text-sm text-ink-muted";
 }
 
 function messageClass(message: string) {

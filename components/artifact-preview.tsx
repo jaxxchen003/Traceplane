@@ -14,7 +14,7 @@ export function ArtifactPreview({
   content: string;
 }) {
   if (!content) {
-    return <div className="border border-dashed border-void-600 rounded rounded px-5 py-8 text-sm text-ink-ghost">No preview content</div>;
+    return <div className="border border-dashed border-void-700 rounded rounded px-5 py-8 text-sm text-ink-ghost">No preview content</div>;
   }
 
   if (type === "JSON") {
@@ -28,7 +28,7 @@ export function ArtifactPreview({
   if (type === "MARKDOWN") {
     const lines = content.split("\n").filter((line) => line.trim().length > 0);
     return (
-      <article className="bg-void-800 border border-void-600 rounded rounded p-6">
+      <article className="bg-void-800 border border-void-700 rounded rounded p-6">
         <div className="space-y-3">
           {lines.map((line, index) =>
             line.startsWith("#") ? (

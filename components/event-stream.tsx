@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface StreamEvent {
   id: string;
@@ -44,9 +45,7 @@ export function EventStream({
 
   const [events, setEvents] = useState<DisplayEvent[]>([]);
   const [connected, setConnected] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const eventSourceRef = useRef<EventSource | null>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const params = episodeId
@@ -59,195 +58,66 @@ export function EventStream({
     const es = new EventSource(url);
     eventSourceRef.current = es;
 
-    es.onopen = () => {
-      setConnected(true);
-      setError(null);
-    };
-
-    es.addEventListener("connected", () => {
-      setConnected(true);
-    });
-
+    es.onopen = () => setConnected(true);
     es.addEventListener("audit", (e) => {
       try {
         const data = JSON.parse(e.data) as StreamEvent;
-        const status: EventStatus =
-          data.data.result === "success"
-            ? "success"
-            : data.data.result === "warning"
-              ? "warning"
-              : "info";
+        const status: EventStatus = data.data.result === "success" ? "success" : data.data.result === "warning" ? "warning" : "info";
         const newEvent: DisplayEvent = {
           id: data.id,
-          time: new Date(data.occurredAt).toLocaleTimeString("en-US", {
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: false,
-          }),
+          time: new Date(data.occurredAt).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false }),
           type: "AUDIT",
           label: data.data.action || "unknown",
           status,
           val: data.data.result,
         };
-
-        setEvents((prev) => {
-          const next = [newEvent, ...prev];
-          return next.slice(0, maxEvents);
-        });
+        setEvents((prev) => [newEvent, ...prev].slice(0, maxEvents));
       } catch (err) {
         console.error("Failed to parse audit event:", err);
       }
     });
 
-    es.addEventListener("heartbeat", () => {
-      // Heartbeat event to keep connection alive
-    });
-
-    es.onerror = () => {
-      setConnected(false);
-      setError("Connection lost. Reconnecting...");
-    };
-
-    return () => {
-      es.close();
-      eventSourceRef.current = null;
-    };
+    es.onerror = () => setConnected(false);
+    return () => es.close();
   }, [episodeId, projectId, maxEvents]);
-
-  // Load historical events on mount
-  useEffect(() => {
-    const loadHistory = async () => {
-      try {
-        const params = episodeId
-          ? `episodeId=${episodeId}`
-          : projectId
-            ? `projectId=${projectId}`
-            : "";
-        const res = await fetch(`/api/audit?${params}`);
-        if (!res.ok) return;
-        const data = await res.json();
-
-        if (data.events?.length) {
-          const historyEvents: DisplayEvent[] = data.events
-            .slice(0, 20)
-            .map(
-              (ev: {
-                id: string;
-                occurredAt: string;
-                action: string;
-                result: string;
-              }) => {
-                const status: EventStatus =
-                  ev.result === "success"
-                    ? "success"
-                    : ev.result === "warning"
-                      ? "warning"
-                      : "info";
-                return {
-                  id: ev.id,
-                  time: new Date(ev.occurredAt).toLocaleTimeString("en-US", {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                    hour12: false,
-                  }),
-                  type: "AUDIT",
-                  label: ev.action,
-                  status,
-                  val: ev.result,
-                };
-              },
-            );
-
-          setEvents(historyEvents);
-        }
-      } catch (err) {
-        console.error("Failed to load history:", err);
-      }
-    };
-
-    loadHistory();
-  }, [episodeId, projectId]);
-
-  // Auto-scroll to show latest events
-  useEffect(() => {
-    if (containerRef.current) {
-      containerRef.current.scrollTop = 0;
-    }
-  }, [events.length]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "success":
-        return "text-signal-success";
-      case "warning":
-        return "text-signal-warning";
-      case "error":
-        return "text-signal-error";
-      case "ghost":
-        return "text-ink-faint";
-      default:
-        return "text-signal-info";
+      case "success": return "bg-emerald-500";
+      case "warning": return "bg-amber-500";
+      case "error": return "bg-rose-500";
+      default: return "bg-indigo-500";
     }
   };
 
   return (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span
-            className={`w-2 h-2 rounded-full ${
-              connected ? "bg-signal-success animate-pulse" : "bg-signal-error"
-            }`}
-          />
-          <span
-            className={`text-xs ${connected ? "text-signal-success" : "text-signal-error"}`}
-          >
-            {connected ? "Live" : error || "Connecting..."}
-          </span>
-        </div>
-        <span className="text-xs text-ink-faint">{events.length} events</span>
+    <div className="space-y-6">
+      <div className="flex items-center gap-2">
+        <span className={`w-2 h-2 rounded-full ${connected ? "bg-emerald-500 animate-pulse" : "bg-rose-500"}`} />
+        <span className="text-[10px] uppercase tracking-[0.2em] text-zinc-500">{connected ? "实时同步" : "连接中断"}</span>
       </div>
 
-      <div
-        ref={containerRef}
-        className="space-y-2 max-h-[300px] overflow-y-auto custom-scrollbar"
-      >
-        {events.length === 0 ? (
-          <div className="text-center text-ink-faint text-sm py-4">
-            No events yet
-          </div>
-        ) : (
-          events.map((ev) => (
-            <div
+      <div className="relative pl-4 space-y-6">
+        <div className="absolute left-[7px] top-2 bottom-0 w-[1px] bg-white/10" />
+        <AnimatePresence initial={false}>
+          {events.map((ev) => (
+            <motion.div
               key={ev.id}
-              className={`flex items-start gap-3 text-sm ${
-                ev.status === "ghost" ? "opacity-60" : ""
-              }`}
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="relative flex gap-4"
             >
-              <span className="text-ink-faint font-mono text-xs mt-0.5">
-                {ev.time}
-              </span>
-              <div className="flex-1 min-w-0">
-                <span
-                  className={`${getStatusColor(ev.status)} font-semibold text-xs`}
-                >
-                  {ev.type}
-                </span>
-                <span className="text-ink-muted ml-2 truncate">{ev.label}</span>
-                {ev.dur && (
-                  <span className="text-signal-success ml-2 font-mono text-xs">
-                    {ev.dur}
-                  </span>
-                )}
-                {ev.val && (
-                  <span className="text-signal-success ml-2 text-xs">
-                    {ev.val}
-                  </span>
-                )}
+              <div className={`absolute -left-[18px] top-1.5 w-3 h-3 rounded-full border-2 border-[#030303] ${getStatusColor(ev.status)}`} />
+              <div className="bg-void-900 rounded-lg p-3 flex-1 border border-void-700">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-[9px] font-mono text-zinc-500">{ev.time}</span>
+                  <span className="text-[9px] font-medium text-indigo-400">{ev.type}</span>
+                </div>
+                <div className="text-xs text-white">{ev.label}</div>
               </div>
-            </div>
-          ))
-        )}
+            </motion.div>
+          ))}
+        </AnimatePresence>
       </div>
     </div>
   );

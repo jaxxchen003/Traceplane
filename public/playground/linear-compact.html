@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Traceplane · Linear Compact</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0a0a;--fg:#fff;--muted:#8f8f8f;--dim:#555;--accent:#6366f1;--border:#1e1e1e;--surface:#141414;--surface2:#1a1a1a;--green:#22c55e;--blue:#3b82f6;--amber:#f59e0b;--red:#ef4444;--gray:#6b7280}
+body{background:var(--bg);color:var(--fg);font-family:'Inter',sans-serif;font-size:14px;line-height:1.5}
+.mono{font-family:'JetBrains Mono',monospace}
+
+nav{display:flex;align-items:center;gap:2rem;padding:0 1.5rem;height:44px;border-bottom:1px solid var(--border);background:var(--bg);position:sticky;top:0;z-index:100}
+nav .logo{font-weight:600;font-size:0.9rem;display:flex;align-items:center;gap:0.4rem;color:var(--fg)}
+nav .logo-icon{width:20px;height:20px;background:var(--accent);border-radius:4px;display:flex;align-items:center;justify-content:center}
+nav .logo-icon svg{width:12px;height:12px;color:#fff}
+nav a{color:var(--muted);text-decoration:none;font-size:0.8rem;transition:color 0.15s}
+nav a:hover{color:var(--fg)}
+nav a.active{color:var(--fg)}
+nav .right{margin-left:auto;display:flex;align-items:center;gap:1rem}
+nav .right .btn-sm{padding:4px 10px;background:var(--accent);color:#fff;border:none;border-radius:4px;font-size:0.78rem;font-weight:500;cursor:pointer}
+
+.layout{display:flex;min-height:calc(100vh - 44px)}
+.sidebar{width:220px;border-right:1px solid var(--border);padding:1rem 0;flex-shrink:0}
+.sidebar .group{margin-bottom:1.5rem}
+.sidebar .group-label{font-size:0.7rem;color:var(--dim);text-transform:uppercase;letter-spacing:0.1em;padding:0 1rem;margin-bottom:0.4rem}
+.sidebar .item{display:flex;align-items:center;gap:0.5rem;padding:0.35rem 1rem;font-size:0.82rem;color:var(--muted);cursor:pointer;transition:all 0.15s}
+.sidebar .item:hover{color:var(--fg);background:rgba(255,255,255,0.03)}
+.sidebar .item.active{color:var(--fg);background:rgba(99,102,241,0.08)}
+.sidebar .item .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.sidebar .item .count{margin-left:auto;font-size:0.72rem;color:var(--dim);font-family:'JetBrains Mono',monospace}
+
+.main{flex:1;padding:1.5rem 2rem;overflow:auto}
+
+.project-header{margin-bottom:1.5rem}
+.project-header .breadcrumb{font-size:0.78rem;color:var(--dim);margin-bottom:0.5rem}
+.project-header h1{font-size:1.5rem;font-weight:600;letter-spacing:-0.02em;display:flex;align-items:center;gap:0.75rem}
+.project-header h1 .id{font-size:0.75rem;color:var(--dim);font-family:'JetBrains Mono',monospace}
+.project-header .meta{display:flex;gap:1rem;margin-top:0.5rem;font-size:0.78rem;color:var(--muted)}
+.project-header .meta .status{display:flex;align-items:center;gap:0.3rem}
+.project-header .meta .status .dot{width:6px;height:6px;border-radius:50%}
+
+.metrics{display:flex;gap:2rem;margin-bottom:2rem;padding:1rem 0;border-bottom:1px solid var(--border)}
+.metrics .metric{display:flex;align-items:baseline;gap:0.4rem}
+.metrics .metric .num{font-size:1.5rem;font-weight:600;font-family:'JetBrains Mono',monospace}
+.metrics .metric .label{font-size:0.75rem;color:var(--dim);text-transform:uppercase;letter-spacing:0.08em}
+
+.list-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.75rem}
+.list-header h2{font-size:0.85rem;font-weight:600}
+.list-header .filters{display:flex;gap:0.25rem}
+.list-header .filters button{padding:3px 8px;font-size:0.72rem;border:1px solid var(--border);background:transparent;color:var(--muted);border-radius:3px;cursor:pointer;transition:all 0.15s}
+.list-header .filters button:hover{color:var(--fg);border-color:var(--dim)}
+.list-header .filters button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+.episode-list{border:1px solid var(--border);border-radius:4px;overflow:hidden}
+.episode-row{display:grid;grid-template-columns:80px 1fr 100px 70px 60px 80px;align-items:center;padding:0.6rem 1rem;border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.1s}
+.episode-row:last-child{border-bottom:none}
+.episode-row:hover{background:rgba(255,255,255,0.02)}
+.episode-row .status-cell{display:flex;align-items:center;gap:0.4rem;font-size:0.72rem;font-weight:500}
+.episode-row .status-cell .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.episode-row .title-cell .name{font-size:0.85rem;font-weight:500;margin-bottom:0.15rem}
+.episode-row .title-cell .sub{font-size:0.72rem;color:var(--dim)}
+.episode-row .agent-cell{font-size:0.78rem;color:var(--muted)}
+.episode-row .dur-cell{font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--muted)}
+.episode-row .art-cell{font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--dim)}
+.episode-row .time-cell{font-size:0.72rem;color:var(--dim)}
+
+.detail-panel{position:fixed;right:0;top:44px;bottom:0;width:420px;border-left:1px solid var(--border);background:var(--surface);z-index:50;display:none;overflow-y:auto}
+.detail-panel.open{display:block}
+.detail-panel .dp-header{padding:1rem 1.25rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:start}
+.detail-panel .dp-header h3{font-size:1rem;font-weight:600}
+.detail-panel .dp-header .close{color:var(--muted);cursor:pointer;font-size:1.2rem;line-height:1}
+.detail-panel .dp-body{padding:1.25rem}
+.detail-panel .dp-section{margin-bottom:1.5rem}
+.detail-panel .dp-section .label{font-size:0.7rem;color:var(--dim);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.5rem}
+.detail-panel .dp-timeline{position:relative;padding-left:20px}
+.detail-panel .dp-timeline::before{content:'';position:absolute;left:6px;top:0;bottom:0;width:1px;background:var(--border)}
+.detail-panel .dp-timeline .step{position:relative;padding:0.5rem 0 1rem 0.75rem;font-size:0.82rem}
+.detail-panel .dp-timeline .step::before{content:'';position:absolute;left:-17px;top:8px;width:8px;height:8px;border-radius:50%;background:var(--border);border:2px solid var(--surface)}
+.detail-panel .dp-timeline .step.current::before{background:var(--accent)}
+.detail-panel .dp-timeline .step .step-title{font-weight:500;margin-bottom:0.15rem}
+.detail-panel .dp-timeline .step .step-meta{font-size:0.72rem;color:var(--dim);font-family:'JetBrains Mono',monospace}
+
+.badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:3px;font-size:0.7rem;font-weight:500}
+.badge-active{background:rgba(59,130,246,0.1);color:var(--blue)}
+.badge-done{background:rgba(34,197,94,0.1);color:var(--green)}
+.badge-paused{background:rgba(245,158,11,0.1);color:var(--amber)}
+.badge-failed{background:rgba(239,68,68,0.1);color:var(--red)}
+.badge-planned{background:rgba(107,114,128,0.1);color:var(--gray)}
+
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.pulse{animation:pulse 2s ease-in-out infinite}
+
+@media(max-width:768px){
+  .sidebar{display:none}
+  .episode-row{grid-template-columns:60px 1fr 60px}
+  .episode-row .agent-cell,.episode-row .dur-cell,.episode-row .art-cell{display:none}
+  .detail-panel{width:100%}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">
+    <div class="logo-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+    </div>
+    Traceplane
+  </div>
+  <a href="#" class="active">Projects</a>
+  <a href="#">Episodes</a>
+  <a href="#">Agents</a>
+  <a href="#">Audit</a>
+  <div class="right">
+    <a href="#">Settings</a>
+    <button class="btn-sm">New Episode</button>
+  </div>
+</nav>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="group">
+      <div class="group-label">Workspace</div>
+      <div class="item active"><span class="dot" style="background:var(--green)"></span> Q2 Customer Pulse <span class="count">12</span></div>
+      <div class="item"><span class="dot" style="background:var(--blue)"></span> API Platform <span class="count">8</span></div>
+      <div class="item"><span class="dot" style="background:var(--amber)"></span> Data Pipeline <span class="count">5</span></div>
+      <div class="item"><span class="dot" style="background:var(--gray)"></span> Internal Tools <span class="count">3</span></div>
+    </div>
+    <div class="group">
+      <div class="group-label">Views</div>
+      <div class="item">📋 All Episodes</div>
+      <div class="item">🔄 Active Now</div>
+      <div class="item">⚠️ Needs Review</div>
+      <div class="item">📊 Analytics</div>
+    </div>
+    <div class="group">
+      <div class="group-label">Agents</div>
+      <div class="item"><span class="dot" style="background:var(--blue)"></span> Claude <span class="count">5</span></div>
+      <div class="item"><span class="dot" style="background:var(--amber)"></span> OpenCode <span class="count">4</span></div>
+      <div class="item"><span class="dot" style="background:var(--green)"></span> Gemini <span class="count">3</span></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="project-header">
+      <div class="breadcrumb">Projects /</div>
+      <h1>Q2 Customer Pulse <span class="id">q2-customer-pulse</span></h1>
+      <div class="meta">
+        <div class="status"><span class="dot" style="background:var(--green)"></span> Healthy</div>
+        <span>·</span>
+        <span>Last update: 2m ago</span>
+        <span>·</span>
+        <span>3 agents active</span>
+      </div>
+    </div>
+
+    <div class="metrics">
+      <div class="metric"><span class="num">12</span><span class="label">Episodes</span></div>
+      <div class="metric"><span class="num" style="color:var(--blue)">3</span><span class="label">Active</span></div>
+      <div class="metric"><span class="num" style="color:var(--green)">94%</span><span class="label">Success</span></div>
+      <div class="metric"><span class="num">48</span><span class="label">Artifacts</span></div>
+      <div class="metric"><span class="num">2.4m</span><span class="label">Avg Duration</span></div>
+    </div>
+
+    <div class="list-header">
+      <h2>Episodes</h2>
+      <div class="filters">
+        <button class="active">All</button>
+        <button>Active</button>
+        <button>Done</button>
+        <button>Failed</button>
+      </div>
+    </div>
+
+    <div class="episode-list">
+      <div class="episode-row" onclick="openDetail()">
+        <div class="status-cell"><span class="dot pulse" style="background:var(--blue)"></span> <span class="badge badge-active">active</span></div>
+        <div class="title-cell"><div class="name">Weekly Report Generation</div><div class="sub">Customer feedback analysis</div></div>
+        <div class="agent-cell">claude</div>
+        <div class="dur-cell mono">1.8m</div>
+        <div class="art-cell mono">5</div>
+        <div class="time-cell">2h ago</div>
+      </div>
+      <div class="episode-row">
+        <div class="status-cell"><span class="dot" style="background:var(--green)"></span> <span class="badge badge-done">done</span></div>
+        <div class="title-cell"><div class="name">Sensitive Document Check</div><div class="sub">Compliance audit</div></div>
+        <div class="agent-cell">opencode</div>
+        <div class="dur-cell mono">0.4m</div>
+        <div class="art-cell mono">2</div>
+        <div class="time-cell">5h ago</div>
+      </div>
+      <div class="episode-row">
+        <div class="status-cell"><span class="dot" style="background:var(--amber)"></span> <span class="badge badge-paused">paused</span></div>
+        <div class="title-cell"><div class="name">MCP Smoke Test</div><div class="sub">Integration testing</div></div>
+        <div class="agent-cell">gemini</div>
+        <div class="dur-cell mono">--</div>
+        <div class="art-cell mono">0</div>
+        <div class="time-cell">1d ago</div>
+      </div>
+      <div class="episode-row">
+        <div class="status-cell"><span class="dot" style="background:var(--green)"></span> <span class="badge badge-done">done</span></div>
+        <div class="title-cell"><div class="name">API Documentation Update</div><div class="sub">OpenAPI spec refresh</div></div>
+        <div class="agent-cell">claude</div>
+        <div class="dur-cell mono">3.2m</div>
+        <div class="art-cell mono">1</div>
+        <div class="time-cell">2d ago</div>
+      </div>
+      <div class="episode-row">
+        <div class="status-cell"><span class="dot" style="background:var(--red)"></span> <span class="badge badge-failed">failed</span></div>
+        <div class="title-cell"><div class="name">Database Migration</div><div class="sub">Schema v2 migration</div></div>
+        <div class="agent-cell">opencode</div>
+        <div class="dur-cell mono">0.1m</div>
+        <div class="art-cell mono">0</div>
+        <div class="time-cell">3d ago</div>
+      </div>
+      <div class="episode-row">
+        <div class="status-cell"><span class="dot" style="background:var(--green)"></span> <span class="badge badge-done">done</span></div>
+        <div class="title-cell"><div class="name">Customer Feedback Analysis</div><div class="sub">NLP sentiment scoring</div></div>
+        <div class="agent-cell">gemini</div>
+        <div class="dur-cell mono">4.1m</div>
+        <div class="art-cell mono">3</div>
+        <div class="time-cell">4d ago</div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="detail-panel" id="detailPanel">
+  <div class="dp-header">
+    <div>
+      <h3>Weekly Report Generation</h3>
+      <span class="badge badge-active" style="margin-top:4px">active</span>
+    </div>
+    <div class="close" onclick="closeDetail()">✕</div>
+  </div>
+  <div class="dp-body">
+    <div class="dp-section">
+      <div class="label">Info</div>
+      <div style="font-size:0.82rem;color:var(--muted);line-height:1.8">
+        <div>ID: <span class="mono" style="color:var(--dim)">cmn71a7ob</span></div>
+        <div>Agent: <span style="color:var(--blue)">claude-code</span></div>
+        <div>Duration: <span class="mono">1.8m</span></div>
+        <div>Artifacts: <span class="mono">5</span></div>
+      </div>
+    </div>
+    <div class="dp-section">
+      <div class="label">Timeline</div>
+      <div class="dp-timeline">
+        <div class="step current">
+          <div class="step-title">Initialize</div>
+          <div class="step-meta">14:32:01</div>
+        </div>
+        <div class="step current">
+          <div class="step-title">Fetch Customer Data</div>
+          <div class="step-meta">14:32:15 · 1.2s</div>
+        </div>
+        <div class="step">
+          <div class="step-title">Generate Report</div>
+          <div class="step-meta">14:33:02 · 0.8s</div>
+        </div>
+        <div class="step">
+          <div class="step-title">Create Artifact</div>
+          <div class="step-meta">14:33:10 · 0.3s</div>
+        </div>
+      </div>
+    </div>
+    <div class="dp-section">
+      <div class="label">Memory</div>
+      <div style="font-size:0.82rem;color:var(--muted);padding:0.5rem;background:var(--surface2);border:1px solid var(--border);border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:0.75rem">
+        customer_db_snapshot<br>
+        last_query_result<br>
+        report_template_v2
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function openDetail(){document.getElementById('detailPanel').classList.add('open')}
+function closeDetail(){document.getElementById('detailPanel').classList.remove('open')}
+
+document.querySelectorAll('.filters button').forEach(btn=>{
+  btn.addEventListener('click',function(){
+    this.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+    this.classList.add('active');
+  });
+});
+</script>
+</body>
+</html>

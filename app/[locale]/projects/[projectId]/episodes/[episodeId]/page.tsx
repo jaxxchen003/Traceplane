@@ -26,55 +26,56 @@ export default async function EpisodeReviewPage({
   const dict = getDictionary(locale);
 
   return (
-    <div className="space-y-6">
-      <div className="mb-8">
-        <div className="flex items-center gap-2 mb-2">
-          <span className="text-xs font-mono text-ink-faint uppercase tracking-wider">
-            Episode
-          </span>
-          <span className="font-mono text-xs text-ink-faint">{episodeId.slice(0, 8)}</span>
+    <div className="space-y-5">
+      <div>
+        <div className="flex items-center gap-1.5 text-xs text-ink-dim mb-2">
+          <Link href={`/${locale}/projects/${projectId}`} className="text-ink-faint hover:text-ink transition-colors">Projects</Link>
+          <span>/</span>
+          <Link href={`/${locale}/projects/${projectId}`} className="text-ink-faint hover:text-ink transition-colors">{episode.projectName}</Link>
+          <span>/</span>
+          <span className="text-ink-faint">{episodeId.slice(0, 8)}</span>
         </div>
-        <div className="flex items-baseline gap-4">
-          <h1 className="text-2xl font-semibold tracking-tight text-ink">
+        <div className="flex items-baseline gap-3">
+          <h1 className="text-xl font-semibold tracking-tight text-ink">
             {episode.title}
           </h1>
           <StatusBadge label={episode.status} raw={episode.status} />
         </div>
-        <p className="mt-3 text-sm text-ink-muted max-w-2xl">{episode.goal}</p>
-        <div className="mt-3 flex items-center gap-4 text-sm">
-          <span className="text-ink-muted">{episode.projectName}</span>
-          <span className="text-void-400">·</span>
-          <span className="text-ink-faint">{formatDuration(episode.startedAt, episode.endedAt)}</span>
-          <span className="text-void-400">·</span>
-          <span className="text-ink-faint">{episode.timeline.length} traces</span>
+        <p className="mt-2 text-sm text-ink-muted max-w-2xl">{episode.goal}</p>
+        <div className="mt-2 flex items-center gap-3 text-xs text-ink-faint">
+          <span>{episode.projectName}</span>
+          <span className="text-void-500">·</span>
+          <span className="font-mono">{formatDuration(episode.startedAt, episode.endedAt)}</span>
+          <span className="text-void-500">·</span>
+          <span className="font-mono">{episode.timeline.length} traces</span>
         </div>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <div className="bg-void-800 border border-void-600 rounded p-4">
-          <div className="text-xs font-medium text-ink-faint uppercase tracking-wider mb-2">
+        <div className="bg-void-900 border border-void-700 rounded-lg p-3">
+          <div className="text-[10px] font-medium text-ink-dim uppercase tracking-widest mb-1.5">
             Status
           </div>
-          <div className="text-lg font-semibold text-ink">{episode.status}</div>
+          <div className="text-base font-semibold text-ink">{episode.status}</div>
         </div>
-        <div className="bg-void-800 border border-void-600 rounded p-4">
-          <div className="text-xs font-medium text-ink-faint uppercase tracking-wider mb-2">
+        <div className="bg-void-900 border border-void-700 rounded-lg p-3">
+          <div className="text-[10px] font-medium text-ink-dim uppercase tracking-widest mb-1.5">
             Traces
           </div>
-          <div className="text-lg font-semibold font-mono text-ink">
+          <div className="text-base font-semibold font-mono text-ink">
             {episode.timeline.length}
           </div>
         </div>
-        <div className="bg-void-800 border border-void-600 rounded p-4">
-          <div className="text-xs font-medium text-ink-faint uppercase tracking-wider mb-2">
+        <div className="bg-void-900 border border-void-700 rounded-lg p-3">
+          <div className="text-[10px] font-medium text-ink-dim uppercase tracking-widest mb-1.5">
             Artifacts
           </div>
-          <div className="text-lg font-semibold font-mono text-ink">
+          <div className="text-base font-semibold font-mono text-ink">
             {episode.artifacts.length}
           </div>
         </div>
-        <div className="bg-void-800 border border-void-600 rounded p-4">
-          <div className="text-xs font-medium text-ink-faint uppercase tracking-wider mb-2">
+        <div className="bg-void-900 border border-void-700 rounded-lg p-3">
+          <div className="text-[10px] font-medium text-ink-dim uppercase tracking-widest mb-1.5">
             Policy
           </div>
           <div className="text-sm font-semibold text-ink truncate">
@@ -94,86 +95,86 @@ export default async function EpisodeReviewPage({
 
       <Panel title="Next Agent Handoff" eyebrow="Continue">
         <div className="space-y-4">
-          <div className="bg-void-800 border border-void-600 rounded p-4">
-            <div className="text-xs uppercase tracking-wider text-accent mb-2">
-              Latest Step
+        <div className="bg-void-900 border border-void-700 rounded-lg p-3">
+          <div className="text-[10px] uppercase tracking-widest text-accent mb-1.5">
+            Latest Step
+          </div>
+          <div className="font-semibold text-ink text-sm">
+            {episode.handoffSummary.latestStepTitle}
+          </div>
+          <div className="text-xs text-ink-muted mt-1">
+            {episode.handoffSummary.latestResult}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div className="bg-void-900 border border-void-700 rounded-lg p-3">
+            <div className="text-[10px] uppercase tracking-widest text-ink-dim mb-1.5">
+              Artifacts
             </div>
-            <div className="font-semibold text-ink">
-              {episode.handoffSummary.latestStepTitle}
-            </div>
-            <div className="text-sm text-ink-muted mt-1">
-              {episode.handoffSummary.latestResult}
+            <div className="font-semibold text-ink text-sm">
+              {episode.handoffSummary.latestArtifactTitle || "None"}
             </div>
           </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <div className="bg-void-800 border border-void-600 rounded p-4">
-              <div className="text-xs uppercase tracking-wider text-ink-faint mb-2">
-                Artifacts
-              </div>
-              <div className="font-semibold text-ink">
-                {episode.handoffSummary.latestArtifactTitle || "None"}
-              </div>
+          <div className="bg-void-900 border border-void-700 rounded-lg p-3">
+            <div className="text-[10px] uppercase tracking-widest text-ink-dim mb-1.5">
+              Handoff Ready
             </div>
-            <div className="bg-void-800 border border-void-600 rounded p-4">
-              <div className="text-xs uppercase tracking-wider text-ink-faint mb-2">
-                Handoff Ready
-              </div>
-              <div
-                className={`font-semibold ${
-                  episode.handoffSummary.readyForHandoff
-                    ? "text-signal-success"
-                    : "text-signal-warning"
-                }`}
-              >
-                {episode.handoffSummary.readyForHandoff ? "Yes" : "No"}
-              </div>
+            <div
+              className={`font-semibold text-sm ${
+                episode.handoffSummary.readyForHandoff
+                  ? "text-signal-success"
+                  : "text-signal-warning"
+              }`}
+            >
+              {episode.handoffSummary.readyForHandoff ? "Yes" : "No"}
             </div>
           </div>
+        </div>
 
-          <div className="bg-signal-success/5 border border-signal-success/20 rounded p-4">
-            <div className="text-xs uppercase tracking-wider text-signal-success mb-2">
-              Next Action
-            </div>
-            <div className="text-sm text-ink-muted">
-              {episode.handoffSummary.nextAction}
-            </div>
+        <div className="bg-signal-success/5 border border-signal-success/20 rounded-lg p-3">
+          <div className="text-[10px] uppercase tracking-widest text-signal-success mb-1.5">
+            Next Action
           </div>
+          <div className="text-xs text-ink-muted">
+            {episode.handoffSummary.nextAction}
+          </div>
+        </div>
 
-          <Link
-            href={`/${locale}/projects/${projectId}/episodes/new?forkFrom=${episodeId}`}
-            className="block w-full px-4 py-2.5 bg-accent text-white text-sm font-medium rounded hover:bg-accent-glow transition-colors text-center"
-          >
-            Fork Episode
-          </Link>
+        <Link
+          href={`/${locale}/projects/${projectId}/episodes/new?forkFrom=${episodeId}`}
+          className="block w-full px-4 py-2.5 bg-accent text-white text-sm font-medium rounded-md hover:bg-accent-glow transition-colors text-center"
+        >
+          Fork Episode
+        </Link>
         </div>
       </Panel>
 
       <Panel title="Audit Trail" eyebrow="Events">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <div className="text-center p-3 bg-void-800 border border-void-600 rounded">
-            <div className="text-2xl font-semibold font-mono text-ink">
+          <div className="text-center p-3 bg-void-900 border border-void-700 rounded-lg">
+            <div className="text-xl font-semibold font-mono text-ink">
               {episode.auditSummary.readCount}
             </div>
-            <div className="text-xs text-ink-faint mt-1">Reads</div>
+            <div className="text-[10px] text-ink-dim mt-1">Reads</div>
           </div>
-          <div className="text-center p-3 bg-void-800 border border-void-600 rounded">
-            <div className="text-2xl font-semibold font-mono text-ink">
+          <div className="text-center p-3 bg-void-900 border border-void-700 rounded-lg">
+            <div className="text-xl font-semibold font-mono text-ink">
               {episode.auditSummary.writeCount}
             </div>
-            <div className="text-xs text-ink-faint mt-1">Writes</div>
+            <div className="text-[10px] text-ink-dim mt-1">Writes</div>
           </div>
-          <div className="text-center p-3 bg-void-800 border border-void-600 rounded">
-            <div className="text-2xl font-semibold font-mono text-signal-error">
+          <div className="text-center p-3 bg-void-900 border border-void-700 rounded-lg">
+            <div className="text-xl font-semibold font-mono text-signal-error">
               {episode.auditSummary.permissionDeniedCount}
             </div>
-            <div className="text-xs text-ink-faint mt-1">Denied</div>
+            <div className="text-[10px] text-ink-dim mt-1">Denied</div>
           </div>
-          <div className="text-center p-3 bg-void-800 border border-void-600 rounded">
-            <div className="text-2xl font-semibold font-mono text-signal-warning">
+          <div className="text-center p-3 bg-void-900 border border-void-700 rounded-lg">
+            <div className="text-xl font-semibold font-mono text-signal-warning">
               {episode.auditSummary.policyHitCount}
             </div>
-            <div className="text-xs text-ink-faint mt-1">Policy</div>
+            <div className="text-[10px] text-ink-dim mt-1">Policy</div>
           </div>
         </div>
       </Panel>

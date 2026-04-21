@@ -1,706 +1,294 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Traceplane Design Playground · UX Style Explorer</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            surface: {
-              0: '#0a0a0a',
-              1: '#111111',
-              2: '#1a1a1a',
-              3: '#222222',
-              4: '#2a2a2a',
-            },
-            accent: {
-              DEFAULT: '#6366f1',
-              hover: '#818cf8',
-              subtle: 'rgba(99, 102, 241, 0.1)',
-            },
-            status: {
-              planned: '#6b7280',
-              active: '#3b82f6',
-              paused: '#f59e0b',
-              done: '#10b981',
-              failed: '#ef4444',
-            },
-          },
-          fontFamily: {
-            sans: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-            mono: ['SF Mono', 'Monaco', 'Cascadia Code', 'Courier New', 'monospace'],
-          },
-        }
-      }
-    }
-  </script>
-  <style>
-    body { background: #0a0a0a; color: #ffffff; }
-    .style-card { transition: all 0.3s ease; }
-    .style-card:hover { transform: translateY(-4px); }
-    .style-card.active { ring: 2px solid #6366f1; }
-    
-    /* Hide scrollbars but keep functionality */
-    .no-scrollbar::-webkit-scrollbar { display: none; }
-    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Traceplane Platform · Design Playground</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0a0a;--fg:#fafafa;--muted:#a1a1aa;--dim:#71717a;--accent:#6366f1;--accent2:#818cf8;--border:#27272a;--surface:#141414;--surface2:#1c1c1c}
+body{background:var(--bg);color:var(--fg);font-family:'Inter',sans-serif}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.fade{opacity:0;animation:fadeUp 0.5s ease forwards}
+.d1{animation-delay:0.1s}.d2{animation-delay:0.2s}.d3{animation-delay:0.3s}.d4{animation-delay:0.4s}
+
+header{border-bottom:1px solid var(--border);padding:1.5rem 2rem;max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:center}
+header .logo{font-weight:600;font-size:1rem;display:flex;align-items:center;gap:0.5rem}
+header .logo-icon{width:24px;height:24px;background:var(--accent);border-radius:5px;display:flex;align-items:center;justify-content:center}
+header .logo-icon svg{width:14px;height:14px;color:#fff}
+header .tag{font-size:0.72rem;color:var(--dim);padding:3px 10px;border:1px solid var(--border);border-radius:100px}
+
+main{max-width:1200px;margin:0 auto;padding:2rem}
+
+.intro{margin-bottom:3rem}
+.intro h1{font-size:1.75rem;font-weight:700;letter-spacing:-0.03em;margin-bottom:0.5rem}
+.intro p{color:var(--muted);font-size:0.9rem;line-height:1.7;max-width:640px}
+
+.section-label{font-size:0.68rem;color:var(--dim);text-transform:uppercase;letter-spacing:0.15em;margin-bottom:1.25rem;padding-bottom:0.5rem;border-bottom:1px solid var(--border)}
+
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;margin-bottom:1.5rem}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;transition:all 0.3s;cursor:pointer;position:relative}
+.card:hover{border-color:var(--accent);transform:translateY(-3px)}
+.card.selected{border-color:var(--accent)}
+.card.selected::after{content:'✓';position:absolute;top:12px;right:12px;width:24px;height:24px;background:var(--accent);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700}
+.card .preview{aspect-ratio:16/10;background:var(--surface2);position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.card .preview .mock{font-family:'JetBrains Mono',monospace;font-size:0.55rem;color:var(--dim);text-align:center;padding:0.75rem;line-height:1.7}
+.card .info{padding:1rem 1.25rem}
+.card .info h3{font-size:0.95rem;font-weight:600;margin-bottom:0.25rem;letter-spacing:-0.01em}
+.card .info .desc{font-size:0.72rem;color:var(--muted);line-height:1.55;margin-bottom:0.5rem}
+.card .info .meta{display:flex;gap:0.75rem;font-size:0.65rem;color:var(--dim)}
+.card .info .meta span{display:flex;align-items:center;gap:0.2rem}
+.card .info .meta .dot{width:5px;height:5px;border-radius:50%}
+
+.open-bar{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1rem 1.5rem;margin-bottom:2rem;display:none;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.75rem}
+.open-bar.visible{display:flex}
+.open-bar .ob-left{display:flex;align-items:center;gap:0.75rem}
+.open-bar .ob-left .ob-label{font-size:0.78rem;color:var(--muted)}
+.open-bar .ob-left .ob-name{font-weight:600;color:var(--fg)}
+.open-bar .ob-btns{display:flex;gap:0.5rem}
+.open-bar .ob-btns a{padding:7px 16px;border-radius:8px;font-size:0.82rem;font-weight:500;text-decoration:none;transition:all 0.2s;display:inline-flex;align-items:center;gap:0.4rem}
+.open-bar .ob-btns .btn-primary{background:var(--accent);color:#fff}
+.open-bar .ob-btns .btn-primary:hover{background:var(--accent2)}
+.open-bar .ob-btns .btn-secondary{border:1px solid var(--border);color:var(--muted)}
+.open-bar .ob-btns .btn-secondary:hover{border-color:var(--dim);color:var(--fg)}
+
+.compare-table{margin-top:2rem;margin-bottom:2rem;overflow-x:auto}
+.compare-table table{width:100%;border-collapse:collapse;font-size:0.78rem}
+.compare-table thead tr{border-bottom:2px solid var(--border);text-align:left}
+.compare-table th{padding:0.6rem 0.75rem;font-weight:500;color:var(--dim)}
+.compare-table td{padding:0.5rem 0.75rem;border-bottom:1px solid var(--border)}
+
+iframe{width:100%;height:80vh;border:1px solid var(--border);border-radius:8px;background:var(--surface)}
+
+@media(max-width:768px){
+  .cards{grid-template-columns:1fr}
+  header{flex-direction:column;gap:0.75rem;align-items:start}
+}
+</style>
 </head>
-<body class="min-h-screen font-sans">
-  <!-- Header -->
-  <header class="border-b border-surface-3 bg-surface-1 sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-6 py-4">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <div class="w-8 h-8 bg-accent rounded flex items-center justify-center">
-            <span class="text-white font-bold text-sm">TP</span>
-          </div>
-          <h1 class="text-xl font-semibold text-white">Design Playground</h1>
+<body>
+
+<header class="fade">
+  <div class="logo">
+    <div class="logo-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+    </div>
+    Traceplane · Platform Playground
+  </div>
+  <div class="tag">产品 UI</div>
+</header>
+
+<main>
+  <div class="intro fade d1">
+    <h1>平台 UI 设计方案对比</h1>
+    <p>以下 4 个方案分别采用不同的布局和信息密度策略，都遵循 DESIGN.md 深色主题 + 边框分隔 + 语义色彩的约束。点击选择，然后打开预览对比。</p>
+  </div>
+
+  <div class="section-label fade d2">选择方案</div>
+
+  <div class="cards fade d2">
+    <div class="card" onclick="selectCard(this,'premium-sentry')">
+      <div class="preview" style="background:#030303">
+        <div class="mock">
+          <span style="color:#6366f1">⚡ Traceplane</span><br>
+          <span style="color:#a1a1aa">Episodes: </span><span style="color:#fafafa">12</span><br>
+          <span style="color:#3b82f6">● active</span> <span style="color:#22c55e">● done</span><br>
+          <span style="color:#71717a">━━━━━━━━━━</span>
         </div>
-        <div class="text-sm text-gray-400">选择您偏好的 UX 样式</div>
+      </div>
+      <div class="info">
+        <h3>Premium Sentry</h3>
+        <div class="desc">Sentry 风格数据密集仪表盘。6 格 KPI + Episode 表格 + 事件流侧栏。dot-grid 背景，高信息密度。</div>
+        <div class="meta">
+          <span><div class="dot" style="background:#3b82f6"></div> 数据密集</span>
+          <span><div class="dot" style="background:#6366f1"></div> 侧栏布局</span>
+        </div>
       </div>
     </div>
-  </header>
 
-  <!-- Main Content -->
-  <main class="max-w-7xl mx-auto px-6 py-8">
-    
-    <!-- Style Selector Cards -->
-    <section class="mb-12">
-      <h2 class="text-lg font-medium text-gray-400 mb-6 uppercase tracking-wider text-xs">选择一种设计风格</h2>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        
-        <!-- Style 1: Linear Minimal -->
-        <div class="style-card border border-surface-3 rounded p-6 cursor-pointer bg-surface-1" onclick="showStyle('linear')">
-          <div class="flex items-center gap-3 mb-4">
-            <div class="w-3 h-3 rounded-full bg-status-active"></div>
-            <h3 class="text-lg font-semibold">Linear Minimal</h3>
-          </div>
-          <p class="text-sm text-gray-400 mb-4">极简主义，类似 Linear 的精确美学。高密度信息，零装饰，专注效率。</p>
-          <div class="space-y-2 text-xs text-gray-500">
-            <div class="flex justify-between">
-              <span>信息密度</span>
-              <span class="text-status-active">高</span>
-            </div>
-            <div class="flex justify-between">
-              <span>装饰元素</span>
-              <span class="text-status-planned">极少</span>
-            </div>
-            <div class="flex justify-between">
-              <span>适合场景</span>
-              <span>效率优先</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Style 2: Notion Warm -->
-        <div class="style-card border border-surface-3 rounded p-6 cursor-pointer bg-surface-1" onclick="showStyle('notion')">
-          <div class="flex items-center gap-3 mb-4">
-            <div class="w-3 h-3 rounded-full bg-status-paused"></div>
-            <h3 class="text-lg font-semibold">Notion Warm</h3>
-          </div>
-          <p class="text-sm text-gray-400 mb-4">温暖友好，类似 Notion 的协作感。适度留白，柔和色彩，适合长时工作。</p>
-          <div class="space-y-2 text-xs text-gray-500">
-            <div class="flex justify-between">
-              <span>信息密度</span>
-              <span class="text-status-active">中等</span>
-            </div>
-            <div class="flex justify-between">
-              <span>装饰元素</span>
-              <span class="text-status-active">适度</span>
-            </div>
-            <div class="flex justify-between">
-              <span>适合场景</span>
-              <span>协作友好</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Style 3: Sentry Data-Dense -->
-        <div class="style-card border border-surface-3 rounded p-6 cursor-pointer bg-surface-1" onclick="showStyle('sentry')">
-          <div class="flex items-center gap-3 mb-4">
-            <div class="w-3 h-3 rounded-full bg-status-done"></div>
-            <h3 class="text-lg font-semibold">Sentry Data-Dense</h3>
-          </div>
-          <p class="text-sm text-gray-400 mb-4">数据密集型，类似 Sentry 的仪表盘风格。技术感强，metrics 丰富，适合监控场景。</p>
-          <div class="space-y-2 text-xs text-gray-500">
-            <div class="flex justify-between">
-              <span>信息密度</span>
-              <span class="text-status-done">极高</span>
-            </div>
-            <div class="flex justify-between">
-              <span>装饰元素</span>
-              <span class="text-status-failed">最少</span>
-            </div>
-            <div class="flex justify-between">
-              <span>适合场景</span>
-              <span>监控运维</span>
-            </div>
-          </div>
+    <div class="card" onclick="selectCard(this,'linear-compact')">
+      <div class="preview" style="background:#0a0a0a">
+        <div class="mock">
+          <span style="color:#6366f1">◈</span> <span style="color:#fff;font-size:0.6rem">Traceplane</span><br>
+          <span style="color:#555">│ Q2 Pulse</span><br>
+          <span style="color:#8f8f8f">● ACT</span> <span style="color:#6b7280">● OK</span><br>
+          <span style="color:#555">━━━━━━━━━━</span>
         </div>
       </div>
-    </section>
-
-    <!-- Preview Area -->
-    <section class="border border-surface-3 rounded overflow-hidden bg-surface-0">
-      <div class="border-b border-surface-3 px-6 py-4 bg-surface-1">
-        <h3 class="text-sm font-medium text-gray-400 uppercase tracking-wider">实时预览</h3>
-      </div>
-      
-      <!-- Preview Container -->
-      <div id="preview-container" class="p-6">
-        <!-- Dynamic content will be injected here -->
-        <div class="text-center py-20 text-gray-500">
-          <p>点击上方卡片选择一种设计风格进行预览</p>
+      <div class="info">
+        <h3>Linear Compact</h3>
+        <div class="desc">Linear 风格极简导航。44px 顶栏 + 左侧项目树 + 紧凑表格 + 滑出详情面板。效率优先，零干扰。</div>
+        <div class="meta">
+          <span><div class="dot" style="background:#22c55e"></div> 效率优先</span>
+          <span><div class="dot" style="background:#6366f1"></div> 滑出面板</span>
         </div>
       </div>
-    </section>
+    </div>
 
-    <!-- Component Library -->
-    <section class="mt-12">
-      <h2 class="text-lg font-medium text-gray-400 mb-6 uppercase tracking-wider text-xs">组件库</h2>
-      
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        
-        <!-- Status Badges -->
-        <div class="border border-surface-3 rounded p-5 bg-surface-1">
-          <h3 class="text-sm font-medium mb-4 text-gray-400">Status Badges</h3>
-          <div class="flex flex-wrap gap-2">
-            <span class="px-2 py-1 rounded text-xs font-medium bg-status-planned/10 text-gray-400">Planned</span>
-            <span class="px-2 py-1 rounded text-xs font-medium bg-status-active/10 text-blue-400">Active</span>
-            <span class="px-2 py-1 rounded text-xs font-medium bg-status-paused/10 text-amber-400">Paused</span>
-            <span class="px-2 py-1 rounded text-xs font-medium bg-status-done/10 text-emerald-400">Done</span>
-            <span class="px-2 py-1 rounded text-xs font-medium bg-status-failed/10 text-red-400">Failed</span>
-          </div>
-        </div>
-
-        <!-- Buttons -->
-        <div class="border border-surface-3 rounded p-5 bg-surface-1">
-          <h3 class="text-sm font-medium mb-4 text-gray-400">Buttons</h3>
-          <div class="flex flex-wrap gap-2">
-            <button class="px-4 py-2 bg-accent text-white text-sm font-medium rounded hover:bg-accent-hover transition-colors">Primary</button>
-            <button class="px-4 py-2 border border-surface-3 text-gray-300 text-sm font-medium rounded hover:border-surface-4 hover:text-white transition-colors">Secondary</button>
-            <button class="px-4 py-2 text-gray-400 text-sm font-medium rounded hover:text-white transition-colors">Ghost</button>
-          </div>
-        </div>
-
-        <!-- Cards -->
-        <div class="border border-surface-3 rounded p-5 bg-surface-1">
-          <h3 class="text-sm font-medium mb-4 text-gray-400">Card Variants</h3>
-          <div class="space-y-2">
-            <div class="p-3 bg-surface-0 border border-surface-3 rounded text-sm">Card Level 0</div>
-            <div class="p-3 bg-surface-1 border border-surface-3 rounded text-sm">Card Level 1</div>
-            <div class="p-3 bg-surface-2 border border-surface-3 rounded text-sm">Card Level 2</div>
-          </div>
-        </div>
-
-        <!-- Timeline -->
-        <div class="border border-surface-3 rounded p-5 bg-surface-1 md:col-span-2 lg:col-span-1">
-          <h3 class="text-sm font-medium mb-4 text-gray-400">Timeline Pattern</h3>
-          <div class="relative pl-4 border-l-2 border-surface-3 space-y-4">
-            <div class="relative">
-              <div class="absolute -left-[21px] w-3 h-3 rounded-full bg-surface-3 border-2 border-surface-1"></div>
-              <div class="text-sm font-medium">Episode Created</div>
-              <div class="text-xs text-gray-500">2 hours ago</div>
-            </div>
-            <div class="relative">
-              <div class="absolute -left-[21px] w-3 h-3 rounded-full bg-accent border-2 border-surface-1"></div>
-              <div class="text-sm font-medium">Step 1: Initialize</div>
-              <div class="text-xs text-gray-500">1 hour ago</div>
-            </div>
-            <div class="relative">
-              <div class="absolute -left-[21px] w-3 h-3 rounded-full bg-status-done border-2 border-surface-1"></div>
-              <div class="text-sm font-medium">Step 2: Complete</div>
-              <div class="text-xs text-gray-500">30 mins ago</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Typography -->
-        <div class="border border-surface-3 rounded p-5 bg-surface-1">
-          <h3 class="text-sm font-medium mb-4 text-gray-400">Typography</h3>
-          <div class="space-y-2">
-            <div class="text-2xl font-semibold">Display</div>
-            <div class="text-xl font-semibold">Title 1</div>
-            <div class="text-lg font-semibold">Title 2</div>
-            <div class="text-sm">Body text regular</div>
-            <div class="text-xs text-gray-500">Caption / Meta</div>
-            <div class="text-xs font-mono text-accent">ID: ep-001</div>
-          </div>
-        </div>
-
-        <!-- Data Display -->
-        <div class="border border-surface-3 rounded p-5 bg-surface-1">
-          <h3 class="text-sm font-medium mb-4 text-gray-400">Data Display</h3>
-          <div class="space-y-3">
-            <div class="flex justify-between items-center py-2 border-b border-surface-3">
-              <span class="text-sm text-gray-400">Episodes</span>
-              <span class="text-sm font-mono font-medium">12</span>
-            </div>
-            <div class="flex justify-between items-center py-2 border-b border-surface-3">
-              <span class="text-sm text-gray-400">Artifacts</span>
-              <span class="text-sm font-mono font-medium">48</span>
-            </div>
-            <div class="flex justify-between items-center py-2">
-              <span class="text-sm text-gray-400">Agents</span>
-              <span class="text-sm font-mono font-medium">3</span>
-            </div>
-          </div>
+    <div class="card" onclick="selectCard(this,'tactical-ops')">
+      <div class="preview" style="background:#070a07">
+        <div class="mock">
+          <span style="color:#00ff66">⬡ TRACEPLANE</span><br>
+          <span style="color:#5a7a5a">│ ONLINE │ 3 AGT</span><br>
+          <span style="color:#00ff66">12</span> <span style="color:#00aaff">3</span> <span style="color:#2d3d2d">│</span> <span style="color:#ffaa00">⚠</span><br>
+          <span style="color:#1a2a1a">██████████</span>
         </div>
       </div>
-    </section>
-
-  </main>
-
-  <script>
-    // Style Templates
-    const styles = {
-      linear: {
-        name: 'Linear Minimal',
-        description: '极简主义，高密度信息，零装饰',
-        css: 'bg-surface-0 border-surface-3',
-        render: () => `
-          <div class="space-y-6">
-            <!-- Header -->
-            <div class="flex items-center justify-between border-b border-surface-3 pb-4">
-              <div>
-                <h1 class="text-2xl font-semibold mb-1">Q2 Customer Pulse</h1>
-                <p class="text-sm text-gray-500">Enterprise Agent Work Graph</p>
-              </div>
-              <div class="flex items-center gap-3">
-                <span class="px-2 py-1 rounded text-xs font-medium bg-status-active/10 text-blue-400">Active</span>
-                <button class="px-3 py-1.5 bg-accent text-white text-sm font-medium rounded">New Episode</button>
-              </div>
-            </div>
-            
-            <!-- Kanban -->
-            <div class="grid grid-cols-3 gap-4">
-              <div>
-                <div class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">To Do (3)</div>
-                <div class="space-y-2">
-                  <div class="p-3 bg-surface-1 border border-surface-3 rounded">
-                    <div class="text-sm font-medium mb-1">Customer Research</div>
-                    <div class="text-xs text-gray-500">EP-001 · 2 artifacts</div>
-                  </div>
-                  <div class="p-3 bg-surface-1 border border-surface-3 rounded">
-                    <div class="text-sm font-medium mb-1">Data Analysis</div>
-                    <div class="text-xs text-gray-500">EP-002 · 0 artifacts</div>
-                  </div>
-                </div>
-              </div>
-              <div>
-                <div class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">In Progress (2)</div>
-                <div class="space-y-2">
-                  <div class="p-3 bg-surface-1 border border-surface-3 rounded border-l-2 border-l-status-active">
-                    <div class="text-sm font-medium mb-1">Weekly Report</div>
-                    <div class="text-xs text-gray-500">EP-003 · 5 artifacts</div>
-                    <div class="mt-2 h-1 bg-surface-3 rounded overflow-hidden">
-                      <div class="h-full w-3/5 bg-status-active"></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div>
-                <div class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">Done (4)</div>
-                <div class="space-y-2">
-                  <div class="p-3 bg-surface-1 border border-surface-3 rounded opacity-60">
-                    <div class="text-sm font-medium mb-1">Q1 Review</div>
-                    <div class="text-xs text-gray-500 line-through">EP-000 · 12 artifacts</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Episode Detail -->
-            <div class="border border-surface-3 rounded p-4 mt-6">
-              <div class="flex items-start justify-between mb-4">
-                <div>
-                  <h2 class="text-lg font-semibold mb-1">Weekly Report Generation</h2>
-                  <div class="text-xs text-gray-500 font-mono">ID: cmn71a7ob · Agent: Claude</div>
-                </div>
-                <span class="px-2 py-1 rounded text-xs font-medium bg-status-active/10 text-blue-400">IN_PROGRESS</span>
-              </div>
-              
-              <!-- Timeline -->
-              <div class="mt-4 pt-4 border-t border-surface-3">
-                <div class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">Timeline</div>
-                <div class="relative pl-4 border-l-2 border-surface-3 space-y-4">
-                  <div class="relative">
-                    <div class="absolute -left-[21px] w-3 h-3 rounded-full bg-surface-3 border-2 border-surface-0"></div>
-                    <div class="text-sm">Initialize</div>
-                    <div class="text-xs text-gray-500">14:32:01</div>
-                  </div>
-                  <div class="relative">
-                    <div class="absolute -left-[21px] w-3 h-3 rounded-full bg-accent border-2 border-surface-0"></div>
-                    <div class="text-sm font-medium">Fetch Customer Data</div>
-                    <div class="text-xs text-gray-500">14:32:15 · 1.2s</div>
-                  </div>
-                  <div class="relative">
-                    <div class="absolute -left-[21px] w-3 h-3 rounded-full bg-status-done border-2 border-surface-0"></div>
-                    <div class="text-sm">Generate Report</div>
-                    <div class="text-xs text-gray-500">14:33:02 · 0.8s</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        `
-      },
-      
-      notion: {
-        name: 'Notion Warm',
-        description: '温暖友好，适度留白，协作感强',
-        css: 'bg-surface-0 border-surface-3',
-        render: () => `
-          <div class="space-y-8">
-            <!-- Header -->
-            <div class="text-center py-8">
-              <h1 class="text-3xl font-semibold mb-3">Q2 Customer Pulse</h1>
-              <p class="text-gray-400 max-w-lg mx-auto">Track and manage your enterprise agent workflows with clarity and context.</p>
-              <div class="mt-6 flex justify-center gap-3">
-                <button class="px-5 py-2.5 bg-accent text-white text-sm font-medium rounded-lg">Create Episode</button>
-                <button class="px-5 py-2.5 border border-surface-3 text-gray-300 text-sm font-medium rounded-lg">View Docs</button>
-              </div>
-            </div>
-
-            <!-- Stats Row -->
-            <div class="grid grid-cols-4 gap-4 py-6 border-y border-surface-3">
-              <div class="text-center">
-                <div class="text-3xl font-semibold text-white mb-1">12</div>
-                <div class="text-sm text-gray-500">Active Episodes</div>
-              </div>
-              <div class="text-center">
-                <div class="text-3xl font-semibold text-status-done mb-1">48</div>
-                <div class="text-sm text-gray-500">Artifacts</div>
-              </div>
-              <div class="text-center">
-                <div class="text-3xl font-semibold text-status-active mb-1">3</div>
-                <div class="text-sm text-gray-500">Agents</div>
-              </div>
-              <div class="text-center">
-                <div class="text-3xl font-semibold text-status-paused mb-1">2</div>
-                <div class="text-sm text-gray-500">Pending Review</div>
-              </div>
-            </div>
-            
-            <!-- Content Grid -->
-            <div class="grid grid-cols-2 gap-6">
-              <!-- Episode Card -->
-              <div class="bg-surface-1 rounded-xl p-6 border border-surface-3">
-                <div class="flex items-start justify-between mb-4">
-                  <div class="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center mb-3">
-                    <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                    </svg>
-                  </div>
-                  <span class="px-3 py-1 rounded-full text-xs font-medium bg-status-active/10 text-blue-400">In Progress</span>
-                </div>
-                <h3 class="text-lg font-semibold mb-2">Weekly Report Generation</h3>
-                <p class="text-sm text-gray-400 mb-4">Generate comprehensive weekly reports from customer feedback data.</p>
-                <div class="flex items-center gap-4 text-sm text-gray-500">
-                  <span>5 artifacts</span>
-                  <span>·</span>
-                  <span>3 steps</span>
-                  <span>·</span>
-                  <span class="font-mono text-xs">cmn71a7ob</span>
-                </div>
-                <div class="mt-4 pt-4 border-t border-surface-3 flex items-center justify-between">
-                  <div class="flex -space-x-2">
-                    <div class="w-8 h-8 rounded-full bg-surface-3 border-2 border-surface-1"></div>
-                    <div class="w-8 h-8 rounded-full bg-accent/30 border-2 border-surface-1"></div>
-                  </div>
-                  <span class="text-sm text-gray-500">Updated 2 hours ago</span>
-                </div>
-              </div>
-
-              <!-- Handoff Panel -->
-              <div class="bg-surface-1 rounded-xl p-6 border border-surface-3">
-                <div class="flex items-center gap-2 mb-4">
-                  <svg class="w-5 h-5 text-status-done" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
-                  </svg>
-                  <h3 class="text-lg font-semibold">Agent Handoff</h3>
-                </div>
-                <div class="space-y-4">
-                  <div class="p-4 bg-surface-0 rounded-lg border border-surface-3">
-                    <div class="text-xs text-gray-500 uppercase tracking-wider mb-2">Latest Step</div>
-                    <div class="text-sm font-medium mb-1">Generated customer report</div>
-                    <div class="text-xs text-gray-500">Ready to continue with next agent</div>
-                  </div>
-                  <div class="flex gap-2">
-                    <button class="flex-1 px-4 py-2 bg-accent text-white text-sm font-medium rounded-lg">Continue</button>
-                    <button class="px-4 py-2 border border-surface-3 text-gray-300 text-sm font-medium rounded-lg">Copy Brief</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Timeline Section -->
-            <div class="bg-surface-1 rounded-xl p-6 border border-surface-3">
-              <h3 class="text-lg font-semibold mb-6">Recent Activity</h3>
-              <div class="space-y-4">
-                <div class="flex items-start gap-4">
-                  <div class="w-8 h-8 rounded-full bg-status-done/10 flex items-center justify-center flex-shrink-0">
-                    <div class="w-2 h-2 rounded-full bg-status-done"></div>
-                  </div>
-                  <div class="flex-1 pb-4 border-b border-surface-3">
-                    <div class="flex items-center justify-between mb-1">
-                      <span class="font-medium">Step completed: Generate Report</span>
-                      <span class="text-sm text-gray-500">2 hours ago</span>
-                    </div>
-                    <p class="text-sm text-gray-400">Successfully generated weekly report with 5 sections and 12 data points.</p>
-                  </div>
-                </div>
-                <div class="flex items-start gap-4">
-                  <div class="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center flex-shrink-0">
-                    <div class="w-2 h-2 rounded-full bg-accent"></div>
-                  </div>
-                  <div class="flex-1 pb-4 border-b border-surface-3">
-                    <div class="flex items-center justify-between mb-1">
-                      <span class="font-medium">Episode created</span>
-                      <span class="text-sm text-gray-500">3 hours ago</span>
-                    </div>
-                    <p class="text-sm text-gray-400">New episode "Weekly Report Generation" created by Claude.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        `
-      },
-      
-      sentry: {
-        name: 'Sentry Data-Dense',
-        description: '数据密集型，技术感强，metrics 丰富',
-        css: 'bg-surface-0 border-surface-3',
-        render: () => `
-          <div class="space-y-4">
-            <!-- Top Bar -->
-            <div class="flex items-center justify-between py-2 border-b border-surface-3">
-              <div class="flex items-center gap-6">
-                <h1 class="text-xl font-semibold">Q2 Customer Pulse</h1>
-                <div class="flex items-center gap-4 text-sm">
-                  <span class="text-gray-500">Project:</span>
-                  <span class="font-mono text-accent">q2-customer-pulse</span>
-                  <span class="text-gray-500">ID:</span>
-                  <span class="font-mono">cmn71a7o9</span>
-                </div>
-              </div>
-              <div class="flex items-center gap-3">
-                <span class="flex items-center gap-2 px-2 py-1 rounded bg-status-active/10 text-status-active text-xs">
-                  <span class="w-1.5 h-1.5 rounded-full bg-status-active animate-pulse"></span>
-                  Healthy
-                </span>
-                <button class="px-3 py-1.5 bg-accent text-white text-xs font-medium rounded">+ New</button>
-              </div>
-            </div>
-
-            <!-- Metrics Grid -->
-            <div class="grid grid-cols-6 gap-3">
-              <div class="bg-surface-1 border border-surface-3 rounded p-3">
-                <div class="text-xs text-gray-500 uppercase mb-1">Episodes</div>
-                <div class="text-2xl font-semibold font-mono">12</div>
-                <div class="text-xs text-status-done mt-1">↑ 3 this week</div>
-              </div>
-              <div class="bg-surface-1 border border-surface-3 rounded p-3">
-                <div class="text-xs text-gray-500 uppercase mb-1">Active Now</div>
-                <div class="text-2xl font-semibold font-mono text-status-active">3</div>
-                <div class="text-xs text-gray-500 mt-1">Running</div>
-              </div>
-              <div class="bg-surface-1 border border-surface-3 rounded p-3">
-                <div class="text-xs text-gray-500 uppercase mb-1">Artifacts</div>
-                <div class="text-2xl font-semibold font-mono">48</div>
-                <div class="text-xs text-gray-500 mt-1">R2: 32 · Local: 16</div>
-              </div>
-              <div class="bg-surface-1 border border-surface-3 rounded p-3">
-                <div class="text-xs text-gray-500 uppercase mb-1">Success Rate</div>
-                <div class="text-2xl font-semibold font-mono text-status-done">94.2%</div>
-                <div class="w-full h-1 bg-surface-3 rounded mt-2">
-                  <div class="h-full bg-status-done rounded" style="width: 94.2%"></div>
-                </div>
-              </div>
-              <div class="bg-surface-1 border border-surface-3 rounded p-3">
-                <div class="text-xs text-gray-500 uppercase mb-1">Avg Duration</div>
-                <div class="text-2xl font-semibold font-mono">2.4m</div>
-                <div class="text-xs text-status-active mt-1">↓ 0.3m from avg</div>
-              </div>
-              <div class="bg-surface-1 border border-surface-3 rounded p-3">
-                <div class="text-xs text-gray-500 uppercase mb-1">Last Event</div>
-                <div class="text-lg font-semibold font-mono">2m</div>
-                <div class="text-xs text-gray-500 mt-1">ago</div>
-              </div>
-            </div>
-
-            <!-- Episode Table -->
-            <div class="bg-surface-1 border border-surface-3 rounded overflow-hidden">
-              <div class="px-4 py-3 border-b border-surface-3 bg-surface-2">
-                <div class="flex items-center justify-between">
-                  <span class="text-sm font-medium">Recent Episodes</span>
-                  <div class="flex items-center gap-2 text-xs">
-                    <span class="text-gray-500">Filter:</span>
-                    <button class="px-2 py-1 rounded bg-accent/10 text-accent">All</button>
-                    <button class="px-2 py-1 rounded hover:bg-surface-3">Active</button>
-                    <button class="px-2 py-1 rounded hover:bg-surface-3">Failed</button>
-                  </div>
-                </div>
-              </div>
-              <table class="w-full text-sm">
-                <thead>
-                  <tr class="border-b border-surface-3 text-xs text-gray-500 uppercase">
-                    <th class="px-4 py-2 text-left font-medium">Status</th>
-                    <th class="px-4 py-2 text-left font-medium">ID</th>
-                    <th class="px-4 py-2 text-left font-medium">Title</th>
-                    <th class="px-4 py-2 text-left font-medium">Agent</th>
-                    <th class="px-4 py-2 text-left font-medium">Duration</th>
-                    <th class="px-4 py-2 text-left font-medium">Artifacts</th>
-                    <th class="px-4 py-2 text-left font-medium">Time</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr class="border-b border-surface-3 hover:bg-surface-2/50">
-                    <td class="px-4 py-3">
-                      <span class="flex items-center gap-2">
-                        <span class="w-2 h-2 rounded-full bg-status-active animate-pulse"></span>
-                        <span class="text-status-active">active</span>
-                      </span>
-                    </td>
-                    <td class="px-4 py-3 font-mono text-xs text-gray-400">cmn71a7ob</td>
-                    <td class="px-4 py-3 font-medium">Weekly Report Generation</td>
-                    <td class="px-4 py-3 text-gray-400">claude</td>
-                    <td class="px-4 py-3 font-mono">1.8m</td>
-                    <td class="px-4 py-3">
-                      <span class="px-2 py-0.5 rounded bg-surface-3 text-xs">5</span>
-                    </td>
-                    <td class="px-4 py-3 text-gray-500 text-xs">2h ago</td>
-                  </tr>
-                  <tr class="border-b border-surface-3 hover:bg-surface-2/50">
-                    <td class="px-4 py-3">
-                      <span class="flex items-center gap-2">
-                        <span class="w-2 h-2 rounded-full bg-status-done"></span>
-                        <span class="text-status-done">done</span>
-                      </span>
-                    </td>
-                    <td class="px-4 py-3 font-mono text-xs text-gray-400">cmn71a7oc</td>
-                    <td class="px-4 py-3 font-medium">Sensitive Document Check</td>
-                    <td class="px-4 py-3 text-gray-400">opencode</td>
-                    <td class="px-4 py-3 font-mono">0.4m</td>
-                    <td class="px-4 py-3">
-                      <span class="px-2 py-0.5 rounded bg-surface-3 text-xs">2</span>
-                    </td>
-                    <td class="px-4 py-3 text-gray-500 text-xs">5h ago</td>
-                  </tr>
-                  <tr class="hover:bg-surface-2/50">
-                    <td class="px-4 py-3">
-                      <span class="flex items-center gap-2">
-                        <span class="w-2 h-2 rounded-full bg-status-paused"></span>
-                        <span class="text-status-paused">paused</span>
-                      </span>
-                    </td>
-                    <td class="px-4 py-3 font-mono text-xs text-gray-400">cmn74tcvb</td>
-                    <td class="px-4 py-3 font-medium">MCP Smoke Test</td>
-                    <td class="px-4 py-3 text-gray-400">gemini</td>
-                    <td class="px-4 py-3 font-mono">--</td>
-                    <td class="px-4 py-3">
-                      <span class="px-2 py-0.5 rounded bg-surface-3 text-xs">0</span>
-                    </td>
-                    <td class="px-4 py-3 text-gray-500 text-xs">1d ago</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <!-- Event Stream -->
-            <div class="grid grid-cols-2 gap-4">
-              <div class="bg-surface-1 border border-surface-3 rounded p-4">
-                <div class="text-xs text-gray-500 uppercase mb-3">Event Stream</div>
-                <div class="space-y-2 text-xs font-mono">
-                  <div class="flex items-center gap-3">
-                    <span class="text-gray-500">14:32:01</span>
-                    <span class="text-status-active">TRACE</span>
-                    <span class="text-gray-400">episode.initialize</span>
-                  </div>
-                  <div class="flex items-center gap-3">
-                    <span class="text-gray-500">14:32:15</span>
-                    <span class="text-status-done">TRACE</span>
-                    <span class="text-gray-400">tool.fetch_customer_data</span>
-                    <span class="text-status-done">1.2s</span>
-                  </div>
-                  <div class="flex items-center gap-3">
-                    <span class="text-gray-500">14:33:02</span>
-                    <span class="text-status-done">TRACE</span>
-                    <span class="text-gray-400">artifact.generate_report</span>
-                    <span class="text-status-done">0.8s</span>
-                  </div>
-                  <div class="flex items-center gap-3 opacity-50">
-                    <span class="text-gray-500">14:33:10</span>
-                    <span class="text-gray-500">AUDIT</span>
-                    <span class="text-gray-400">permission.check</span>
-                    <span class="text-status-done">allow</span>
-                  </div>
-                </div>
-              </div>
-              <div class="bg-surface-1 border border-surface-3 rounded p-4">
-                <div class="text-xs text-gray-500 uppercase mb-3">System Health</div>
-                <div class="space-y-3">
-                  <div>
-                    <div class="flex justify-between text-xs mb-1">
-                      <span class="text-gray-400">Database</span>
-                      <span class="text-status-done">OK</span>
-                    </div>
-                    <div class="h-1 bg-surface-3 rounded"><div class="h-full w-full bg-status-done rounded"></div></div>
-                  </div>
-                  <div>
-                    <div class="flex justify-between text-xs mb-1">
-                      <span class="text-gray-400">R2 Storage</span>
-                      <span class="text-status-done">OK</span>
-                    </div>
-                    <div class="h-1 bg-surface-3 rounded"><div class="h-full w-full bg-status-done rounded"></div></div>
-                  </div>
-                  <div>
-                    <div class="flex justify-between text-xs mb-1">
-                      <span class="text-gray-400">Hook Bridge</span>
-                      <span class="text-status-active">Active</span>
-                    </div>
-                    <div class="h-1 bg-surface-3 rounded"><div class="h-full w-3/4 bg-status-active rounded"></div></div>
-                  </div>
-                  <div>
-                    <div class="flex justify-between text-xs mb-1">
-                      <span class="text-gray-400">Queue</span>
-                      <span class="text-gray-500">0 pending</span>
-                    </div>
-                    <div class="h-1 bg-surface-3 rounded"><div class="h-full w-full bg-surface-4 rounded"></div></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        `
-      }
-    };
-
-    function showStyle(styleKey) {
-      const container = document.getElementById('preview-container');
-      const style = styles[styleKey];
-      
-      // Update active state on cards
-      document.querySelectorAll('.style-card').forEach(card => {
-        card.classList.remove('active', 'border-accent');
-        card.classList.add('border-surface-3');
-      });
-      event.currentTarget.classList.add('active', 'border-accent');
-      event.currentTarget.classList.remove('border-surface-3');
-      
-      // Render preview
-      container.innerHTML = `
-        <div class="${style.css}">
-          ${style.render()}
+      <div class="info">
+        <h3>Tactical OPS</h3>
+        <div class="desc">军事战术风格。绿色终端色系，4 栏布局（图标栏+项目树+主区+事件流）。实时时钟，状态码缩写，CRT 扫描线。</div>
+        <div class="meta">
+          <span><div class="dot" style="background:#00ff66"></div> 战术风格</span>
+          <span><div class="dot" style="background:#ffaa00"></div> 4栏布局</span>
         </div>
-      `;
-    }
-  </script>
+      </div>
+    </div>
+  </div>
+
+  <div class="cards fade d3">
+    <div class="card" onclick="selectCard(this,'data-matrix')">
+      <div class="preview" style="background:#0c0c0f">
+        <div class="mock">
+          <span style="color:#6366f1">⚡</span> <span style="color:#e4e4e7">Traceplane</span><br>
+          <span style="color:#71717a">Episodes </span><span style="color:#e4e4e7;font-weight:600">12</span><br>
+          <span style="color:#3b82f6">active</span> <span style="color:#22c55e">done</span> <span style="color:#ef4444">failed</span><br>
+          <span style="color:#27272a">──────────────</span>
+        </div>
+      </div>
+      <div class="info">
+        <h3>Data Matrix</h3>
+        <div class="desc">现代 SaaS 仪表盘风格。Inter + JetBrains Mono，8px 圆角卡片，hover 微辉光，6 格 KPI + 表格 + 侧栏堆叠。兼顾美学和密度。</div>
+        <div class="meta">
+          <span><div class="dot" style="background:#6366f1"></div> 现代 SaaS</div>
+          <span><div class="dot" style="background:#818cf8"></div> 平衡美学</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="open-bar fade d4" id="actionBar">
+    <div class="ob-left">
+      <div class="ob-label">已选择：</div>
+      <div class="ob-name" id="selectedName">—</div>
+    </div>
+    <div class="ob-btns">
+      <a href="#" id="previewBtn" class="btn-primary" target="_blank">打开预览 →</a>
+      <a href="#" class="btn-secondary" onclick="openCompare();return false">并排对比</a>
+    </div>
+  </div>
+
+  <div class="compare-table fade d4">
+    <table>
+      <thead>
+        <tr>
+          <th>维度</th>
+          <th style="color:var(--accent)">Premium Sentry</th>
+          <th style="color:var(--fg)">Linear Compact</th>
+          <th style="color:#00ff66">Tactical OPS</th>
+          <th style="color:var(--accent2)">Data Matrix</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="color:var(--dim)">布局</td>
+          <td>顶栏 + 3栏（表格+侧栏）</td>
+          <td>44px顶栏 + 侧栏树 + 主区 + 滑出面板</td>
+          <td>4栏（图标+树+主+事件流）</td>
+          <td>顶栏 + 6格KPI + 表格 + 侧栏堆叠</td>
+        </tr>
+        <tr>
+          <td style="color:var(--dim)">字体</td>
+          <td>Inter + JetBrains Mono</td>
+          <td>Inter + JetBrains Mono</td>
+          <td>Share Tech Mono + Barlow</td>
+          <td>Inter + JetBrains Mono</td>
+        </tr>
+        <tr>
+          <td style="color:var(--dim)">圆角</td>
+          <td>2-4px</td>
+          <td>3-4px</td>
+          <td>0-1px</td>
+          <td>4-8px</td>
+        </tr>
+        <tr>
+          <td style="color:var(--dim)">信息密度</td>
+          <td>极高</td>
+          <td>高（紧凑行高）</td>
+          <td>极高（4栏）</td>
+          <td>高（留呼吸空间）</td>
+        </tr>
+        <tr>
+          <td style="color:var(--dim)">交互特色</td>
+          <td>脉冲动画 + 过滤器</td>
+          <td>滑出详情面板</td>
+          <td>实时时钟 + 状态码</td>
+          <td>Hover 辉光 + 渐变条</td>
+        </tr>
+        <tr>
+          <td style="color:var(--dim)">氛围</td>
+          <td>工业监控</td>
+          <td>极简效率</td>
+          <td>军事战术</td>
+          <td>现代 SaaS</td>
+        </tr>
+        <tr>
+          <td style="color:var(--dim)">背景色</td>
+          <td>#030303</td>
+          <td>#0a0a0a</td>
+          <td>#070a07（绿调）</td>
+          <td>#0c0c0f（蓝调）</td>
+        </tr>
+        <tr>
+          <td style="color:var(--dim)">适合场景</td>
+          <td>运维监控台</td>
+          <td>日常高频操作</td>
+          <td>硬核/展示场景</td>
+          <td>通用/商业场景</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div>
+    <h2 style="font-size:1.1rem;font-weight:600;margin-bottom:0.5rem">实时预览</h2>
+    <p style="font-size:0.82rem;color:var(--muted);margin-bottom:1rem">在下方 iframe 中预览选中的方案</p>
+    <iframe id="previewFrame" src="about:blank" style="background:var(--surface)"></iframe>
+  </div>
+</main>
+
+<script>
+const schemes={
+  'premium-sentry':{name:'Premium Sentry',file:'premium-sentry.html'},
+  'linear-compact':{name:'Linear Compact',file:'linear-compact.html'},
+  'tactical-ops':{name:'Tactical OPS',file:'tactical-ops.html'},
+  'data-matrix':{name:'Data Matrix',file:'data-matrix.html'}
+};
+let selected=null;
+
+function selectCard(el,key){
+  document.querySelectorAll('.card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  selected=key;
+  const s=schemes[key];
+  document.getElementById('selectedName').textContent=s.name;
+  document.getElementById('actionBar').classList.add('visible');
+  document.getElementById('previewBtn').href=s.file;
+  document.getElementById('previewFrame').src=s.file;
+}
+
+function openCompare(){
+  const w=window.open('','_blank','width=1400,height=900');
+  let html='<!DOCTYPE html><html><head><title>Traceplane 平台方案对比</title><style>';
+  html+='*{margin:0;padding:0;box-sizing:border-box}body{background:#0a0a0a;font-family:Inter,sans-serif;display:grid;grid-template-columns:1fr 1fr;gap:0;height:100vh}';
+  html+='iframe{width:100%;height:50%;border:none;border-bottom:1px solid #222}iframe:nth-child(2){border-right:1px solid #222}';
+  html+='</style></head><body>';
+  Object.values(schemes).forEach(s=>{html+='<iframe src="'+s.file+'"></iframe>'});
+  html+='</body></html>';
+  w.document.write(html);
+  w.document.close();
+}
+</script>
 </body>
 </html>

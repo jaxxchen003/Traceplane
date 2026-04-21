@@ -8,11 +8,19 @@ coverage
 .env.production
 .claude
 .gemini
+.agent-work-graph
+.omx
 opencode.jsonc
+tsconfig.tsbuildinfo
 prisma/dev.db
 prisma/dev.db-journal
-.agent-work-graph
 *.log
 .vercel
 .turbo
 !.env.example
+
+# Internal dev files
+原始讨论记录.md
+task_plan.md
+findings.md
+progress.md

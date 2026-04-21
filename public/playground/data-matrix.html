@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Traceplane · Data Matrix</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0c0c0f;--fg:#e4e4e7;--muted:#71717a;--dim:#3f3f46;--accent:#6366f1;--accent2:#818cf8;--accent-dim:rgba(99,102,241,0.06);--border:#27272a;--surface:#141417;--surface2:#1c1c20;--green:#22c55e;--blue:#3b82f6;--amber:#f59e0b;--red:#ef4444;--gray:#71717a}
+body{background:var(--bg);color:var(--fg);font-family:'Inter',sans-serif;font-size:13px;line-height:1.5}
+.mono{font-family:'JetBrains Mono',monospace}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+@keyframes pulse-soft{0%,100%{opacity:1}50%{opacity:0.5}}
+.pulse-soft{animation:pulse-soft 2.5s ease-in-out infinite}
+
+nav{height:48px;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 1.5rem;gap:1rem;background:var(--bg);position:sticky;top:0;z-index:100;backdrop-filter:blur(8px)}
+nav .logo{font-weight:600;font-size:0.92rem;display:flex;align-items:center;gap:0.5rem}
+nav .logo-icon{width:22px;height:22px;background:var(--accent);border-radius:5px;display:flex;align-items:center;justify-content:center}
+nav .logo-icon svg{width:13px;height:13px;color:#fff}
+nav .divider{width:1px;height:20px;background:var(--border)}
+nav .tabs{display:flex;gap:0}
+nav .tabs a{padding:0 0.75rem;font-size:0.82rem;color:var(--muted);text-decoration:none;height:48px;display:flex;align-items:center;border-bottom:2px solid transparent;transition:all 0.15s}
+nav .tabs a:hover{color:var(--fg)}
+nav .tabs a.active{color:var(--fg);border-color:var(--accent)}
+nav .right{margin-left:auto;display:flex;align-items:center;gap:0.75rem}
+nav .right .search{padding:5px 10px;background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:0.78rem;width:180px;outline:none;font-family:inherit}
+nav .right .search:focus{border-color:var(--accent);color:var(--fg)}
+nav .right .avatar{width:28px;height:28px;background:var(--surface2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.7rem;color:var(--muted);border:1px solid var(--border)}
+
+.page{max-width:1400px;margin:0 auto;padding:1.5rem 2rem}
+
+.breadcrumb{font-size:0.75rem;color:var(--dim);margin-bottom:0.75rem;display:flex;align-items:center;gap:0.4rem}
+.breadcrumb a{color:var(--muted);text-decoration:none}
+.breadcrumb a:hover{color:var(--fg)}
+
+.project-top{display:flex;justify-content:space-between;align-items:start;margin-bottom:1.75rem}
+.project-top .info h1{font-size:1.35rem;font-weight:600;letter-spacing:-0.02em;display:flex;align-items:center;gap:0.6rem}
+.project-top .info h1 .slug{font-size:0.72rem;color:var(--dim);font-family:'JetBrains Mono',monospace}
+.project-top .info .tags{display:flex;gap:0.5rem;margin-top:0.4rem}
+.project-top .info .tag{font-size:0.68rem;padding:2px 8px;border-radius:4px;border:1px solid var(--border);color:var(--muted);display:flex;align-items:center;gap:0.3rem}
+.project-top .info .tag .dot{width:5px;height:5px;border-radius:50%}
+.project-top .actions{display:flex;gap:0.5rem}
+.project-top .actions button{padding:6px 14px;font-size:0.78rem;border-radius:6px;cursor:pointer;font-family:inherit;font-weight:500;transition:all 0.15s}
+.project-top .actions .btn-p{background:var(--accent);color:#fff;border:none}
+.project-top .actions .btn-p:hover{background:var(--accent2)}
+.project-top .actions .btn-s{background:transparent;color:var(--muted);border:1px solid var(--border)}
+.project-top .actions .btn-s:hover{border-color:var(--dim);color:var(--fg)}
+
+.kpi-row{display:grid;grid-template-columns:repeat(6,1fr);gap:0.75rem;margin-bottom:1.75rem}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:1rem;position:relative;overflow:hidden}
+.kpi::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:0}
+.kpi:hover::after{opacity:1}
+.kpi .kpi-label{font-size:0.65rem;color:var(--dim);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.5rem}
+.kpi .kpi-val{font-size:1.65rem;font-weight:600;font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;letter-spacing:-0.02em}
+.kpi .kpi-change{font-size:0.68rem;margin-top:0.25rem;font-family:'JetBrains Mono',monospace}
+.kpi .kpi-bar{height:2px;background:var(--border);border-radius:1px;margin-top:0.5rem;overflow:hidden}
+.kpi .kpi-bar .fill{height:100%;border-radius:1px;transition:width 0.5s ease}
+
+.content-grid{display:grid;grid-template-columns:1fr 360px;gap:1.25rem}
+
+.table-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.table-card .tc-header{padding:0.75rem 1rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.table-card .tc-header h2{font-size:0.85rem;font-weight:600}
+.table-card .tc-header .tc-filters{display:flex;gap:0.25rem}
+.table-card .tc-header .tc-filters button{padding:3px 8px;font-size:0.7rem;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--dim);cursor:pointer;transition:all 0.15s}
+.table-card .tc-header .tc-filters button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.table-card .tc-header .tc-filters button:hover:not(.active){color:var(--fg);border-color:var(--dim)}
+
+.ep-table{width:100%;border-collapse:collapse}
+.ep-table th{font-size:0.65rem;color:var(--dim);text-transform:uppercase;letter-spacing:0.1em;font-weight:500;text-align:left;padding:0.6rem 1rem;border-bottom:1px solid var(--border);background:var(--surface2)}
+.ep-table td{padding:0.65rem 1rem;border-bottom:1px solid var(--border);font-size:0.82rem;vertical-align:middle}
+.ep-table tr:last-child td{border-bottom:none}
+.ep-table tr{cursor:pointer;transition:background 0.1s}
+.ep-table tr:hover{background:var(--accent-dim)}
+.ep-table .status{display:flex;align-items:center;gap:0.4rem;font-size:0.72rem;font-weight:500}
+.ep-table .status .pip{width:6px;height:6px;border-radius:2px}
+.ep-table .ep-name{font-weight:500}
+.ep-table .ep-sub{font-size:0.7rem;color:var(--dim);margin-top:0.1rem}
+.ep-table .ep-agent{font-size:0.78rem;color:var(--muted);display:flex;align-items:center;gap:0.35rem}
+.ep-table .ep-agent .avatar-sm{width:18px;height:18px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:0.6rem;font-weight:600}
+.ep-table .mono-cell{font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--dim)}
+.ep-table .art-badge{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:20px;padding:0 5px;background:var(--surface2);border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:var(--dim)}
+
+.side-stack{display:flex;flex-direction:column;gap:1rem}
+.side-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.side-card .sc-header{padding:0.6rem 0.85rem;border-bottom:1px solid var(--border);font-size:0.78rem;font-weight:600;display:flex;justify-content:space-between;align-items:center}
+.side-card .sc-header .sc-badge{font-size:0.6rem;padding:1px 6px;background:var(--accent-dim);color:var(--accent);border-radius:3px;font-family:'JetBrains Mono',monospace}
+.side-card .sc-body{padding:0.85rem}
+
+.event-list{font-size:0.78rem}
+.event-list .ev-item{display:flex;align-items:start;gap:0.6rem;padding:0.4rem 0;border-bottom:1px solid var(--border)}
+.event-list .ev-item:last-child{border-bottom:none}
+.event-list .ev-ts{font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:var(--dim);min-width:36px;flex-shrink:0}
+.event-list .ev-type{font-family:'JetBrains Mono',monospace;font-size:0.65rem;font-weight:600;min-width:36px;flex-shrink:0}
+.event-list .ev-type.trace{color:var(--blue)}
+.event-list .ev-type.audit{color:var(--dim)}
+.event-list .ev-type.mem{color:var(--accent)}
+.event-list .ev-msg{color:var(--muted);font-size:0.75rem}
+.event-list .ev-dur{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:0.68rem;flex-shrink:0}
+
+.health-list .h-item{margin-bottom:0.65rem}
+.health-list .h-item:last-child{margin-bottom:0}
+.health-list .h-top{display:flex;justify-content:space-between;font-size:0.72rem;margin-bottom:0.25rem}
+.health-list .h-top .h-name{color:var(--muted)}
+.health-list .h-top .h-status{font-weight:500;font-size:0.68rem}
+.health-list .h-bar{height:3px;background:var(--border);border-radius:2px;overflow:hidden}
+.health-list .h-bar .h-fill{height:100%;border-radius:2px}
+
+@media(max-width:1024px){
+  .content-grid{grid-template-columns:1fr}
+  .kpi-row{grid-template-columns:repeat(3,1fr)}
+}
+@media(max-width:640px){
+  .kpi-row{grid-template-columns:repeat(2,1fr)}
+  nav .tabs{display:none}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">
+    <div class="logo-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+    </div>
+    Traceplane
+  </div>
+  <div class="divider"></div>
+  <div class="tabs">
+    <a href="#" class="active">Projects</a>
+    <a href="#">Episodes</a>
+    <a href="#">Agents</a>
+    <a href="#">Trace</a>
+    <a href="#">Audit</a>
+  </div>
+  <div class="right">
+    <input class="search" placeholder="搜索 episodes..." type="text">
+    <div class="avatar">JC</div>
+  </div>
+</nav>
+
+<div class="page">
+  <div class="breadcrumb">
+    <a href="#">Projects</a> <span>/</span> <span>Q2 Customer Pulse</span>
+  </div>
+
+  <div class="project-top">
+    <div class="info">
+      <h1>Q2 Customer Pulse <span class="slug">q2-customer-pulse</span></h1>
+      <div class="tags">
+        <div class="tag"><div class="dot" style="background:var(--green)"></div> Healthy</div>
+        <div class="tag"><div class="dot" style="background:var(--blue)"></div> 3 Active</div>
+        <div class="tag">Updated 2m ago</div>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn-s">Export</button>
+      <button class="btn-p">+ New Episode</button>
+    </div>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi">
+      <div class="kpi-label">Episodes</div>
+      <div class="kpi-val">12</div>
+      <div class="kpi-change" style="color:var(--green)">↑ 3 this week</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Active</div>
+      <div class="kpi-val" style="color:var(--blue)">3</div>
+      <div class="kpi-change" style="color:var(--dim)">Running now</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Artifacts</div>
+      <div class="kpi-val">48</div>
+      <div class="kpi-change" style="color:var(--dim)">R2: 32 · Local: 16</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Success Rate</div>
+      <div class="kpi-val" style="color:var(--green)">94%</div>
+      <div class="kpi-bar"><div class="fill" style="width:94%;background:var(--green)"></div></div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Avg Duration</div>
+      <div class="kpi-val">2.4m</div>
+      <div class="kpi-change" style="color:var(--blue)">↓ 0.3m</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Agents</div>
+      <div class="kpi-val">3</div>
+      <div class="kpi-change" style="color:var(--dim)">claude · open · gemini</div>
+    </div>
+  </div>
+
+  <div class="content-grid">
+    <div class="table-card">
+      <div class="tc-header">
+        <h2>Recent Episodes</h2>
+        <div class="tc-filters">
+          <button class="active">All</button>
+          <button>Active</button>
+          <button>Done</button>
+          <button>Failed</button>
+        </div>
+      </div>
+      <table class="ep-table">
+        <thead>
+          <tr>
+            <th>Status</th>
+            <th>Episode</th>
+            <th>Agent</th>
+            <th>Duration</th>
+            <th>Artifacts</th>
+            <th>Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><div class="status"><div class="pip pulse-soft" style="background:var(--blue)"></div><span style="color:var(--blue)">active</span></div></td>
+            <td><div class="ep-name">Weekly Report Generation</div><div class="ep-sub">Customer feedback analysis</div></td>
+            <td><div class="ep-agent"><div class="avatar-sm" style="background:rgba(59,130,246,0.1);color:var(--blue)">C</div> claude</div></td>
+            <td class="mono-cell">1.8m</td>
+            <td><span class="art-badge">5</span></td>
+            <td class="mono-cell">2h ago</td>
+          </tr>
+          <tr>
+            <td><div class="status"><div class="pip" style="background:var(--green)"></div><span style="color:var(--green)">done</span></div></td>
+            <td><div class="ep-name">Sensitive Document Check</div><div class="ep-sub">Compliance audit</div></td>
+            <td><div class="ep-agent"><div class="avatar-sm" style="background:rgba(245,158,11,0.1);color:var(--amber)">O</div> opencode</div></td>
+            <td class="mono-cell">0.4m</td>
+            <td><span class="art-badge">2</span></td>
+            <td class="mono-cell">5h ago</td>
+          </tr>
+          <tr>
+            <td><div class="status"><div class="pip" style="background:var(--amber)"></div><span style="color:var(--amber)">paused</span></div></td>
+            <td><div class="ep-name">MCP Smoke Test</div><div class="ep-sub">Integration testing</div></td>
+            <td><div class="ep-agent"><div class="avatar-sm" style="background:rgba(34,197,94,0.1);color:var(--green)">G</div> gemini</div></td>
+            <td class="mono-cell">--</td>
+            <td><span class="art-badge">0</span></td>
+            <td class="mono-cell">1d ago</td>
+          </tr>
+          <tr>
+            <td><div class="status"><div class="pip" style="background:var(--green)"></div><span style="color:var(--green)">done</span></div></td>
+            <td><div class="ep-name">API Documentation Update</div><div class="ep-sub">OpenAPI spec refresh</div></td>
+            <td><div class="ep-agent"><div class="avatar-sm" style="background:rgba(59,130,246,0.1);color:var(--blue)">C</div> claude</div></td>
+            <td class="mono-cell">3.2m</td>
+            <td><span class="art-badge">1</span></td>
+            <td class="mono-cell">2d ago</td>
+          </tr>
+          <tr>
+            <td><div class="status"><div class="pip" style="background:var(--red)"></div><span style="color:var(--red)">failed</span></div></td>
+            <td><div class="ep-name">Database Migration</div><div class="ep-sub">Schema v2 migration</div></td>
+            <td><div class="ep-agent"><div class="avatar-sm" style="background:rgba(245,158,11,0.1);color:var(--amber)">O</div> opencode</div></td>
+            <td class="mono-cell">0.1m</td>
+            <td><span class="art-badge">0</span></td>
+            <td class="mono-cell">3d ago</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="side-stack">
+      <div class="side-card">
+        <div class="sc-header">Event Stream <span class="sc-badge">LIVE</span></div>
+        <div class="sc-body">
+          <div class="event-list">
+            <div class="ev-item"><span class="ev-ts">14:32</span><span class="ev-type trace">TRC</span><span class="ev-msg">episode.initialize</span></div>
+            <div class="ev-item"><span class="ev-ts">14:32</span><span class="ev-type trace">TRC</span><span class="ev-msg">tool.fetch_data</span><span class="ev-dur" style="color:var(--green)">1.2s</span></div>
+            <div class="ev-item"><span class="ev-ts">14:33</span><span class="ev-type trace">TRC</span><span class="ev-msg">artifact.create</span><span class="ev-dur" style="color:var(--green)">0.8s</span></div>
+            <div class="ev-item" style="opacity:0.5"><span class="ev-ts">14:33</span><span class="ev-type audit">AUD</span><span class="ev-msg">permission.check</span><span class="ev-dur" style="color:var(--green)">allow</span></div>
+            <div class="ev-item"><span class="ev-ts">14:34</span><span class="ev-type mem">MEM</span><span class="ev-msg">snapshot.save</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="side-card">
+        <div class="sc-header">System Health</div>
+        <div class="sc-body">
+          <div class="health-list">
+            <div class="h-item">
+              <div class="h-top"><span class="h-name">Database</span><span class="h-status" style="color:var(--green)">Operational</span></div>
+              <div class="h-bar"><div class="h-fill" style="width:100%;background:var(--green)"></div></div>
+            </div>
+            <div class="h-item">
+              <div class="h-top"><span class="h-name">R2 Storage</span><span class="h-status" style="color:var(--green)">Operational</span></div>
+              <div class="h-bar"><div class="h-fill" style="width:100%;background:var(--green)"></div></div>
+            </div>
+            <div class="h-item">
+              <div class="h-top"><span class="h-name">Hook Bridge</span><span class="h-status" style="color:var(--blue)">Active</span></div>
+              <div class="h-bar"><div class="h-fill" style="width:85%;background:var(--blue)"></div></div>
+            </div>
+            <div class="h-item">
+              <div class="h-top"><span class="h-name">Queue</span><span class="h-status" style="color:var(--dim)">0 pending</span></div>
+              <div class="h-bar"><div class="h-fill" style="width:100%;background:var(--dim)"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="side-card">
+        <div class="sc-header">Quick Actions</div>
+        <div class="sc-body" style="padding:0.5rem">
+          <div style="padding:0.4rem 0.6rem;font-size:0.78rem;color:var(--muted);cursor:pointer;border-radius:4px;transition:all 0.15s" onmouseover="this.style.background='var(--accent-dim)';this.style.color='var(--fg)'" onmouseout="this.style.background='';this.style.color='var(--muted)'">+ New Episode</div>
+          <div style="padding:0.4rem 0.6rem;font-size:0.78rem;color:var(--muted);cursor:pointer;border-radius:4px;transition:all 0.15s" onmouseover="this.style.background='var(--accent-dim)';this.style.color='var(--fg)'" onmouseout="this.style.background='';this.style.color='var(--muted)'">↗ Export Data</div>
+          <div style="padding:0.4rem 0.6rem;font-size:0.78rem;color:var(--muted);cursor:pointer;border-radius:4px;transition:all 0.15s" onmouseover="this.style.background='var(--accent-dim)';this.style.color='var(--fg)'" onmouseout="this.style.background='';this.style.color='var(--muted)'">⚙ Configure</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.querySelectorAll('.tc-filters button').forEach(btn=>{
+  btn.addEventListener('click',function(){
+    this.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+    this.classList.add('active');
+  });
+});
+</script>
+</body>
+</html>

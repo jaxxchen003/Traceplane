@@ -93,7 +93,7 @@ export function StateInspector({
       </div>
 
       <div className="space-y-4">
-        <div className="p-4 bg-void-900 rounded border border-void-600 font-mono text-xs text-ink-faint overflow-auto max-h-60">
+        <div className="p-4 bg-void-900 rounded border border-void-700 font-mono text-xs text-ink-faint overflow-auto max-h-60">
           <pre>{JSON.stringify(snapshot, null, 2)}</pre>
         </div>
 
@@ -110,7 +110,7 @@ export function StateInspector({
               {diffs.map((d) => (
                 <div
                   key={d.key}
-                  className="p-2 text-xs rounded bg-void-800/50 border border-void-600/50"
+                  className="p-2 text-xs rounded bg-void-800/50 border border-void-700/50"
                 >
                   <span className="font-bold text-ink-muted">{d.key}</span>
                   <div className="flex items-center gap-2 mt-1">
@@ -129,12 +129,12 @@ export function StateInspector({
         </div>
       </div>
 
-      <div className="pt-4 border-t border-void-600">
+      <div className="pt-4 border-t border-void-700">
         <label className="text-xs text-ink-faint block mb-2">
           Fork Experiment Name
         </label>
         <input
-          className="w-full px-3 py-2 bg-void-900 border border-void-600 rounded text-sm text-ink outline-none focus:border-accent transition-colors"
+          className="w-full px-3 py-2 bg-void-900 border border-void-700 rounded text-sm text-ink outline-none focus:border-accent transition-colors"
           placeholder="e.g. Try with better prompt..."
           value={forkInput}
           onChange={(e) => setForkInput(e.target.value)}

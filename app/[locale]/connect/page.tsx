@@ -185,25 +185,25 @@ export default async function ConnectPage({
               </div>
             </div>
             <div className="grid gap-3 md:grid-cols-2">
-              <div className="rounded-[22px] border border-white/10 bg-white/5 px-4 py-4">
+              <div className="rounded-[22px] border border-void-700 bg-white/5 px-4 py-4">
                 <div className="text-[11px] uppercase tracking-[0.18em] text-ink-ghost">
                   {locale === "zh" ? "最近 Capture 事件" : "Captured events"}
                 </div>
                 <div className="mt-2 text-2xl font-semibold text-white">{connectSurface.totals.capturedEvents}</div>
               </div>
-              <div className="rounded-[22px] border border-white/10 bg-white/5 px-4 py-4">
+              <div className="rounded-[22px] border border-void-700 bg-white/5 px-4 py-4">
                 <div className="text-[11px] uppercase tracking-[0.18em] text-ink-ghost">
                   {locale === "zh" ? "导入 Episode" : "Imported episodes"}
                 </div>
                 <div className="mt-2 text-2xl font-semibold text-white">{connectSurface.totals.importedEpisodes}</div>
               </div>
             </div>
-            <div className="rounded-[22px] border border-white/10 bg-white/5 px-4 py-4 text-ink-muted">
+            <div className="rounded-[22px] border border-void-700 bg-white/5 px-4 py-4 text-ink-muted">
               {locale === "zh"
                 ? `同步目录：${connectSurface.runtimeSurface.localProjection.rootPath} · ${connectSurface.runtimeSurface.localProjection.rootExists ? "已检测到本地投影" : "尚未检测到本地投影"}`
                 : `Sync root: ${connectSurface.runtimeSurface.localProjection.rootPath} · ${connectSurface.runtimeSurface.localProjection.rootExists ? "projection detected" : "projection not detected"}`}
             </div>
-            <div className="rounded-[22px] border border-white/10 bg-black/20 px-4 py-4 text-sm leading-7 text-ink-muted">
+            <div className="rounded-[22px] border border-void-700 bg-black/20 px-4 py-4 text-sm leading-7 text-ink-muted">
               {connectSurface.runtimeSurface.runtime.cloud.deploymentStage === "cloud-active"
                 ? locale === "zh"
                   ? "当前 host 接入已经写入云端工作平面，可把 MCP、capture 和 import 视为正式路径。"
@@ -269,7 +269,7 @@ export default async function ConnectPage({
           ].map((item) => (
             <div
               key={item.step}
-              className="rounded-[24px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02))] px-5 py-5"
+              className="rounded-[24px] border border-void-700 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02))] px-5 py-5"
             >
               <div className="text-[11px] uppercase tracking-[0.22em] text-signal-warning-200/80">{item.step}</div>
               <h3 className="mt-3 text-lg font-semibold text-white">{item.title}</h3>
@@ -297,7 +297,7 @@ export default async function ConnectPage({
           {hostCards.map((host) => (
             <div
               key={host.id}
-              className="rounded-[28px] border border-white/10 bg-white/5 px-5 py-5"
+              className="rounded-[28px] border border-void-700 bg-white/5 px-5 py-5"
             >
               <div className="flex items-start justify-between gap-4">
                 <div>
@@ -306,7 +306,7 @@ export default async function ConnectPage({
                     {host.level.map((tag) => (
                       <span
                         key={tag}
-                        className="rounded-full border border-white/10 bg-white/8 px-3 py-1 text-[11px] uppercase tracking-[0.16em] text-ink-muted"
+                        className="rounded-full border border-void-700 bg-white/8 px-3 py-1 text-[11px] uppercase tracking-[0.16em] text-ink-muted"
                       >
                         {tag}
                       </span>
@@ -316,7 +316,7 @@ export default async function ConnectPage({
               </div>
 
               <div className="mt-5 space-y-4 text-sm text-ink-muted">
-                <div className="rounded-[20px] border border-white/10 bg-white/6 px-4 py-4">
+                <div className="rounded-[20px] border border-void-700 bg-white/6 px-4 py-4">
                   <div className="text-[11px] uppercase tracking-[0.18em] text-ink-ghost">
                     {locale === "zh" ? "最新信号" : "Latest signal"}
                   </div>
@@ -328,7 +328,7 @@ export default async function ConnectPage({
                   <div className="mb-2 text-[11px] uppercase tracking-[0.18em] text-ink-ghost">
                     {locale === "zh" ? "Setup" : "Setup"}
                   </div>
-                  <pre className="overflow-x-auto rounded-[20px] border border-white/10 bg-slate-950/70 px-4 py-3 text-xs text-slate-100">
+                  <pre className="overflow-x-auto rounded-[20px] border border-void-700 bg-slate-950/70 px-4 py-3 text-xs text-slate-100">
                     <code>{host.setup}</code>
                   </pre>
                 </div>
@@ -336,7 +336,7 @@ export default async function ConnectPage({
                   <div className="mb-2 text-[11px] uppercase tracking-[0.18em] text-ink-ghost">
                     {locale === "zh" ? "Verify" : "Verify"}
                   </div>
-                  <pre className="overflow-x-auto rounded-[20px] border border-white/10 bg-slate-950/70 px-4 py-3 text-xs text-slate-100">
+                  <pre className="overflow-x-auto rounded-[20px] border border-void-700 bg-slate-950/70 px-4 py-3 text-xs text-slate-100">
                     <code>{host.verify}</code>
                   </pre>
                 </div>

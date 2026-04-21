@@ -179,7 +179,7 @@ export function GraphTheater({
   ];
 
   return (
-    <section className="relative overflow-hidden rounded border border-void-600 bg-void-900 px-6 py-6">
+    <section className="relative overflow-hidden rounded border border-void-700 bg-void-900 px-6 py-6">
       <div className="pointer-events-none absolute inset-0 bg-dot" />
       
       <div className="relative z-10 flex flex-col gap-6 xl:flex-row">
@@ -202,7 +202,7 @@ export function GraphTheater({
                 className={`rounded border px-3 py-1.5 text-[11px] uppercase tracking-wider transition ${
                   filter === tab.key
                     ? "border-accent/30 bg-accent-dim text-accent"
-                    : "border-void-600 bg-void-800 text-ink-faint hover:border-void-500 hover:text-ink"
+                    : "border-void-700 bg-void-800 text-ink-faint hover:border-void-500 hover:text-ink"
                 }`}
               >
                 {tab.label}
@@ -212,7 +212,7 @@ export function GraphTheater({
 
           <div className="mt-6 grid gap-3 sm:grid-cols-3 xl:grid-cols-1">
             {stats.map((stat) => (
-              <div key={stat.label} className="rounded border border-void-600 bg-void-800 px-4 py-4">
+              <div key={stat.label} className="rounded border border-void-700 bg-void-800 px-4 py-4">
                 <div className="text-[11px] uppercase tracking-wider text-ink-faint">{stat.label}</div>
                 <div className="mt-2 text-2xl font-semibold text-ink">{stat.value}</div>
               </div>
@@ -220,7 +220,7 @@ export function GraphTheater({
           </div>
         </div>
 
-        <div className="relative min-h-[480px] flex-1 overflow-hidden rounded border border-void-600 bg-void-800">
+        <div className="relative min-h-[480px] flex-1 overflow-hidden rounded border border-void-700 bg-void-800">
           <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
             {edgeLines}
           </svg>

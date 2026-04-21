@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Traceplane · Tactical OPS</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#070a07;--fg:#b8d4b8;--muted:#5a7a5a;--dim:#2d3d2d;--accent:#00ff66;--accent2:#00cc55;--accent-dim:rgba(0,255,102,0.06);--border:#1a2a1a;--surface:#0d120d;--surface2:#111a11;--red:#ff3344;--amber:#ffaa00;--blue:#00aaff;--mono:'Share Tech Mono',monospace;--sans:'Barlow',sans-serif}
+body{background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:14px;line-height:1.5;overflow-x:hidden}
+
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,20,0,0.015) 3px,rgba(0,20,0,0.015) 4px);pointer-events:none;z-index:9999}
+
+@keyframes pulse-g{0%,100%{opacity:1}50%{opacity:0.4}}
+@keyframes sweep{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.pulse-g{animation:pulse-g 2s ease-in-out infinite}
+.blink{animation:blink 1.5s step-end infinite}
+
+.topbar{display:flex;align-items:center;height:40px;padding:0 1rem;border-bottom:2px solid var(--border);background:var(--surface);font-family:var(--mono);font-size:0.75rem;gap:1.5rem}
+.topbar .logo{color:var(--accent);font-weight:700;font-size:0.85rem;letter-spacing:0.05em}
+.topbar .sep{color:var(--dim)}
+.topbar .sys{color:var(--muted);display:flex;align-items:center;gap:0.4rem}
+.topbar .sys .indicator{width:8px;height:8px;border:1px solid var(--accent);border-radius:50%;position:relative}
+.topbar .sys .indicator::after{content:'';position:absolute;inset:2px;background:var(--accent);border-radius:50%;animation:pulse-g 2s ease-in-out infinite}
+.topbar .time{margin-left:auto;color:var(--dim);font-variant-numeric:tabular-nums}
+.topbar .alert{color:var(--amber);display:flex;align-items:center;gap:0.3rem}
+
+.layout{display:grid;grid-template-columns:56px 200px 1fr 320px;min-height:calc(100vh - 40px)}
+
+.icon-bar{background:var(--surface);border-right:2px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:0.75rem 0;gap:0.25rem}
+.icon-bar .ib{width:36px;height:36px;display:flex;align-items:center;justify-content:center;color:var(--dim);cursor:pointer;transition:all 0.15s;border:1px solid transparent;font-size:0.9rem}
+.icon-bar .ib:hover{color:var(--fg);background:var(--accent-dim);border-color:var(--border)}
+.icon-bar .ib.active{color:var(--accent);border-color:var(--accent);background:var(--accent-dim)}
+
+.side-panel{background:var(--surface);border-right:2px solid var(--border);padding:1rem 0;font-size:0.78rem;font-family:var(--mono)}
+.side-panel .sp-title{font-size:0.65rem;color:var(--dim);text-transform:uppercase;letter-spacing:0.15em;padding:0 0.75rem;margin-bottom:0.5rem;display:flex;align-items:center;gap:0.5rem}
+.side-panel .sp-title::before{content:'▸';color:var(--accent)}
+.side-panel .sp-item{padding:0.35rem 0.75rem;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:0.5rem;transition:all 0.15s}
+.side-panel .sp-item:hover{color:var(--fg);background:var(--accent-dim)}
+.side-panel .sp-item.active{color:var(--accent);border-left:2px solid var(--accent);padding-left:calc(0.75rem - 2px)}
+.side-panel .sp-item .cnt{margin-left:auto;font-size:0.68rem;color:var(--dim)}
+.side-panel .divider{height:1px;background:var(--border);margin:0.75rem 0}
+
+.main-area{padding:1.5rem;overflow:auto;display:flex;flex-direction:column;gap:1.25rem}
+
+.mission-header{border:1px solid var(--border);padding:1.25rem;position:relative}
+.mission-header::before{content:'MISSION';position:absolute;top:-8px;left:12px;font-size:0.6rem;background:var(--bg);padding:0 6px;color:var(--accent);font-family:var(--mono);letter-spacing:0.2em}
+.mission-header h1{font-family:var(--mono);font-size:1.25rem;font-weight:700;color:var(--accent);margin-bottom:0.5rem;letter-spacing:0.02em}
+.mission-header .mh-meta{display:flex;gap:1.5rem;font-family:var(--mono);font-size:0.72rem;color:var(--muted)}
+.mission-header .mh-meta .tag{padding:1px 6px;border:1px solid currentColor;font-size:0.65rem}
+.mission-header .mh-meta .tag.green{color:var(--accent);border-color:var(--accent)}
+.mission-header .mh-meta .tag.blue{color:var(--blue);border-color:var(--blue)}
+
+.tactical-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--border)}
+.tac-cell{background:var(--surface2);padding:1rem;text-align:center}
+.tac-cell .tac-label{font-family:var(--mono);font-size:0.6rem;color:var(--dim);text-transform:uppercase;letter-spacing:0.15em;margin-bottom:0.5rem}
+.tac-cell .tac-val{font-family:var(--mono);font-size:1.5rem;font-weight:700;font-variant-numeric:tabular-nums}
+.tac-cell .tac-sub{font-family:var(--mono);font-size:0.65rem;color:var(--dim);margin-top:0.25rem}
+
+.obj-list{border:1px solid var(--border)}
+.obj-list .ol-header{padding:0.5rem 0.75rem;border-bottom:2px solid var(--border);background:var(--surface);display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em}
+.obj-list .ol-row{display:grid;grid-template-columns:36px 1fr 80px 60px 70px;align-items:center;padding:0.5rem 0.75rem;border-bottom:1px solid var(--border);font-size:0.78rem;cursor:pointer;transition:background 0.1s}
+.obj-list .ol-row:hover{background:var(--accent-dim)}
+.obj-list .ol-row:last-child{border-bottom:none}
+.obj-list .ol-row .st{font-family:var(--mono);font-size:0.65rem;display:flex;align-items:center;gap:0.3rem}
+.obj-list .ol-row .st .pip{width:6px;height:6px;border-radius:1px}
+.obj-list .ol-row .name{font-weight:500}
+.obj-list .ol-row .agent{font-family:var(--mono);color:var(--dim);font-size:0.72rem}
+.obj-list .ol-row .dur{font-family:var(--mono);color:var(--dim);font-size:0.72rem;text-align:right}
+.obj-list .ol-row .time{font-family:var(--mono);color:var(--dim);font-size:0.68rem;text-align:right}
+
+.right-panel{background:var(--surface);border-left:2px solid var(--border);padding:1rem 0;font-size:0.78rem;overflow-y:auto}
+.rp-section{margin-bottom:1.5rem}
+.rp-section .rp-title{font-family:var(--mono);font-size:0.6rem;color:var(--dim);text-transform:uppercase;letter-spacing:0.15em;padding:0 0.75rem;margin-bottom:0.5rem;border-bottom:1px solid var(--border);padding-bottom:0.4rem}
+.rp-section .rp-item{padding:0.3rem 0.75rem;font-family:var(--mono);font-size:0.72rem;color:var(--muted);display:flex;align-items:center;gap:0.5rem}
+.rp-section .rp-item .ts{color:var(--dim);min-width:40px}
+.rp-section .rp-item .type{min-width:44px;font-weight:600}
+.rp-section .rp-item .type.trace{color:var(--blue)}
+.rp-section .rp-item .type.audit{color:var(--dim)}
+.rp-section .rp-item .type.mem{color:var(--accent)}
+
+.health-bar{padding:0 0.75rem}
+.health-item{margin-bottom:0.75rem}
+.health-item .hi-label{display:flex;justify-content:space-between;font-family:var(--mono);font-size:0.65rem;color:var(--dim);margin-bottom:0.25rem}
+.health-item .hi-bar{height:3px;background:var(--border);border-radius:0;overflow:hidden}
+.health-item .hi-bar .hi-fill{height:100%;border-radius:0}
+
+@media(max-width:1024px){
+  .layout{grid-template-columns:56px 1fr}
+  .side-panel,.right-panel{display:none}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo">⬡ TRACEPLANE</div>
+  <div class="sep">│</div>
+  <div class="sys"><div class="indicator"></div> ONLINE</div>
+  <div class="sep">│</div>
+  <div class="sys">AGENTS: <span style="color:var(--accent)">3</span></div>
+  <div class="sep">│</div>
+  <div class="sys">QUEUE: <span style="color:var(--accent)">0</span></div>
+  <div class="sep">│</div>
+  <div class="alert">⚠ 1 PAUSED</div>
+  <div class="time" id="clock"></div>
+</div>
+
+<div class="layout">
+  <div class="icon-bar">
+    <div class="ib active" title="Dashboard">◈</div>
+    <div class="ib" title="Episodes">▤</div>
+    <div class="ib" title="Agents">⬡</div>
+    <div class="ib" title="Trace">◈</div>
+    <div class="ib" title="Artifacts">▣</div>
+    <div class="ib" title="Audit">◉</div>
+    <div class="ib" title="Settings">⚙</div>
+  </div>
+
+  <div class="side-panel">
+    <div class="sp-title">PROJECTS</div>
+    <div class="sp-item active">Q2 Customer Pulse <span class="cnt">12</span></div>
+    <div class="sp-item">API Platform <span class="cnt">8</span></div>
+    <div class="sp-item">Data Pipeline <span class="cnt">5</span></div>
+    <div class="sp-item">Internal Tools <span class="cnt">3</span></div>
+    <div class="divider"></div>
+    <div class="sp-title">AGENTS</div>
+    <div class="sp-item">claude-code <span class="cnt" style="color:var(--blue)">●</span></div>
+    <div class="sp-item">opencode <span class="cnt" style="color:var(--amber)">●</span></div>
+    <div class="sp-item">gemini <span class="cnt" style="color:var(--accent)">●</span></div>
+    <div class="divider"></div>
+    <div class="sp-title">FILTERS</div>
+    <div class="sp-item">[ALL]</div>
+    <div class="sp-item">[ACTIVE]</div>
+    <div class="sp-item">[FAILED]</div>
+  </div>
+
+  <div class="main-area">
+    <div class="mission-header">
+      <h1>Q2 CUSTOMER PULSE</h1>
+      <div class="mh-meta">
+        <span class="tag green">● HEALTHY</span>
+        <span class="tag blue">3 ACTIVE</span>
+        <span>LAST: 2m ago</span>
+        <span>ID: q2-customer-pulse</span>
+      </div>
+    </div>
+
+    <div class="tactical-grid">
+      <div class="tac-cell">
+        <div class="tac-label">Episodes</div>
+        <div class="tac-val" style="color:var(--fg)">12</div>
+        <div class="tac-sub">+3 this week</div>
+      </div>
+      <div class="tac-cell">
+        <div class="tac-label">Active</div>
+        <div class="tac-val" style="color:var(--blue)">3</div>
+        <div class="tac-sub">running</div>
+      </div>
+      <div class="tac-cell">
+        <div class="tac-label">Artifacts</div>
+        <div class="tac-val" style="color:var(--fg)">48</div>
+        <div class="tac-sub">R2:32 · L:16</div>
+      </div>
+      <div class="tac-cell">
+        <div class="tac-label">Success</div>
+        <div class="tac-val" style="color:var(--accent)">94%</div>
+        <div class="tac-sub" style="color:var(--accent)">▲2%</div>
+      </div>
+      <div class="tac-cell">
+        <div class="tac-label">Avg Time</div>
+        <div class="tac-val" style="color:var(--fg)">2.4m</div>
+        <div class="tac-sub">▼0.3m</div>
+      </div>
+    </div>
+
+    <div class="obj-list">
+      <div class="ol-header">
+        <span>OBJECTIVES</span>
+        <span style="color:var(--dim)">5 ITEMS</span>
+      </div>
+      <div class="ol-row">
+        <div class="st"><div class="pip pulse-g" style="background:var(--blue)"></div> ACT</div>
+        <div class="name">Weekly Report Generation</div>
+        <div class="agent">claude</div>
+        <div class="dur">1.8m</div>
+        <div class="time">2h ago</div>
+      </div>
+      <div class="ol-row">
+        <div class="st"><div class="pip" style="background:var(--accent)"></div> OK</div>
+        <div class="name">Sensitive Document Check</div>
+        <div class="agent">opencode</div>
+        <div class="dur">0.4m</div>
+        <div class="time">5h ago</div>
+      </div>
+      <div class="ol-row">
+        <div class="st"><div class="pip" style="background:var(--amber)"></div> HLD</div>
+        <div class="name">MCP Smoke Test</div>
+        <div class="agent">gemini</div>
+        <div class="dur">--</div>
+        <div class="time">1d ago</div>
+      </div>
+      <div class="ol-row">
+        <div class="st"><div class="pip" style="background:var(--accent)"></div> OK</div>
+        <div class="name">API Documentation Update</div>
+        <div class="agent">claude</div>
+        <div class="dur">3.2m</div>
+        <div class="time">2d ago</div>
+      </div>
+      <div class="ol-row">
+        <div class="st"><div class="pip" style="background:var(--red)"></div> ERR</div>
+        <div class="name">Database Migration</div>
+        <div class="agent">opencode</div>
+        <div class="dur">0.1m</div>
+        <div class="time">3d ago</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="right-panel">
+    <div class="rp-section">
+      <div class="rp-title">EVENT FEED</div>
+      <div class="rp-item"><span class="ts">14:32</span><span class="type trace">TRC</span> episode.initialize</div>
+      <div class="rp-item"><span class="ts">14:32</span><span class="type trace">TRC</span> tool.fetch_data <span style="color:var(--accent)">1.2s</span></div>
+      <div class="rp-item"><span class="ts">14:33</span><span class="type trace">TRC</span> artifact.create <span style="color:var(--accent)">0.8s</span></div>
+      <div class="rp-item" style="opacity:0.5"><span class="ts">14:33</span><span class="type audit">AUD</span> permission.check</div>
+      <div class="rp-item"><span class="ts">14:34</span><span class="type mem">MEM</span> snapshot.save</div>
+      <div class="rp-item"><span class="ts">14:35</span><span class="type trace">TRC</span> handoff.prepare</div>
+    </div>
+    <div class="rp-section">
+      <div class="rp-title">SYSTEM STATUS</div>
+      <div class="health-bar">
+        <div class="health-item">
+          <div class="hi-label"><span>DB</span><span style="color:var(--accent)">OK</span></div>
+          <div class="hi-bar"><div class="hi-fill" style="width:100%;background:var(--accent)"></div></div>
+        </div>
+        <div class="health-item">
+          <div class="hi-label"><span>R2</span><span style="color:var(--accent)">OK</span></div>
+          <div class="hi-bar"><div class="hi-fill" style="width:100%;background:var(--accent)"></div></div>
+        </div>
+        <div class="health-item">
+          <div class="hi-label"><span>HOOK</span><span style="color:var(--blue)">ACT</span></div>
+          <div class="hi-bar"><div class="hi-fill" style="width:85%;background:var(--blue)"></div></div>
+        </div>
+        <div class="health-item">
+          <div class="hi-label"><span>QUEUE</span><span>0</span></div>
+          <div class="hi-bar"><div class="hi-fill" style="width:100%;background:var(--dim)"></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="rp-section">
+      <div class="rp-title">QUICK ACTIONS</div>
+      <div class="sp-item" style="cursor:pointer">[+] NEW EPISODE</div>
+      <div class="sp-item" style="cursor:pointer">[↗] EXPORT DATA</div>
+      <div class="sp-item" style="cursor:pointer">[⚙] CONFIGURE</div>
+    </div>
+  </div>
+</div>
+
+<script>
+function updateClock(){
+  const now=new Date();
+  const h=String(now.getHours()).padStart(2,'0');
+  const m=String(now.getMinutes()).padStart(2,'0');
+  const s=String(now.getSeconds()).padStart(2,'0');
+  document.getElementById('clock').textContent=h+':'+m+':'+s+' UTC';
+}
+setInterval(updateClock,1000);
+updateClock();
+</script>
+</body>
+</html>

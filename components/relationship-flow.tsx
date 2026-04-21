@@ -48,7 +48,7 @@ export function RelationshipFlow({
             {columnIndex < columns.length - 1 ? (
               <div className="pointer-events-none absolute right-[-18px] top-1/2 hidden h-px w-9 bg-void-600 lg:block" />
             ) : null}
-            <div className="bg-void-800 border border-void-600 rounded p-4">
+            <div className="bg-void-800 border border-void-700 rounded p-4">
               <div className={`mb-3 text-[11px] uppercase tracking-wider ${tone.label}`}>
                 {column.title}
               </div>
@@ -66,7 +66,7 @@ export function RelationshipFlow({
                     </div>
                   ))
                 ) : (
-                  <div className="border border-dashed border-void-600 rounded px-4 py-6 text-sm text-ink-faint text-center">
+                  <div className="border border-dashed border-void-700 rounded px-4 py-6 text-sm text-ink-faint text-center">
                     No nodes
                   </div>
                 )}

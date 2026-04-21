@@ -60,7 +60,7 @@ export function GraphBriefing({
   return (
     <Panel title={title} eyebrow="Graph Briefing">
       {nodes.length === 0 ? (
-        <div className="border border-dashed border-void-600 rounded px-4 py-4 text-sm text-ink-faint">
+        <div className="border border-dashed border-void-700 rounded px-4 py-4 text-sm text-ink-faint">
           {emptyLabel}
         </div>
       ) : (
@@ -78,7 +78,7 @@ export function GraphBriefing({
                   className={`block w-full rounded border px-4 py-4 text-left transition ${
                     active
                       ? styles.border
-                      : "bg-void-800 border-void-600 hover:border-void-500"
+                      : "bg-void-800 border-void-700 hover:border-void-500"
                   }`}
                 >
                   <div className="text-[10px] uppercase tracking-wider text-ink-ghost">{node.tone}</div>
@@ -89,7 +89,7 @@ export function GraphBriefing({
             })}
           </div>
 
-          <div className="bg-void-800 border border-void-600 rounded px-5 py-5">
+          <div className="bg-void-800 border border-void-700 rounded px-5 py-5">
             {selectedNode ? (
               <>
                 <div className={`text-[10px] uppercase tracking-wider ${toneStyles[selectedNode.tone].label}`}>
