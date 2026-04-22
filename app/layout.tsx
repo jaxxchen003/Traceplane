@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-
+import Script from "next/script";
 import { brand } from "@/lib/brand";
 import "./globals.css";
 
@@ -15,17 +15,22 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-CN" className="dark">
-      <body>
-        {children}
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-3K6BSYFM2V" />
-        <script dangerouslySetInnerHTML={{
-          __html: `
+      <head>
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-3K6BSYFM2V"
+          strategy="afterInteractive"
+        />
+        <Script id="ga4-init" strategy="afterInteractive">
+          {`
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
             gtag('config', 'G-3K6BSYFM2V');
-          `
-        }} />
+          `}
+        </Script>
+      </head>
+      <body>
+        {children}
       </body>
     </html>
   );
