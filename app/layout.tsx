@@ -15,7 +15,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-CN" className="dark">
-      <head>
+      <body>
+        {children}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-3K6BSYFM2V"
           strategy="afterInteractive"
@@ -28,9 +29,6 @@ export default function RootLayout({
             gtag('config', 'G-3K6BSYFM2V');
           `}
         </Script>
-      </head>
-      <body>
-        {children}
       </body>
     </html>
   );
