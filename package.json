@@ -7,7 +7,7 @@
   },
   "scripts": {
     "dev": "next dev --webpack",
-    "build": "next build --webpack",
+    "build": "prisma generate && next build --webpack",
     "start": "next start",
     "start:demo": "node scripts/start-demo.mjs",
     "mcp:start": "node scripts/mcp-server.mjs",
