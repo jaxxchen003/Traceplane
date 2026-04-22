@@ -4,7 +4,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: `${brand.name} · ${brand.category}`,
-  description: brand.descriptor,
+  description: brand.descriptorZh,
 };
 
 export default function RootLayout({
