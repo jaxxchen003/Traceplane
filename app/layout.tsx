@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { brand } from "@/lib/brand";
 import "./globals.css";
 
@@ -16,21 +17,19 @@ export default function RootLayout({
     <html lang="zh-CN" className="dark">
       <body>
         {children}
-        {/* Google Analytics 4 */}
-        <script
-          async
-          src="https://www.googletagmanager.com/gtag/js?id=G-3K6BSYFM2V"
-        />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-              gtag('config', 'G-3K6BSYFM2V');
-            `,
-          }}
-        />
+{/* Google Analytics 4 */}
+      <Script
+        src="https://www.googletagmanager.com/gtag/js?id=G-3K6BSYFM2V"
+        strategy="afterInteractive"
+      />
+      <Script id="ga4-config" strategy="afterInteractive">
+        {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-3K6BSYFM2V');
+        `}
+      </Script>
       </body>
     </html>
   );
