@@ -40,7 +40,17 @@
     "db:cloud:push": "node scripts/db-cloud-push.mjs",
     "db:cloud:seed": "node prisma/seed-cloud.mjs"
   },
-  "keywords": [],
+  "keywords": [
+    "multi-agent",
+    "claude-code",
+    "opencode",
+    "agent-sdk",
+    "mcp",
+    "ai-agents",
+    "workflow-automation",
+    "context-management",
+    "agent-handoff"
+  ],
   "author": "",
   "license": "ISC",
   "type": "module",
