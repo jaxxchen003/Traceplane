@@ -17,6 +17,7 @@
 ```bash
 npm install
 cp .env.example .env
+# 确保 .env 里的 DATABASE_URL 指向可访问的 Postgres 实例
 npm run db:setup
 ```
 
@@ -71,7 +72,7 @@ npm run mcp:host -- claude-code .mcp.json
       "command": "node",
       "args": ["scripts/mcp-server.mjs"],
       "env": {
-        "DATABASE_URL": "file:./dev.db"
+        "DATABASE_URL": "postgresql://postgres:postgres@localhost:5432/traceplane?schema=public"
       }
     }
   }
@@ -143,7 +144,7 @@ npm run mcp:host -- opencode opencode.jsonc
       "command": ["node", "scripts/mcp-server.mjs"],
       "enabled": true,
       "environment": {
-        "DATABASE_URL": "file:./dev.db"
+        "DATABASE_URL": "postgresql://postgres:postgres@localhost:5432/traceplane?schema=public"
       }
     }
   }
@@ -184,7 +185,7 @@ npm run mcp:host -- gemini .gemini/settings.json
       "args": ["scripts/mcp-server.mjs"],
       "cwd": "/ABSOLUTE/PATH/TO/enterprise-agent-work-graph",
       "env": {
-        "DATABASE_URL": "file:./dev.db"
+        "DATABASE_URL": "postgresql://postgres:postgres@localhost:5432/traceplane?schema=public"
       },
       "timeout": 30000,
       "trust": false

@@ -4,7 +4,7 @@
       "command": "node",
       "args": ["scripts/mcp-server.mjs"],
       "env": {
-        "DATABASE_URL": "file:./dev.db"
+        "DATABASE_URL": "postgresql://postgres:postgres@localhost:5432/traceplane?schema=public"
       }
     }
   }

@@ -6,7 +6,7 @@ import "./_lib/load-env.mjs";
 const host = process.argv[2];
 const explicitOutput = process.argv[3];
 const cwd = process.cwd();
-const dbUrl = process.env.DATABASE_URL || "file:./dev.db";
+const dbUrl = process.env.DATABASE_URL || "postgresql://postgres:postgres@localhost:5432/traceplane?schema=public";
 
 const definitions = {
   "claude-code": {

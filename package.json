@@ -29,6 +29,7 @@
     "claude:hook:test": "node scripts/test-claude-hook-bridge.mjs",
     "test": "vitest",
     "test:run": "vitest run",
+    "test:integration": "TRACEPLANE_RUN_HTTP_INTEGRATION=true vitest run tests/api-integration tests/e2e",
     "test:coverage": "vitest run --coverage",
     "lint": "eslint .",
     "ci": "npm run lint && npm run build && npm run test:run",

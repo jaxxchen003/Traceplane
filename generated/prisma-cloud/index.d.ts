@@ -15,69 +15,79 @@ export type PrismaPromise<T> = $Public.PrismaPromise<T>
 
 /**
  * Model Workspace
- * 
+ *
  */
 export type Workspace = $Result.DefaultSelection<Prisma.$WorkspacePayload>
 /**
  * Model Project
- * 
+ *
  */
 export type Project = $Result.DefaultSelection<Prisma.$ProjectPayload>
 /**
  * Model Agent
- * 
+ *
  */
 export type Agent = $Result.DefaultSelection<Prisma.$AgentPayload>
 /**
  * Model ProjectAgent
- * 
+ *
  */
 export type ProjectAgent = $Result.DefaultSelection<Prisma.$ProjectAgentPayload>
 /**
  * Model Episode
- * 
+ *
  */
 export type Episode = $Result.DefaultSelection<Prisma.$EpisodePayload>
 /**
  * Model EpisodeAgent
- * 
+ *
  */
 export type EpisodeAgent = $Result.DefaultSelection<Prisma.$EpisodeAgentPayload>
 /**
  * Model MemoryItem
- * 
+ *
  */
 export type MemoryItem = $Result.DefaultSelection<Prisma.$MemoryItemPayload>
 /**
  * Model TraceEvent
- * 
+ *
  */
 export type TraceEvent = $Result.DefaultSelection<Prisma.$TraceEventPayload>
 /**
  * Model Artifact
- * 
+ *
  */
 export type Artifact = $Result.DefaultSelection<Prisma.$ArtifactPayload>
 /**
  * Model Policy
- * 
+ *
  */
 export type Policy = $Result.DefaultSelection<Prisma.$PolicyPayload>
 /**
  * Model AccessGrant
- * 
+ *
  */
 export type AccessGrant = $Result.DefaultSelection<Prisma.$AccessGrantPayload>
 /**
  * Model AuditEvent
- * 
+ *
  */
 export type AuditEvent = $Result.DefaultSelection<Prisma.$AuditEventPayload>
 /**
  * Model NodeEdge
- * 
+ *
  */
 export type NodeEdge = $Result.DefaultSelection<Prisma.$NodeEdgePayload>
+/**
+ * Model TaskGraph
+ *
+ */
+export type TaskGraph = $Result.DefaultSelection<Prisma.$TaskGraphPayload>
+/**
+ * Model TaskGraphEpisode
+ *
+ */
+export type TaskGraphEpisode = $Result.DefaultSelection<Prisma.$TaskGraphEpisodePayload>
 
 /**
  * Enums
@@ -174,6 +184,23 @@ export const EdgeType: {
 
 export type EdgeType = (typeof EdgeType)[keyof typeof EdgeType]
 
+
+export const TaskGraphStatus: {
+  RUNNING: 'RUNNING',
+  COMPLETED: 'COMPLETED',
+  FAILED: 'FAILED'
+};
+
+export type TaskGraphStatus = (typeof TaskGraphStatus)[keyof typeof TaskGraphStatus]
+
+
+export const TaskGraphEpisodeRole: {
+  ORCHESTRATOR: 'ORCHESTRATOR',
+  WORKER: 'WORKER'
+};
+
+export type TaskGraphEpisodeRole = (typeof TaskGraphEpisodeRole)[keyof typeof TaskGraphEpisodeRole]
+
 }
 
 export type ProjectStatus = $Enums.ProjectStatus
@@ -207,6 +234,14 @@ export const FileType: typeof $Enums.FileType
 export type EdgeType = $Enums.EdgeType
 
 export const EdgeType: typeof $Enums.EdgeType
+
+export type TaskGraphStatus = $Enums.TaskGraphStatus
+
+export const TaskGraphStatus: typeof $Enums.TaskGraphStatus
+
+export type TaskGraphEpisodeRole = $Enums.TaskGraphEpisodeRole
+
+export const TaskGraphEpisodeRole: typeof $Enums.TaskGraphEpisodeRole
 
 /**
  * ##  Prisma Client ʲˢ
@@ -321,7 +356,7 @@ export class PrismaClient<
    *   prisma.user.create({ data: { name: 'Alice' } }),
    * ])
    * ```
-   * 
+   *
    * Read more in our [docs](https://www.prisma.io/docs/concepts/components/prisma-client/transactions).
    */
   $transaction<P extends Prisma.PrismaPromise<any>[]>(arg: [...P], options?: { isolationLevel?: Prisma.TransactionIsolationLevel }): $Utils.JsPromise<runtime.Types.Utils.UnwrapTuple<P>>
@@ -462,6 +497,26 @@ export class PrismaClient<
     * ```
     */
   get nodeEdge(): Prisma.NodeEdgeDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.taskGraph`: Exposes CRUD operations for the **TaskGraph** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more TaskGraphs
+    * const taskGraphs = await prisma.taskGraph.findMany()
+    * ```
+    */
+  get taskGraph(): Prisma.TaskGraphDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.taskGraphEpisode`: Exposes CRUD operations for the **TaskGraphEpisode** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more TaskGraphEpisodes
+    * const taskGraphEpisodes = await prisma.taskGraphEpisode.findMany()
+    * ```
+    */
+  get taskGraphEpisode(): Prisma.TaskGraphEpisodeDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -914,7 +969,9 @@ export namespace Prisma {
     Policy: 'Policy',
     AccessGrant: 'AccessGrant',
     AuditEvent: 'AuditEvent',
-    NodeEdge: 'NodeEdge'
+    NodeEdge: 'NodeEdge',
+    TaskGraph: 'TaskGraph',
+    TaskGraphEpisode: 'TaskGraphEpisode'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -933,7 +990,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "workspace" | "project" | "agent" | "projectAgent" | "episode" | "episodeAgent" | "memoryItem" | "traceEvent" | "artifact" | "policy" | "accessGrant" | "auditEvent" | "nodeEdge"
+      modelProps: "workspace" | "project" | "agent" | "projectAgent" | "episode" | "episodeAgent" | "memoryItem" | "traceEvent" | "artifact" | "policy" | "accessGrant" | "auditEvent" | "nodeEdge" | "taskGraph" | "taskGraphEpisode"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1899,6 +1956,154 @@ export namespace Prisma {
           }
         }
       }
+      TaskGraph: {
+        payload: Prisma.$TaskGraphPayload<ExtArgs>
+        fields: Prisma.TaskGraphFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.TaskGraphFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TaskGraphPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.TaskGraphFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TaskGraphPayload>
+          }
+          findFirst: {
+            args: Prisma.TaskGraphFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TaskGraphPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.TaskGraphFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TaskGraphPayload>
+          }
+          findMany: {
+            args: Prisma.TaskGraphFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TaskGraphPayload>[]
+          }
+          create: {
+            args: Prisma.TaskGraphCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TaskGraphPayload>
+          }
+          createMany: {
+            args: Prisma.TaskGraphCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.TaskGraphCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TaskGraphPayload>[]
+          }
+          delete: {
+            args: Prisma.TaskGraphDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TaskGraphPayload>
+          }
+          update: {
+            args: Prisma.TaskGraphUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TaskGraphPayload>
+          }
+          deleteMany: {
+            args: Prisma.TaskGraphDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.TaskGraphUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.TaskGraphUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TaskGraphPayload>[]
+          }
+          upsert: {
+            args: Prisma.TaskGraphUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TaskGraphPayload>
+          }
+          aggregate: {
+            args: Prisma.TaskGraphAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateTaskGraph>
+          }
+          groupBy: {
+            args: Prisma.TaskGraphGroupByArgs<ExtArgs>
+            result: $Utils.Optional<TaskGraphGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.TaskGraphCountArgs<ExtArgs>
+            result: $Utils.Optional<TaskGraphCountAggregateOutputType> | number
+          }
+        }
+      }
+      TaskGraphEpisode: {
+        payload: Prisma.$TaskGraphEpisodePayload<ExtArgs>
+        fields: Prisma.TaskGraphEpisodeFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.TaskGraphEpisodeFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TaskGraphEpisodePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.TaskGraphEpisodeFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TaskGraphEpisodePayload>
+          }
+          findFirst: {
+            args: Prisma.TaskGraphEpisodeFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TaskGraphEpisodePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.TaskGraphEpisodeFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TaskGraphEpisodePayload>
+          }
+          findMany: {
+            args: Prisma.TaskGraphEpisodeFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TaskGraphEpisodePayload>[]
+          }
+          create: {
+            args: Prisma.TaskGraphEpisodeCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TaskGraphEpisodePayload>
+          }
+          createMany: {
+            args: Prisma.TaskGraphEpisodeCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.TaskGraphEpisodeCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TaskGraphEpisodePayload>[]
+          }
+          delete: {
+            args: Prisma.TaskGraphEpisodeDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TaskGraphEpisodePayload>
+          }
+          update: {
+            args: Prisma.TaskGraphEpisodeUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TaskGraphEpisodePayload>
+          }
+          deleteMany: {
+            args: Prisma.TaskGraphEpisodeDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.TaskGraphEpisodeUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.TaskGraphEpisodeUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TaskGraphEpisodePayload>[]
+          }
+          upsert: {
+            args: Prisma.TaskGraphEpisodeUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TaskGraphEpisodePayload>
+          }
+          aggregate: {
+            args: Prisma.TaskGraphEpisodeAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateTaskGraphEpisode>
+          }
+          groupBy: {
+            args: Prisma.TaskGraphEpisodeGroupByArgs<ExtArgs>
+            result: $Utils.Optional<TaskGraphEpisodeGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.TaskGraphEpisodeCountArgs<ExtArgs>
+            result: $Utils.Optional<TaskGraphEpisodeCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -1944,7 +2149,7 @@ export namespace Prisma {
      * ```
      * // Defaults to stdout
      * log: ['query', 'info', 'warn', 'error']
-     * 
+     *
      * // Emit as events
      * log: [
      *   { emit: 'stdout', level: 'query' },
@@ -1968,7 +2173,7 @@ export namespace Prisma {
     }
     /**
      * Global configuration for omitting model fields by default.
-     * 
+     *
      * @example
      * ```
      * const prisma = new PrismaClient({
@@ -1996,6 +2201,8 @@ export namespace Prisma {
     accessGrant?: AccessGrantOmit
     auditEvent?: AuditEventOmit
     nodeEdge?: NodeEdgeOmit
+    taskGraph?: TaskGraphOmit
+    taskGraphEpisode?: TaskGraphEpisodeOmit
   }
 
   /* Types for Logging */
@@ -2093,12 +2300,14 @@ export namespace Prisma {
     projects: number
     policies: number
     auditEvents: number
+    taskGraphs: number
   }
 
   export type WorkspaceCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     projects?: boolean | WorkspaceCountOutputTypeCountProjectsArgs
     policies?: boolean | WorkspaceCountOutputTypeCountPoliciesArgs
     auditEvents?: boolean | WorkspaceCountOutputTypeCountAuditEventsArgs
+    taskGraphs?: boolean | WorkspaceCountOutputTypeCountTaskGraphsArgs
   }
 
   // Custom InputTypes
@@ -2133,6 +2342,13 @@ export namespace Prisma {
     where?: AuditEventWhereInput
   }
 
+  /**
+   * WorkspaceCountOutputType without action
+   */
+  export type WorkspaceCountOutputTypeCountTaskGraphsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TaskGraphWhereInput
+  }
+
 
   /**
    * Count Type ProjectCountOutputType
@@ -2144,6 +2360,7 @@ export namespace Prisma {
     policies: number
     accessGrants: number
     auditEvents: number
+    taskGraphs: number
   }
 
   export type ProjectCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2152,6 +2369,7 @@ export namespace Prisma {
     policies?: boolean | ProjectCountOutputTypeCountPoliciesArgs
     accessGrants?: boolean | ProjectCountOutputTypeCountAccessGrantsArgs
     auditEvents?: boolean | ProjectCountOutputTypeCountAuditEventsArgs
+    taskGraphs?: boolean | ProjectCountOutputTypeCountTaskGraphsArgs
   }
 
   // Custom InputTypes
@@ -2200,6 +2418,13 @@ export namespace Prisma {
     where?: AuditEventWhereInput
   }
 
+  /**
+   * ProjectCountOutputType without action
+   */
+  export type ProjectCountOutputTypeCountTaskGraphsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TaskGraphWhereInput
+  }
+
 
   /**
    * Count Type AgentCountOutputType
@@ -2212,6 +2437,8 @@ export namespace Prisma {
     memoryItems: number
     traceEvents: number
     artifacts: number
+    createdTaskGraphs: number
+    taskGraphEpisodes: number
   }
 
   export type AgentCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2221,6 +2448,8 @@ export namespace Prisma {
     memoryItems?: boolean | AgentCountOutputTypeCountMemoryItemsArgs
     traceEvents?: boolean | AgentCountOutputTypeCountTraceEventsArgs
     artifacts?: boolean | AgentCountOutputTypeCountArtifactsArgs
+    createdTaskGraphs?: boolean | AgentCountOutputTypeCountCreatedTaskGraphsArgs
+    taskGraphEpisodes?: boolean | AgentCountOutputTypeCountTaskGraphEpisodesArgs
   }
 
   // Custom InputTypes
@@ -2276,6 +2505,20 @@ export namespace Prisma {
     where?: ArtifactWhereInput
   }
 
+  /**
+   * AgentCountOutputType without action
+   */
+  export type AgentCountOutputTypeCountCreatedTaskGraphsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TaskGraphWhereInput
+  }
+
+  /**
+   * AgentCountOutputType without action
+   */
+  export type AgentCountOutputTypeCountTaskGraphEpisodesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TaskGraphEpisodeWhereInput
+  }
+
 
   /**
    * Count Type EpisodeCountOutputType
@@ -2289,6 +2532,8 @@ export namespace Prisma {
     artifacts: number
     auditEvents: number
     accessGrants: number
+    orchestratedTaskGraphs: number
+    taskGraphEpisodes: number
   }
 
   export type EpisodeCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2299,6 +2544,8 @@ export namespace Prisma {
     artifacts?: boolean | EpisodeCountOutputTypeCountArtifactsArgs
     auditEvents?: boolean | EpisodeCountOutputTypeCountAuditEventsArgs
     accessGrants?: boolean | EpisodeCountOutputTypeCountAccessGrantsArgs
+    orchestratedTaskGraphs?: boolean | EpisodeCountOutputTypeCountOrchestratedTaskGraphsArgs
+    taskGraphEpisodes?: boolean | EpisodeCountOutputTypeCountTaskGraphEpisodesArgs
   }
 
   // Custom InputTypes
@@ -2359,6 +2606,20 @@ export namespace Prisma {
    */
   export type EpisodeCountOutputTypeCountAccessGrantsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: AccessGrantWhereInput
+  }
+
+  /**
+   * EpisodeCountOutputType without action
+   */
+  export type EpisodeCountOutputTypeCountOrchestratedTaskGraphsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TaskGraphWhereInput
+  }
+
+  /**
+   * EpisodeCountOutputType without action
+   */
+  export type EpisodeCountOutputTypeCountTaskGraphEpisodesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TaskGraphEpisodeWhereInput
   }
 
 
@@ -2465,6 +2726,37 @@ export namespace Prisma {
 
 
   /**
+   * Count Type TaskGraphCountOutputType
+   */
+
+  export type TaskGraphCountOutputType = {
+    episodes: number
+  }
+
+  export type TaskGraphCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    episodes?: boolean | TaskGraphCountOutputTypeCountEpisodesArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * TaskGraphCountOutputType without action
+   */
+  export type TaskGraphCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TaskGraphCountOutputType
+     */
+    select?: TaskGraphCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * TaskGraphCountOutputType without action
+   */
+  export type TaskGraphCountOutputTypeCountEpisodesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TaskGraphEpisodeWhereInput
+  }
+
+
+  /**
    * Models
    */
 
@@ -2542,43 +2834,43 @@ export namespace Prisma {
     where?: WorkspaceWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of Workspaces to fetch.
      */
     orderBy?: WorkspaceOrderByWithRelationInput | WorkspaceOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the start position
      */
     cursor?: WorkspaceWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` Workspaces from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` Workspaces.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
+     *
      * Count returned Workspaces
     **/
     _count?: true | WorkspaceCountAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
+     *
      * Select which fields to find the minimum value
     **/
     _min?: WorkspaceMinAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
+     *
      * Select which fields to find the maximum value
     **/
     _max?: WorkspaceMaxAggregateInputType
@@ -2643,6 +2935,7 @@ export namespace Prisma {
     projects?: boolean | Workspace$projectsArgs<ExtArgs>
     policies?: boolean | Workspace$policiesArgs<ExtArgs>
     auditEvents?: boolean | Workspace$auditEventsArgs<ExtArgs>
+    taskGraphs?: boolean | Workspace$taskGraphsArgs<ExtArgs>
     _count?: boolean | WorkspaceCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["workspace"]>
 
@@ -2678,6 +2971,7 @@ export namespace Prisma {
     projects?: boolean | Workspace$projectsArgs<ExtArgs>
     policies?: boolean | Workspace$policiesArgs<ExtArgs>
     auditEvents?: boolean | Workspace$auditEventsArgs<ExtArgs>
+    taskGraphs?: boolean | Workspace$taskGraphsArgs<ExtArgs>
     _count?: boolean | WorkspaceCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type WorkspaceIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -2689,6 +2983,7 @@ export namespace Prisma {
       projects: Prisma.$ProjectPayload<ExtArgs>[]
       policies: Prisma.$PolicyPayload<ExtArgs>[]
       auditEvents: Prisma.$AuditEventPayload<ExtArgs>[]
+      taskGraphs: Prisma.$TaskGraphPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -2776,13 +3071,13 @@ export namespace Prisma {
      * @example
      * // Get all Workspaces
      * const workspaces = await prisma.workspace.findMany()
-     * 
+     *
      * // Get first 10 Workspaces
      * const workspaces = await prisma.workspace.findMany({ take: 10 })
-     * 
+     *
      * // Only select the `id`
      * const workspaceWithIdOnly = await prisma.workspace.findMany({ select: { id: true } })
-     * 
+     *
      */
     findMany<T extends WorkspaceFindManyArgs>(args?: SelectSubset<T, WorkspaceFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$WorkspacePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
 
@@ -2796,7 +3091,7 @@ export namespace Prisma {
      *     // ... data to create a Workspace
      *   }
      * })
-     * 
+     *
      */
     create<T extends WorkspaceCreateArgs>(args: SelectSubset<T, WorkspaceCreateArgs<ExtArgs>>): Prisma__WorkspaceClient<$Result.GetResult<Prisma.$WorkspacePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -2810,7 +3105,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   ]
      * })
-     *     
+     *
      */
     createMany<T extends WorkspaceCreateManyArgs>(args?: SelectSubset<T, WorkspaceCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -2824,7 +3119,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   ]
      * })
-     * 
+     *
      * // Create many Workspaces and only return the `id`
      * const workspaceWithIdOnly = await prisma.workspace.createManyAndReturn({
      *   select: { id: true },
@@ -2834,7 +3129,7 @@ export namespace Prisma {
      * })
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * 
+     *
      */
     createManyAndReturn<T extends WorkspaceCreateManyAndReturnArgs>(args?: SelectSubset<T, WorkspaceCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$WorkspacePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
 
@@ -2848,7 +3143,7 @@ export namespace Prisma {
      *     // ... filter to delete one Workspace
      *   }
      * })
-     * 
+     *
      */
     delete<T extends WorkspaceDeleteArgs>(args: SelectSubset<T, WorkspaceDeleteArgs<ExtArgs>>): Prisma__WorkspaceClient<$Result.GetResult<Prisma.$WorkspacePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -2865,7 +3160,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   }
      * })
-     * 
+     *
      */
     update<T extends WorkspaceUpdateArgs>(args: SelectSubset<T, WorkspaceUpdateArgs<ExtArgs>>): Prisma__WorkspaceClient<$Result.GetResult<Prisma.$WorkspacePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -2879,7 +3174,7 @@ export namespace Prisma {
      *     // ... provide filter here
      *   }
      * })
-     * 
+     *
      */
     deleteMany<T extends WorkspaceDeleteManyArgs>(args?: SelectSubset<T, WorkspaceDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -2898,7 +3193,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   }
      * })
-     * 
+     *
      */
     updateMany<T extends WorkspaceUpdateManyArgs>(args: SelectSubset<T, WorkspaceUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -2915,7 +3210,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   ]
      * })
-     * 
+     *
      * // Update zero or more Workspaces and only return the `id`
      * const workspaceWithIdOnly = await prisma.workspace.updateManyAndReturn({
      *   select: { id: true },
@@ -2928,7 +3223,7 @@ export namespace Prisma {
      * })
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * 
+     *
      */
     updateManyAndReturn<T extends WorkspaceUpdateManyAndReturnArgs>(args: SelectSubset<T, WorkspaceUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$WorkspacePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
 
@@ -3017,7 +3312,7 @@ export namespace Prisma {
      *     _all: true
      *   },
      * })
-     * 
+     *
     **/
     groupBy<
       T extends WorkspaceGroupByArgs,
@@ -3094,6 +3389,7 @@ export namespace Prisma {
     projects<T extends Workspace$projectsArgs<ExtArgs> = {}>(args?: Subset<T, Workspace$projectsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     policies<T extends Workspace$policiesArgs<ExtArgs> = {}>(args?: Subset<T, Workspace$policiesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PolicyPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     auditEvents<T extends Workspace$auditEventsArgs<ExtArgs> = {}>(args?: Subset<T, Workspace$auditEventsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AuditEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    taskGraphs<T extends Workspace$taskGraphsArgs<ExtArgs> = {}>(args?: Subset<T, Workspace$taskGraphsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TaskGraphPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3130,7 +3426,7 @@ export namespace Prisma {
     readonly createdAt: FieldRef<"Workspace", 'DateTime'>
     readonly updatedAt: FieldRef<"Workspace", 'DateTime'>
   }
-    
+
 
   // Custom InputTypes
   /**
@@ -3199,31 +3495,31 @@ export namespace Prisma {
     where?: WorkspaceWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of Workspaces to fetch.
      */
     orderBy?: WorkspaceOrderByWithRelationInput | WorkspaceOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the position for searching for Workspaces.
      */
     cursor?: WorkspaceWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` Workspaces from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` Workspaces.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
+     *
      * Filter by unique combinations of Workspaces.
      */
     distinct?: WorkspaceScalarFieldEnum | WorkspaceScalarFieldEnum[]
@@ -3251,31 +3547,31 @@ export namespace Prisma {
     where?: WorkspaceWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of Workspaces to fetch.
      */
     orderBy?: WorkspaceOrderByWithRelationInput | WorkspaceOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the position for searching for Workspaces.
      */
     cursor?: WorkspaceWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` Workspaces from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` Workspaces.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
+     *
      * Filter by unique combinations of Workspaces.
      */
     distinct?: WorkspaceScalarFieldEnum | WorkspaceScalarFieldEnum[]
@@ -3303,25 +3599,25 @@ export namespace Prisma {
     where?: WorkspaceWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of Workspaces to fetch.
      */
     orderBy?: WorkspaceOrderByWithRelationInput | WorkspaceOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the position for listing Workspaces.
      */
     cursor?: WorkspaceWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` Workspaces from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` Workspaces.
      */
     skip?: number
@@ -3589,6 +3885,30 @@ export namespace Prisma {
   }
 
   /**
+   * Workspace.taskGraphs
+   */
+  export type Workspace$taskGraphsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TaskGraph
+     */
+    select?: TaskGraphSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TaskGraph
+     */
+    omit?: TaskGraphOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TaskGraphInclude<ExtArgs> | null
+    where?: TaskGraphWhereInput
+    orderBy?: TaskGraphOrderByWithRelationInput | TaskGraphOrderByWithRelationInput[]
+    cursor?: TaskGraphWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: TaskGraphScalarFieldEnum | TaskGraphScalarFieldEnum[]
+  }
+
+  /**
    * Workspace without action
    */
   export type WorkspaceDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -3697,43 +4017,43 @@ export namespace Prisma {
     where?: ProjectWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of Projects to fetch.
      */
     orderBy?: ProjectOrderByWithRelationInput | ProjectOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the start position
      */
     cursor?: ProjectWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` Projects from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` Projects.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
+     *
      * Count returned Projects
     **/
     _count?: true | ProjectCountAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
+     *
      * Select which fields to find the minimum value
     **/
     _min?: ProjectMinAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
+     *
      * Select which fields to find the maximum value
     **/
     _max?: ProjectMaxAggregateInputType
@@ -3809,6 +4129,7 @@ export namespace Prisma {
     policies?: boolean | Project$policiesArgs<ExtArgs>
     accessGrants?: boolean | Project$accessGrantsArgs<ExtArgs>
     auditEvents?: boolean | Project$auditEventsArgs<ExtArgs>
+    taskGraphs?: boolean | Project$taskGraphsArgs<ExtArgs>
     _count?: boolean | ProjectCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["project"]>
 
@@ -3861,6 +4182,7 @@ export namespace Prisma {
     policies?: boolean | Project$policiesArgs<ExtArgs>
     accessGrants?: boolean | Project$accessGrantsArgs<ExtArgs>
     auditEvents?: boolean | Project$auditEventsArgs<ExtArgs>
+    taskGraphs?: boolean | Project$taskGraphsArgs<ExtArgs>
     _count?: boolean | ProjectCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type ProjectIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -3879,6 +4201,7 @@ export namespace Prisma {
       policies: Prisma.$PolicyPayload<ExtArgs>[]
       accessGrants: Prisma.$AccessGrantPayload<ExtArgs>[]
       auditEvents: Prisma.$AuditEventPayload<ExtArgs>[]
+      taskGraphs: Prisma.$TaskGraphPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -3970,13 +4293,13 @@ export namespace Prisma {
      * @example
      * // Get all Projects
      * const projects = await prisma.project.findMany()
-     * 
+     *
      * // Get first 10 Projects
      * const projects = await prisma.project.findMany({ take: 10 })
-     * 
+     *
      * // Only select the `id`
      * const projectWithIdOnly = await prisma.project.findMany({ select: { id: true } })
-     * 
+     *
      */
     findMany<T extends ProjectFindManyArgs>(args?: SelectSubset<T, ProjectFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
 
@@ -3990,7 +4313,7 @@ export namespace Prisma {
      *     // ... data to create a Project
      *   }
      * })
-     * 
+     *
      */
     create<T extends ProjectCreateArgs>(args: SelectSubset<T, ProjectCreateArgs<ExtArgs>>): Prisma__ProjectClient<$Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -4004,7 +4327,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   ]
      * })
-     *     
+     *
      */
     createMany<T extends ProjectCreateManyArgs>(args?: SelectSubset<T, ProjectCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -4018,7 +4341,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   ]
      * })
-     * 
+     *
      * // Create many Projects and only return the `id`
      * const projectWithIdOnly = await prisma.project.createManyAndReturn({
      *   select: { id: true },
@@ -4028,7 +4351,7 @@ export namespace Prisma {
      * })
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * 
+     *
      */
     createManyAndReturn<T extends ProjectCreateManyAndReturnArgs>(args?: SelectSubset<T, ProjectCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
 
@@ -4042,7 +4365,7 @@ export namespace Prisma {
      *     // ... filter to delete one Project
      *   }
      * })
-     * 
+     *
      */
     delete<T extends ProjectDeleteArgs>(args: SelectSubset<T, ProjectDeleteArgs<ExtArgs>>): Prisma__ProjectClient<$Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -4059,7 +4382,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   }
      * })
-     * 
+     *
      */
     update<T extends ProjectUpdateArgs>(args: SelectSubset<T, ProjectUpdateArgs<ExtArgs>>): Prisma__ProjectClient<$Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -4073,7 +4396,7 @@ export namespace Prisma {
      *     // ... provide filter here
      *   }
      * })
-     * 
+     *
      */
     deleteMany<T extends ProjectDeleteManyArgs>(args?: SelectSubset<T, ProjectDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -4092,7 +4415,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   }
      * })
-     * 
+     *
      */
     updateMany<T extends ProjectUpdateManyArgs>(args: SelectSubset<T, ProjectUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -4109,7 +4432,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   ]
      * })
-     * 
+     *
      * // Update zero or more Projects and only return the `id`
      * const projectWithIdOnly = await prisma.project.updateManyAndReturn({
      *   select: { id: true },
@@ -4122,7 +4445,7 @@ export namespace Prisma {
      * })
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * 
+     *
      */
     updateManyAndReturn<T extends ProjectUpdateManyAndReturnArgs>(args: SelectSubset<T, ProjectUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
 
@@ -4211,7 +4534,7 @@ export namespace Prisma {
      *     _all: true
      *   },
      * })
-     * 
+     *
     **/
     groupBy<
       T extends ProjectGroupByArgs,
@@ -4291,6 +4614,7 @@ export namespace Prisma {
     policies<T extends Project$policiesArgs<ExtArgs> = {}>(args?: Subset<T, Project$policiesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PolicyPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     accessGrants<T extends Project$accessGrantsArgs<ExtArgs> = {}>(args?: Subset<T, Project$accessGrantsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AccessGrantPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     auditEvents<T extends Project$auditEventsArgs<ExtArgs> = {}>(args?: Subset<T, Project$auditEventsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AuditEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    taskGraphs<T extends Project$taskGraphsArgs<ExtArgs> = {}>(args?: Subset<T, Project$taskGraphsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TaskGraphPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4331,7 +4655,7 @@ export namespace Prisma {
     readonly createdAt: FieldRef<"Project", 'DateTime'>
     readonly updatedAt: FieldRef<"Project", 'DateTime'>
   }
-    
+
 
   // Custom InputTypes
   /**
@@ -4400,31 +4724,31 @@ export namespace Prisma {
     where?: ProjectWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of Projects to fetch.
      */
     orderBy?: ProjectOrderByWithRelationInput | ProjectOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the position for searching for Projects.
      */
     cursor?: ProjectWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` Projects from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` Projects.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
+     *
      * Filter by unique combinations of Projects.
      */
     distinct?: ProjectScalarFieldEnum | ProjectScalarFieldEnum[]
@@ -4452,31 +4776,31 @@ export namespace Prisma {
     where?: ProjectWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of Projects to fetch.
      */
     orderBy?: ProjectOrderByWithRelationInput | ProjectOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the position for searching for Projects.
      */
     cursor?: ProjectWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` Projects from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` Projects.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
+     *
      * Filter by unique combinations of Projects.
      */
     distinct?: ProjectScalarFieldEnum | ProjectScalarFieldEnum[]
@@ -4504,25 +4828,25 @@ export namespace Prisma {
     where?: ProjectWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of Projects to fetch.
      */
     orderBy?: ProjectOrderByWithRelationInput | ProjectOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the position for listing Projects.
      */
     cursor?: ProjectWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` Projects from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` Projects.
      */
     skip?: number
@@ -4846,6 +5170,30 @@ export namespace Prisma {
   }
 
   /**
+   * Project.taskGraphs
+   */
+  export type Project$taskGraphsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TaskGraph
+     */
+    select?: TaskGraphSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TaskGraph
+     */
+    omit?: TaskGraphOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TaskGraphInclude<ExtArgs> | null
+    where?: TaskGraphWhereInput
+    orderBy?: TaskGraphOrderByWithRelationInput | TaskGraphOrderByWithRelationInput[]
+    cursor?: TaskGraphWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: TaskGraphScalarFieldEnum | TaskGraphScalarFieldEnum[]
+  }
+
+  /**
    * Project without action
    */
   export type ProjectDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -4948,43 +5296,43 @@ export namespace Prisma {
     where?: AgentWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of Agents to fetch.
      */
     orderBy?: AgentOrderByWithRelationInput | AgentOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the start position
      */
     cursor?: AgentWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` Agents from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` Agents.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
+     *
      * Count returned Agents
     **/
     _count?: true | AgentCountAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
+     *
      * Select which fields to find the minimum value
     **/
     _min?: AgentMinAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
+     *
      * Select which fields to find the maximum value
     **/
     _max?: AgentMaxAggregateInputType
@@ -5058,6 +5406,8 @@ export namespace Prisma {
     memoryItems?: boolean | Agent$memoryItemsArgs<ExtArgs>
     traceEvents?: boolean | Agent$traceEventsArgs<ExtArgs>
     artifacts?: boolean | Agent$artifactsArgs<ExtArgs>
+    createdTaskGraphs?: boolean | Agent$createdTaskGraphsArgs<ExtArgs>
+    taskGraphEpisodes?: boolean | Agent$taskGraphEpisodesArgs<ExtArgs>
     _count?: boolean | AgentCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["agent"]>
 
@@ -5105,6 +5455,8 @@ export namespace Prisma {
     memoryItems?: boolean | Agent$memoryItemsArgs<ExtArgs>
     traceEvents?: boolean | Agent$traceEventsArgs<ExtArgs>
     artifacts?: boolean | Agent$artifactsArgs<ExtArgs>
+    createdTaskGraphs?: boolean | Agent$createdTaskGraphsArgs<ExtArgs>
+    taskGraphEpisodes?: boolean | Agent$taskGraphEpisodesArgs<ExtArgs>
     _count?: boolean | AgentCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type AgentIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -5119,6 +5471,8 @@ export namespace Prisma {
       memoryItems: Prisma.$MemoryItemPayload<ExtArgs>[]
       traceEvents: Prisma.$TraceEventPayload<ExtArgs>[]
       artifacts: Prisma.$ArtifactPayload<ExtArgs>[]
+      createdTaskGraphs: Prisma.$TaskGraphPayload<ExtArgs>[]
+      taskGraphEpisodes: Prisma.$TaskGraphEpisodePayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -5209,13 +5563,13 @@ export namespace Prisma {
      * @example
      * // Get all Agents
      * const agents = await prisma.agent.findMany()
-     * 
+     *
      * // Get first 10 Agents
      * const agents = await prisma.agent.findMany({ take: 10 })
-     * 
+     *
      * // Only select the `id`
      * const agentWithIdOnly = await prisma.agent.findMany({ select: { id: true } })
-     * 
+     *
      */
     findMany<T extends AgentFindManyArgs>(args?: SelectSubset<T, AgentFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
 
@@ -5229,7 +5583,7 @@ export namespace Prisma {
      *     // ... data to create a Agent
      *   }
      * })
-     * 
+     *
      */
     create<T extends AgentCreateArgs>(args: SelectSubset<T, AgentCreateArgs<ExtArgs>>): Prisma__AgentClient<$Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -5243,7 +5597,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   ]
      * })
-     *     
+     *
      */
     createMany<T extends AgentCreateManyArgs>(args?: SelectSubset<T, AgentCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -5257,7 +5611,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   ]
      * })
-     * 
+     *
      * // Create many Agents and only return the `id`
      * const agentWithIdOnly = await prisma.agent.createManyAndReturn({
      *   select: { id: true },
@@ -5267,7 +5621,7 @@ export namespace Prisma {
      * })
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * 
+     *
      */
     createManyAndReturn<T extends AgentCreateManyAndReturnArgs>(args?: SelectSubset<T, AgentCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
 
@@ -5281,7 +5635,7 @@ export namespace Prisma {
      *     // ... filter to delete one Agent
      *   }
      * })
-     * 
+     *
      */
     delete<T extends AgentDeleteArgs>(args: SelectSubset<T, AgentDeleteArgs<ExtArgs>>): Prisma__AgentClient<$Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -5298,7 +5652,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   }
      * })
-     * 
+     *
      */
     update<T extends AgentUpdateArgs>(args: SelectSubset<T, AgentUpdateArgs<ExtArgs>>): Prisma__AgentClient<$Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -5312,7 +5666,7 @@ export namespace Prisma {
      *     // ... provide filter here
      *   }
      * })
-     * 
+     *
      */
     deleteMany<T extends AgentDeleteManyArgs>(args?: SelectSubset<T, AgentDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -5331,7 +5685,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   }
      * })
-     * 
+     *
      */
     updateMany<T extends AgentUpdateManyArgs>(args: SelectSubset<T, AgentUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -5348,7 +5702,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   ]
      * })
-     * 
+     *
      * // Update zero or more Agents and only return the `id`
      * const agentWithIdOnly = await prisma.agent.updateManyAndReturn({
      *   select: { id: true },
@@ -5361,7 +5715,7 @@ export namespace Prisma {
      * })
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * 
+     *
      */
     updateManyAndReturn<T extends AgentUpdateManyAndReturnArgs>(args: SelectSubset<T, AgentUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
 
@@ -5450,7 +5804,7 @@ export namespace Prisma {
      *     _all: true
      *   },
      * })
-     * 
+     *
     **/
     groupBy<
       T extends AgentGroupByArgs,
@@ -5530,6 +5884,8 @@ export namespace Prisma {
     memoryItems<T extends Agent$memoryItemsArgs<ExtArgs> = {}>(args?: Subset<T, Agent$memoryItemsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MemoryItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     traceEvents<T extends Agent$traceEventsArgs<ExtArgs> = {}>(args?: Subset<T, Agent$traceEventsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TraceEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     artifacts<T extends Agent$artifactsArgs<ExtArgs> = {}>(args?: Subset<T, Agent$artifactsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ArtifactPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    createdTaskGraphs<T extends Agent$createdTaskGraphsArgs<ExtArgs> = {}>(args?: Subset<T, Agent$createdTaskGraphsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TaskGraphPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    taskGraphEpisodes<T extends Agent$taskGraphEpisodesArgs<ExtArgs> = {}>(args?: Subset<T, Agent$taskGraphEpisodesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TaskGraphEpisodePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -5569,7 +5925,7 @@ export namespace Prisma {
     readonly createdAt: FieldRef<"Agent", 'DateTime'>
     readonly updatedAt: FieldRef<"Agent", 'DateTime'>
   }
-    
+
 
   // Custom InputTypes
   /**
@@ -5638,31 +5994,31 @@ export namespace Prisma {
     where?: AgentWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of Agents to fetch.
      */
     orderBy?: AgentOrderByWithRelationInput | AgentOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the position for searching for Agents.
      */
     cursor?: AgentWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` Agents from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` Agents.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
+     *
      * Filter by unique combinations of Agents.
      */
     distinct?: AgentScalarFieldEnum | AgentScalarFieldEnum[]
@@ -5690,31 +6046,31 @@ export namespace Prisma {
     where?: AgentWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of Agents to fetch.
      */
     orderBy?: AgentOrderByWithRelationInput | AgentOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the position for searching for Agents.
      */
     cursor?: AgentWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` Agents from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` Agents.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
+     *
      * Filter by unique combinations of Agents.
      */
     distinct?: AgentScalarFieldEnum | AgentScalarFieldEnum[]
@@ -5742,25 +6098,25 @@ export namespace Prisma {
     where?: AgentWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of Agents to fetch.
      */
     orderBy?: AgentOrderByWithRelationInput | AgentOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the position for listing Agents.
      */
     cursor?: AgentWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` Agents from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` Agents.
      */
     skip?: number
@@ -6100,6 +6456,54 @@ export namespace Prisma {
   }
 
   /**
+   * Agent.createdTaskGraphs
+   */
+  export type Agent$createdTaskGraphsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TaskGraph
+     */
+    select?: TaskGraphSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TaskGraph
+     */
+    omit?: TaskGraphOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TaskGraphInclude<ExtArgs> | null
+    where?: TaskGraphWhereInput
+    orderBy?: TaskGraphOrderByWithRelationInput | TaskGraphOrderByWithRelationInput[]
+    cursor?: TaskGraphWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: TaskGraphScalarFieldEnum | TaskGraphScalarFieldEnum[]
+  }
+
+  /**
+   * Agent.taskGraphEpisodes
+   */
+  export type Agent$taskGraphEpisodesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TaskGraphEpisode
+     */
+    select?: TaskGraphEpisodeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TaskGraphEpisode
+     */
+    omit?: TaskGraphEpisodeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TaskGraphEpisodeInclude<ExtArgs> | null
+    where?: TaskGraphEpisodeWhereInput
+    orderBy?: TaskGraphEpisodeOrderByWithRelationInput | TaskGraphEpisodeOrderByWithRelationInput[]
+    cursor?: TaskGraphEpisodeWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: TaskGraphEpisodeScalarFieldEnum | TaskGraphEpisodeScalarFieldEnum[]
+  }
+
+  /**
    * Agent without action
    */
   export type AgentDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -6174,43 +6578,43 @@ export namespace Prisma {
     where?: ProjectAgentWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of ProjectAgents to fetch.
      */
     orderBy?: ProjectAgentOrderByWithRelationInput | ProjectAgentOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the start position
      */
     cursor?: ProjectAgentWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` ProjectAgents from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` ProjectAgents.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
+     *
      * Count returned ProjectAgents
     **/
     _count?: true | ProjectAgentCountAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
+     *
      * Select which fields to find the minimum value
     **/
     _min?: ProjectAgentMinAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
+     *
      * Select which fields to find the maximum value
     **/
     _max?: ProjectAgentMaxAggregateInputType
@@ -6395,13 +6799,13 @@ export namespace Prisma {
      * @example
      * // Get all ProjectAgents
      * const projectAgents = await prisma.projectAgent.findMany()
-     * 
+     *
      * // Get first 10 ProjectAgents
      * const projectAgents = await prisma.projectAgent.findMany({ take: 10 })
-     * 
+     *
      * // Only select the `projectId`
      * const projectAgentWithProjectIdOnly = await prisma.projectAgent.findMany({ select: { projectId: true } })
-     * 
+     *
      */
     findMany<T extends ProjectAgentFindManyArgs>(args?: SelectSubset<T, ProjectAgentFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProjectAgentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
 
@@ -6415,7 +6819,7 @@ export namespace Prisma {
      *     // ... data to create a ProjectAgent
      *   }
      * })
-     * 
+     *
      */
     create<T extends ProjectAgentCreateArgs>(args: SelectSubset<T, ProjectAgentCreateArgs<ExtArgs>>): Prisma__ProjectAgentClient<$Result.GetResult<Prisma.$ProjectAgentPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -6429,7 +6833,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   ]
      * })
-     *     
+     *
      */
     createMany<T extends ProjectAgentCreateManyArgs>(args?: SelectSubset<T, ProjectAgentCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -6443,7 +6847,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   ]
      * })
-     * 
+     *
      * // Create many ProjectAgents and only return the `projectId`
      * const projectAgentWithProjectIdOnly = await prisma.projectAgent.createManyAndReturn({
      *   select: { projectId: true },
@@ -6453,7 +6857,7 @@ export namespace Prisma {
      * })
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * 
+     *
      */
     createManyAndReturn<T extends ProjectAgentCreateManyAndReturnArgs>(args?: SelectSubset<T, ProjectAgentCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProjectAgentPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
 
@@ -6467,7 +6871,7 @@ export namespace Prisma {
      *     // ... filter to delete one ProjectAgent
      *   }
      * })
-     * 
+     *
      */
     delete<T extends ProjectAgentDeleteArgs>(args: SelectSubset<T, ProjectAgentDeleteArgs<ExtArgs>>): Prisma__ProjectAgentClient<$Result.GetResult<Prisma.$ProjectAgentPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -6484,7 +6888,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   }
      * })
-     * 
+     *
      */
     update<T extends ProjectAgentUpdateArgs>(args: SelectSubset<T, ProjectAgentUpdateArgs<ExtArgs>>): Prisma__ProjectAgentClient<$Result.GetResult<Prisma.$ProjectAgentPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -6498,7 +6902,7 @@ export namespace Prisma {
      *     // ... provide filter here
      *   }
      * })
-     * 
+     *
      */
     deleteMany<T extends ProjectAgentDeleteManyArgs>(args?: SelectSubset<T, ProjectAgentDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -6517,7 +6921,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   }
      * })
-     * 
+     *
      */
     updateMany<T extends ProjectAgentUpdateManyArgs>(args: SelectSubset<T, ProjectAgentUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -6534,7 +6938,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   ]
      * })
-     * 
+     *
      * // Update zero or more ProjectAgents and only return the `projectId`
      * const projectAgentWithProjectIdOnly = await prisma.projectAgent.updateManyAndReturn({
      *   select: { projectId: true },
@@ -6547,7 +6951,7 @@ export namespace Prisma {
      * })
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * 
+     *
      */
     updateManyAndReturn<T extends ProjectAgentUpdateManyAndReturnArgs>(args: SelectSubset<T, ProjectAgentUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProjectAgentPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
 
@@ -6636,7 +7040,7 @@ export namespace Prisma {
      *     _all: true
      *   },
      * })
-     * 
+     *
     **/
     groupBy<
       T extends ProjectAgentGroupByArgs,
@@ -6745,7 +7149,7 @@ export namespace Prisma {
     readonly agentId: FieldRef<"ProjectAgent", 'String'>
     readonly createdAt: FieldRef<"ProjectAgent", 'DateTime'>
   }
-    
+
 
   // Custom InputTypes
   /**
@@ -6814,31 +7218,31 @@ export namespace Prisma {
     where?: ProjectAgentWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of ProjectAgents to fetch.
      */
     orderBy?: ProjectAgentOrderByWithRelationInput | ProjectAgentOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the position for searching for ProjectAgents.
      */
     cursor?: ProjectAgentWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` ProjectAgents from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` ProjectAgents.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
+     *
      * Filter by unique combinations of ProjectAgents.
      */
     distinct?: ProjectAgentScalarFieldEnum | ProjectAgentScalarFieldEnum[]
@@ -6866,31 +7270,31 @@ export namespace Prisma {
     where?: ProjectAgentWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of ProjectAgents to fetch.
      */
     orderBy?: ProjectAgentOrderByWithRelationInput | ProjectAgentOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the position for searching for ProjectAgents.
      */
     cursor?: ProjectAgentWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` ProjectAgents from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` ProjectAgents.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
+     *
      * Filter by unique combinations of ProjectAgents.
      */
     distinct?: ProjectAgentScalarFieldEnum | ProjectAgentScalarFieldEnum[]
@@ -6918,25 +7322,25 @@ export namespace Prisma {
     where?: ProjectAgentWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of ProjectAgents to fetch.
      */
     orderBy?: ProjectAgentOrderByWithRelationInput | ProjectAgentOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the position for listing ProjectAgents.
      */
     cursor?: ProjectAgentWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` ProjectAgents from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` ProjectAgents.
      */
     skip?: number
@@ -7173,6 +7577,7 @@ export namespace Prisma {
     projectId: string | null
     primaryAgentId: string | null
     parentEpisodeId: string | null
+    forkPointTraceId: string | null
     primaryActor: string | null
     workType: $Enums.WorkType | null
     relationIntent: $Enums.EdgeType | null
@@ -7190,6 +7595,7 @@ export namespace Prisma {
     projectId: string | null
     primaryAgentId: string | null
     parentEpisodeId: string | null
+    forkPointTraceId: string | null
     primaryActor: string | null
     workType: $Enums.WorkType | null
     relationIntent: $Enums.EdgeType | null
@@ -7207,6 +7613,7 @@ export namespace Prisma {
     projectId: number
     primaryAgentId: number
     parentEpisodeId: number
+    forkPointTraceId: number
     titleI18n: number
     summaryI18n: number
     goalI18n: number
@@ -7233,6 +7640,7 @@ export namespace Prisma {
     projectId?: true
     primaryAgentId?: true
     parentEpisodeId?: true
+    forkPointTraceId?: true
     primaryActor?: true
     workType?: true
     relationIntent?: true
@@ -7250,6 +7658,7 @@ export namespace Prisma {
     projectId?: true
     primaryAgentId?: true
     parentEpisodeId?: true
+    forkPointTraceId?: true
     primaryActor?: true
     workType?: true
     relationIntent?: true
@@ -7267,6 +7676,7 @@ export namespace Prisma {
     projectId?: true
     primaryAgentId?: true
     parentEpisodeId?: true
+    forkPointTraceId?: true
     titleI18n?: true
     summaryI18n?: true
     goalI18n?: true
@@ -7294,43 +7704,43 @@ export namespace Prisma {
     where?: EpisodeWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of Episodes to fetch.
      */
     orderBy?: EpisodeOrderByWithRelationInput | EpisodeOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the start position
      */
     cursor?: EpisodeWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` Episodes from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` Episodes.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
+     *
      * Count returned Episodes
     **/
     _count?: true | EpisodeCountAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
+     *
      * Select which fields to find the minimum value
     **/
     _min?: EpisodeMinAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
+     *
      * Select which fields to find the maximum value
     **/
     _max?: EpisodeMaxAggregateInputType
@@ -7364,6 +7774,7 @@ export namespace Prisma {
     projectId: string
     primaryAgentId: string
     parentEpisodeId: string | null
+    forkPointTraceId: string | null
     titleI18n: JsonValue
     summaryI18n: JsonValue | null
     goalI18n: JsonValue | null
@@ -7405,6 +7816,7 @@ export namespace Prisma {
     projectId?: boolean
     primaryAgentId?: boolean
     parentEpisodeId?: boolean
+    forkPointTraceId?: boolean
     titleI18n?: boolean
     summaryI18n?: boolean
     goalI18n?: boolean
@@ -7432,6 +7844,8 @@ export namespace Prisma {
     artifacts?: boolean | Episode$artifactsArgs<ExtArgs>
     auditEvents?: boolean | Episode$auditEventsArgs<ExtArgs>
     accessGrants?: boolean | Episode$accessGrantsArgs<ExtArgs>
+    orchestratedTaskGraphs?: boolean | Episode$orchestratedTaskGraphsArgs<ExtArgs>
+    taskGraphEpisodes?: boolean | Episode$taskGraphEpisodesArgs<ExtArgs>
     _count?: boolean | EpisodeCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["episode"]>
 
@@ -7440,6 +7854,7 @@ export namespace Prisma {
     projectId?: boolean
     primaryAgentId?: boolean
     parentEpisodeId?: boolean
+    forkPointTraceId?: boolean
     titleI18n?: boolean
     summaryI18n?: boolean
     goalI18n?: boolean
@@ -7467,6 +7882,7 @@ export namespace Prisma {
     projectId?: boolean
     primaryAgentId?: boolean
     parentEpisodeId?: boolean
+    forkPointTraceId?: boolean
     titleI18n?: boolean
     summaryI18n?: boolean
     goalI18n?: boolean
@@ -7494,6 +7910,7 @@ export namespace Prisma {
     projectId?: boolean
     primaryAgentId?: boolean
     parentEpisodeId?: boolean
+    forkPointTraceId?: boolean
     titleI18n?: boolean
     summaryI18n?: boolean
     goalI18n?: boolean
@@ -7513,7 +7930,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type EpisodeOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "projectId" | "primaryAgentId" | "parentEpisodeId" | "titleI18n" | "summaryI18n" | "goalI18n" | "successCriteriaI18n" | "finalOutcomeI18n" | "primaryActor" | "workType" | "relationIntent" | "status" | "blockedReasonI18n" | "failureReasonI18n" | "reviewOutcome" | "policyVersion" | "startedAt" | "endedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["episode"]>
+  export type EpisodeOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "projectId" | "primaryAgentId" | "parentEpisodeId" | "forkPointTraceId" | "titleI18n" | "summaryI18n" | "goalI18n" | "successCriteriaI18n" | "finalOutcomeI18n" | "primaryActor" | "workType" | "relationIntent" | "status" | "blockedReasonI18n" | "failureReasonI18n" | "reviewOutcome" | "policyVersion" | "startedAt" | "endedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["episode"]>
   export type EpisodeInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     project?: boolean | ProjectDefaultArgs<ExtArgs>
     primaryAgent?: boolean | AgentDefaultArgs<ExtArgs>
@@ -7525,6 +7942,8 @@ export namespace Prisma {
     artifacts?: boolean | Episode$artifactsArgs<ExtArgs>
     auditEvents?: boolean | Episode$auditEventsArgs<ExtArgs>
     accessGrants?: boolean | Episode$accessGrantsArgs<ExtArgs>
+    orchestratedTaskGraphs?: boolean | Episode$orchestratedTaskGraphsArgs<ExtArgs>
+    taskGraphEpisodes?: boolean | Episode$taskGraphEpisodesArgs<ExtArgs>
     _count?: boolean | EpisodeCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type EpisodeIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -7551,12 +7970,15 @@ export namespace Prisma {
       artifacts: Prisma.$ArtifactPayload<ExtArgs>[]
       auditEvents: Prisma.$AuditEventPayload<ExtArgs>[]
       accessGrants: Prisma.$AccessGrantPayload<ExtArgs>[]
+      orchestratedTaskGraphs: Prisma.$TaskGraphPayload<ExtArgs>[]
+      taskGraphEpisodes: Prisma.$TaskGraphEpisodePayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       projectId: string
       primaryAgentId: string
       parentEpisodeId: string | null
+      forkPointTraceId: string | null
       titleI18n: Prisma.JsonValue
       summaryI18n: Prisma.JsonValue | null
       goalI18n: Prisma.JsonValue | null
@@ -7653,13 +8075,13 @@ export namespace Prisma {
      * @example
      * // Get all Episodes
      * const episodes = await prisma.episode.findMany()
-     * 
+     *
      * // Get first 10 Episodes
      * const episodes = await prisma.episode.findMany({ take: 10 })
-     * 
+     *
      * // Only select the `id`
      * const episodeWithIdOnly = await prisma.episode.findMany({ select: { id: true } })
-     * 
+     *
      */
     findMany<T extends EpisodeFindManyArgs>(args?: SelectSubset<T, EpisodeFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EpisodePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
 
@@ -7673,7 +8095,7 @@ export namespace Prisma {
      *     // ... data to create a Episode
      *   }
      * })
-     * 
+     *
      */
     create<T extends EpisodeCreateArgs>(args: SelectSubset<T, EpisodeCreateArgs<ExtArgs>>): Prisma__EpisodeClient<$Result.GetResult<Prisma.$EpisodePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -7687,7 +8109,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   ]
      * })
-     *     
+     *
      */
     createMany<T extends EpisodeCreateManyArgs>(args?: SelectSubset<T, EpisodeCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -7701,7 +8123,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   ]
      * })
-     * 
+     *
      * // Create many Episodes and only return the `id`
      * const episodeWithIdOnly = await prisma.episode.createManyAndReturn({
      *   select: { id: true },
@@ -7711,7 +8133,7 @@ export namespace Prisma {
      * })
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * 
+     *
      */
     createManyAndReturn<T extends EpisodeCreateManyAndReturnArgs>(args?: SelectSubset<T, EpisodeCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EpisodePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
 
@@ -7725,7 +8147,7 @@ export namespace Prisma {
      *     // ... filter to delete one Episode
      *   }
      * })
-     * 
+     *
      */
     delete<T extends EpisodeDeleteArgs>(args: SelectSubset<T, EpisodeDeleteArgs<ExtArgs>>): Prisma__EpisodeClient<$Result.GetResult<Prisma.$EpisodePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -7742,7 +8164,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   }
      * })
-     * 
+     *
      */
     update<T extends EpisodeUpdateArgs>(args: SelectSubset<T, EpisodeUpdateArgs<ExtArgs>>): Prisma__EpisodeClient<$Result.GetResult<Prisma.$EpisodePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -7756,7 +8178,7 @@ export namespace Prisma {
      *     // ... provide filter here
      *   }
      * })
-     * 
+     *
      */
     deleteMany<T extends EpisodeDeleteManyArgs>(args?: SelectSubset<T, EpisodeDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -7775,7 +8197,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   }
      * })
-     * 
+     *
      */
     updateMany<T extends EpisodeUpdateManyArgs>(args: SelectSubset<T, EpisodeUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -7792,7 +8214,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   ]
      * })
-     * 
+     *
      * // Update zero or more Episodes and only return the `id`
      * const episodeWithIdOnly = await prisma.episode.updateManyAndReturn({
      *   select: { id: true },
@@ -7805,7 +8227,7 @@ export namespace Prisma {
      * })
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * 
+     *
      */
     updateManyAndReturn<T extends EpisodeUpdateManyAndReturnArgs>(args: SelectSubset<T, EpisodeUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EpisodePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
 
@@ -7894,7 +8316,7 @@ export namespace Prisma {
      *     _all: true
      *   },
      * })
-     * 
+     *
     **/
     groupBy<
       T extends EpisodeGroupByArgs,
@@ -7978,6 +8400,8 @@ export namespace Prisma {
     artifacts<T extends Episode$artifactsArgs<ExtArgs> = {}>(args?: Subset<T, Episode$artifactsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ArtifactPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     auditEvents<T extends Episode$auditEventsArgs<ExtArgs> = {}>(args?: Subset<T, Episode$auditEventsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AuditEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     accessGrants<T extends Episode$accessGrantsArgs<ExtArgs> = {}>(args?: Subset<T, Episode$accessGrantsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AccessGrantPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    orchestratedTaskGraphs<T extends Episode$orchestratedTaskGraphsArgs<ExtArgs> = {}>(args?: Subset<T, Episode$orchestratedTaskGraphsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TaskGraphPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    taskGraphEpisodes<T extends Episode$taskGraphEpisodesArgs<ExtArgs> = {}>(args?: Subset<T, Episode$taskGraphEpisodesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TaskGraphEpisodePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -8011,6 +8435,7 @@ export namespace Prisma {
     readonly projectId: FieldRef<"Episode", 'String'>
     readonly primaryAgentId: FieldRef<"Episode", 'String'>
     readonly parentEpisodeId: FieldRef<"Episode", 'String'>
+    readonly forkPointTraceId: FieldRef<"Episode", 'String'>
     readonly titleI18n: FieldRef<"Episode", 'Json'>
     readonly summaryI18n: FieldRef<"Episode", 'Json'>
     readonly goalI18n: FieldRef<"Episode", 'Json'>
@@ -8029,7 +8454,7 @@ export namespace Prisma {
     readonly createdAt: FieldRef<"Episode", 'DateTime'>
     readonly updatedAt: FieldRef<"Episode", 'DateTime'>
   }
-    
+
 
   // Custom InputTypes
   /**
@@ -8098,31 +8523,31 @@ export namespace Prisma {
     where?: EpisodeWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of Episodes to fetch.
      */
     orderBy?: EpisodeOrderByWithRelationInput | EpisodeOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the position for searching for Episodes.
      */
     cursor?: EpisodeWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` Episodes from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` Episodes.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
+     *
      * Filter by unique combinations of Episodes.
      */
     distinct?: EpisodeScalarFieldEnum | EpisodeScalarFieldEnum[]
@@ -8150,31 +8575,31 @@ export namespace Prisma {
     where?: EpisodeWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of Episodes to fetch.
      */
     orderBy?: EpisodeOrderByWithRelationInput | EpisodeOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the position for searching for Episodes.
      */
     cursor?: EpisodeWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` Episodes from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` Episodes.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
+     *
      * Filter by unique combinations of Episodes.
      */
     distinct?: EpisodeScalarFieldEnum | EpisodeScalarFieldEnum[]
@@ -8202,25 +8627,25 @@ export namespace Prisma {
     where?: EpisodeWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of Episodes to fetch.
      */
     orderBy?: EpisodeOrderByWithRelationInput | EpisodeOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the position for listing Episodes.
      */
     cursor?: EpisodeWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` Episodes from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` Episodes.
      */
     skip?: number
@@ -8611,6 +9036,54 @@ export namespace Prisma {
   }
 
   /**
+   * Episode.orchestratedTaskGraphs
+   */
+  export type Episode$orchestratedTaskGraphsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TaskGraph
+     */
+    select?: TaskGraphSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TaskGraph
+     */
+    omit?: TaskGraphOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TaskGraphInclude<ExtArgs> | null
+    where?: TaskGraphWhereInput
+    orderBy?: TaskGraphOrderByWithRelationInput | TaskGraphOrderByWithRelationInput[]
+    cursor?: TaskGraphWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: TaskGraphScalarFieldEnum | TaskGraphScalarFieldEnum[]
+  }
+
+  /**
+   * Episode.taskGraphEpisodes
+   */
+  export type Episode$taskGraphEpisodesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TaskGraphEpisode
+     */
+    select?: TaskGraphEpisodeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TaskGraphEpisode
+     */
+    omit?: TaskGraphEpisodeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TaskGraphEpisodeInclude<ExtArgs> | null
+    where?: TaskGraphEpisodeWhereInput
+    orderBy?: TaskGraphEpisodeOrderByWithRelationInput | TaskGraphEpisodeOrderByWithRelationInput[]
+    cursor?: TaskGraphEpisodeWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: TaskGraphEpisodeScalarFieldEnum | TaskGraphEpisodeScalarFieldEnum[]
+  }
+
+  /**
    * Episode without action
    */
   export type EpisodeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -8685,43 +9158,43 @@ export namespace Prisma {
     where?: EpisodeAgentWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of EpisodeAgents to fetch.
      */
     orderBy?: EpisodeAgentOrderByWithRelationInput | EpisodeAgentOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the start position
      */
     cursor?: EpisodeAgentWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` EpisodeAgents from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` EpisodeAgents.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
+     *
      * Count returned EpisodeAgents
     **/
     _count?: true | EpisodeAgentCountAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
+     *
      * Select which fields to find the minimum value
     **/
     _min?: EpisodeAgentMinAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
+     *
      * Select which fields to find the maximum value
     **/
     _max?: EpisodeAgentMaxAggregateInputType
@@ -8906,13 +9379,13 @@ export namespace Prisma {
      * @example
      * // Get all EpisodeAgents
      * const episodeAgents = await prisma.episodeAgent.findMany()
-     * 
+     *
      * // Get first 10 EpisodeAgents
      * const episodeAgents = await prisma.episodeAgent.findMany({ take: 10 })
-     * 
+     *
      * // Only select the `episodeId`
      * const episodeAgentWithEpisodeIdOnly = await prisma.episodeAgent.findMany({ select: { episodeId: true } })
-     * 
+     *
      */
     findMany<T extends EpisodeAgentFindManyArgs>(args?: SelectSubset<T, EpisodeAgentFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EpisodeAgentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
 
@@ -8926,7 +9399,7 @@ export namespace Prisma {
      *     // ... data to create a EpisodeAgent
      *   }
      * })
-     * 
+     *
      */
     create<T extends EpisodeAgentCreateArgs>(args: SelectSubset<T, EpisodeAgentCreateArgs<ExtArgs>>): Prisma__EpisodeAgentClient<$Result.GetResult<Prisma.$EpisodeAgentPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -8940,7 +9413,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   ]
      * })
-     *     
+     *
      */
     createMany<T extends EpisodeAgentCreateManyArgs>(args?: SelectSubset<T, EpisodeAgentCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -8954,7 +9427,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   ]
      * })
-     * 
+     *
      * // Create many EpisodeAgents and only return the `episodeId`
      * const episodeAgentWithEpisodeIdOnly = await prisma.episodeAgent.createManyAndReturn({
      *   select: { episodeId: true },
@@ -8964,7 +9437,7 @@ export namespace Prisma {
      * })
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * 
+     *
      */
     createManyAndReturn<T extends EpisodeAgentCreateManyAndReturnArgs>(args?: SelectSubset<T, EpisodeAgentCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EpisodeAgentPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
 
@@ -8978,7 +9451,7 @@ export namespace Prisma {
      *     // ... filter to delete one EpisodeAgent
      *   }
      * })
-     * 
+     *
      */
     delete<T extends EpisodeAgentDeleteArgs>(args: SelectSubset<T, EpisodeAgentDeleteArgs<ExtArgs>>): Prisma__EpisodeAgentClient<$Result.GetResult<Prisma.$EpisodeAgentPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -8995,7 +9468,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   }
      * })
-     * 
+     *
      */
     update<T extends EpisodeAgentUpdateArgs>(args: SelectSubset<T, EpisodeAgentUpdateArgs<ExtArgs>>): Prisma__EpisodeAgentClient<$Result.GetResult<Prisma.$EpisodeAgentPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -9009,7 +9482,7 @@ export namespace Prisma {
      *     // ... provide filter here
      *   }
      * })
-     * 
+     *
      */
     deleteMany<T extends EpisodeAgentDeleteManyArgs>(args?: SelectSubset<T, EpisodeAgentDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -9028,7 +9501,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   }
      * })
-     * 
+     *
      */
     updateMany<T extends EpisodeAgentUpdateManyArgs>(args: SelectSubset<T, EpisodeAgentUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -9045,7 +9518,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   ]
      * })
-     * 
+     *
      * // Update zero or more EpisodeAgents and only return the `episodeId`
      * const episodeAgentWithEpisodeIdOnly = await prisma.episodeAgent.updateManyAndReturn({
      *   select: { episodeId: true },
@@ -9058,7 +9531,7 @@ export namespace Prisma {
      * })
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * 
+     *
      */
     updateManyAndReturn<T extends EpisodeAgentUpdateManyAndReturnArgs>(args: SelectSubset<T, EpisodeAgentUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EpisodeAgentPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
 
@@ -9147,7 +9620,7 @@ export namespace Prisma {
      *     _all: true
      *   },
      * })
-     * 
+     *
     **/
     groupBy<
       T extends EpisodeAgentGroupByArgs,
@@ -9256,7 +9729,7 @@ export namespace Prisma {
     readonly agentId: FieldRef<"EpisodeAgent", 'String'>
     readonly createdAt: FieldRef<"EpisodeAgent", 'DateTime'>
   }
-    
+
 
   // Custom InputTypes
   /**
@@ -9325,31 +9798,31 @@ export namespace Prisma {
     where?: EpisodeAgentWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of EpisodeAgents to fetch.
      */
     orderBy?: EpisodeAgentOrderByWithRelationInput | EpisodeAgentOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the position for searching for EpisodeAgents.
      */
     cursor?: EpisodeAgentWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` EpisodeAgents from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` EpisodeAgents.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
+     *
      * Filter by unique combinations of EpisodeAgents.
      */
     distinct?: EpisodeAgentScalarFieldEnum | EpisodeAgentScalarFieldEnum[]
@@ -9377,31 +9850,31 @@ export namespace Prisma {
     where?: EpisodeAgentWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of EpisodeAgents to fetch.
      */
     orderBy?: EpisodeAgentOrderByWithRelationInput | EpisodeAgentOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the position for searching for EpisodeAgents.
      */
     cursor?: EpisodeAgentWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` EpisodeAgents from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` EpisodeAgents.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
+     *
      * Filter by unique combinations of EpisodeAgents.
      */
     distinct?: EpisodeAgentScalarFieldEnum | EpisodeAgentScalarFieldEnum[]
@@ -9429,25 +9902,25 @@ export namespace Prisma {
     where?: EpisodeAgentWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of EpisodeAgents to fetch.
      */
     orderBy?: EpisodeAgentOrderByWithRelationInput | EpisodeAgentOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the position for listing EpisodeAgents.
      */
     cursor?: EpisodeAgentWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` EpisodeAgents from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` EpisodeAgents.
      */
     skip?: number
@@ -9787,55 +10260,55 @@ export namespace Prisma {
     where?: MemoryItemWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of MemoryItems to fetch.
      */
     orderBy?: MemoryItemOrderByWithRelationInput | MemoryItemOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the start position
      */
     cursor?: MemoryItemWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` MemoryItems from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` MemoryItems.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
+     *
      * Count returned MemoryItems
     **/
     _count?: true | MemoryItemCountAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
+     *
      * Select which fields to average
     **/
     _avg?: MemoryItemAvgAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
+     *
      * Select which fields to sum
     **/
     _sum?: MemoryItemSumAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
+     *
      * Select which fields to find the minimum value
     **/
     _min?: MemoryItemMinAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
+     *
      * Select which fields to find the maximum value
     **/
     _max?: MemoryItemMaxAggregateInputType
@@ -10077,13 +10550,13 @@ export namespace Prisma {
      * @example
      * // Get all MemoryItems
      * const memoryItems = await prisma.memoryItem.findMany()
-     * 
+     *
      * // Get first 10 MemoryItems
      * const memoryItems = await prisma.memoryItem.findMany({ take: 10 })
-     * 
+     *
      * // Only select the `id`
      * const memoryItemWithIdOnly = await prisma.memoryItem.findMany({ select: { id: true } })
-     * 
+     *
      */
     findMany<T extends MemoryItemFindManyArgs>(args?: SelectSubset<T, MemoryItemFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MemoryItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
 
@@ -10097,7 +10570,7 @@ export namespace Prisma {
      *     // ... data to create a MemoryItem
      *   }
      * })
-     * 
+     *
      */
     create<T extends MemoryItemCreateArgs>(args: SelectSubset<T, MemoryItemCreateArgs<ExtArgs>>): Prisma__MemoryItemClient<$Result.GetResult<Prisma.$MemoryItemPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -10111,7 +10584,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   ]
      * })
-     *     
+     *
      */
     createMany<T extends MemoryItemCreateManyArgs>(args?: SelectSubset<T, MemoryItemCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -10125,7 +10598,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   ]
      * })
-     * 
+     *
      * // Create many MemoryItems and only return the `id`
      * const memoryItemWithIdOnly = await prisma.memoryItem.createManyAndReturn({
      *   select: { id: true },
@@ -10135,7 +10608,7 @@ export namespace Prisma {
      * })
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * 
+     *
      */
     createManyAndReturn<T extends MemoryItemCreateManyAndReturnArgs>(args?: SelectSubset<T, MemoryItemCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MemoryItemPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
 
@@ -10149,7 +10622,7 @@ export namespace Prisma {
      *     // ... filter to delete one MemoryItem
      *   }
      * })
-     * 
+     *
      */
     delete<T extends MemoryItemDeleteArgs>(args: SelectSubset<T, MemoryItemDeleteArgs<ExtArgs>>): Prisma__MemoryItemClient<$Result.GetResult<Prisma.$MemoryItemPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -10166,7 +10639,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   }
      * })
-     * 
+     *
      */
     update<T extends MemoryItemUpdateArgs>(args: SelectSubset<T, MemoryItemUpdateArgs<ExtArgs>>): Prisma__MemoryItemClient<$Result.GetResult<Prisma.$MemoryItemPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -10180,7 +10653,7 @@ export namespace Prisma {
      *     // ... provide filter here
      *   }
      * })
-     * 
+     *
      */
     deleteMany<T extends MemoryItemDeleteManyArgs>(args?: SelectSubset<T, MemoryItemDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -10199,7 +10672,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   }
      * })
-     * 
+     *
      */
     updateMany<T extends MemoryItemUpdateManyArgs>(args: SelectSubset<T, MemoryItemUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -10216,7 +10689,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   ]
      * })
-     * 
+     *
      * // Update zero or more MemoryItems and only return the `id`
      * const memoryItemWithIdOnly = await prisma.memoryItem.updateManyAndReturn({
      *   select: { id: true },
@@ -10229,7 +10702,7 @@ export namespace Prisma {
      * })
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * 
+     *
      */
     updateManyAndReturn<T extends MemoryItemUpdateManyAndReturnArgs>(args: SelectSubset<T, MemoryItemUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MemoryItemPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
 
@@ -10318,7 +10791,7 @@ export namespace Prisma {
      *     _all: true
      *   },
      * })
-     * 
+     *
     **/
     groupBy<
       T extends MemoryItemGroupByArgs,
@@ -10436,7 +10909,7 @@ export namespace Prisma {
     readonly ttlDays: FieldRef<"MemoryItem", 'Int'>
     readonly createdAt: FieldRef<"MemoryItem", 'DateTime'>
   }
-    
+
 
   // Custom InputTypes
   /**
@@ -10505,31 +10978,31 @@ export namespace Prisma {
     where?: MemoryItemWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of MemoryItems to fetch.
      */
     orderBy?: MemoryItemOrderByWithRelationInput | MemoryItemOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the position for searching for MemoryItems.
      */
     cursor?: MemoryItemWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` MemoryItems from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` MemoryItems.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
+     *
      * Filter by unique combinations of MemoryItems.
      */
     distinct?: MemoryItemScalarFieldEnum | MemoryItemScalarFieldEnum[]
@@ -10557,31 +11030,31 @@ export namespace Prisma {
     where?: MemoryItemWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of MemoryItems to fetch.
      */
     orderBy?: MemoryItemOrderByWithRelationInput | MemoryItemOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the position for searching for MemoryItems.
      */
     cursor?: MemoryItemWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` MemoryItems from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` MemoryItems.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
+     *
      * Filter by unique combinations of MemoryItems.
      */
     distinct?: MemoryItemScalarFieldEnum | MemoryItemScalarFieldEnum[]
@@ -10609,25 +11082,25 @@ export namespace Prisma {
     where?: MemoryItemWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of MemoryItems to fetch.
      */
     orderBy?: MemoryItemOrderByWithRelationInput | MemoryItemOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the position for listing MemoryItems.
      */
     cursor?: MemoryItemWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` MemoryItems from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` MemoryItems.
      */
     skip?: number
@@ -10953,6 +11426,7 @@ export namespace Prisma {
     errorSummaryI18n: number
     policyHitReasonI18n: number
     permissionDeniedI18n: number
+    snapshot: number
     eventTime: number
     createdAt: number
     _all: number
@@ -11008,6 +11482,7 @@ export namespace Prisma {
     errorSummaryI18n?: true
     policyHitReasonI18n?: true
     permissionDeniedI18n?: true
+    snapshot?: true
     eventTime?: true
     createdAt?: true
     _all?: true
@@ -11020,55 +11495,55 @@ export namespace Prisma {
     where?: TraceEventWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of TraceEvents to fetch.
      */
     orderBy?: TraceEventOrderByWithRelationInput | TraceEventOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the start position
      */
     cursor?: TraceEventWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` TraceEvents from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` TraceEvents.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
+     *
      * Count returned TraceEvents
     **/
     _count?: true | TraceEventCountAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
+     *
      * Select which fields to average
     **/
     _avg?: TraceEventAvgAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
+     *
      * Select which fields to sum
     **/
     _sum?: TraceEventSumAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
+     *
      * Select which fields to find the minimum value
     **/
     _min?: TraceEventMinAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
+     *
      * Select which fields to find the maximum value
     **/
     _max?: TraceEventMaxAggregateInputType
@@ -11116,6 +11591,7 @@ export namespace Prisma {
     errorSummaryI18n: JsonValue | null
     policyHitReasonI18n: JsonValue | null
     permissionDeniedI18n: JsonValue | null
+    snapshot: JsonValue | null
     eventTime: Date
     createdAt: Date
     _count: TraceEventCountAggregateOutputType | null
@@ -11156,6 +11632,7 @@ export namespace Prisma {
     errorSummaryI18n?: boolean
     policyHitReasonI18n?: boolean
     permissionDeniedI18n?: boolean
+    snapshot?: boolean
     eventTime?: boolean
     createdAt?: boolean
     episode?: boolean | EpisodeDefaultArgs<ExtArgs>
@@ -11182,6 +11659,7 @@ export namespace Prisma {
     errorSummaryI18n?: boolean
     policyHitReasonI18n?: boolean
     permissionDeniedI18n?: boolean
+    snapshot?: boolean
     eventTime?: boolean
     createdAt?: boolean
     episode?: boolean | EpisodeDefaultArgs<ExtArgs>
@@ -11205,6 +11683,7 @@ export namespace Prisma {
     errorSummaryI18n?: boolean
     policyHitReasonI18n?: boolean
     permissionDeniedI18n?: boolean
+    snapshot?: boolean
     eventTime?: boolean
     createdAt?: boolean
     episode?: boolean | EpisodeDefaultArgs<ExtArgs>
@@ -11228,11 +11707,12 @@ export namespace Prisma {
     errorSummaryI18n?: boolean
     policyHitReasonI18n?: boolean
     permissionDeniedI18n?: boolean
+    snapshot?: boolean
     eventTime?: boolean
     createdAt?: boolean
   }
 
-  export type TraceEventOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "episodeId" | "actorAgentId" | "stepIndex" | "eventType" | "toolName" | "stepTitleI18n" | "status" | "shortResultI18n" | "inputSummaryI18n" | "decisionSummaryI18n" | "toolPayloadSummaryI18n" | "resultSummaryI18n" | "errorSummaryI18n" | "policyHitReasonI18n" | "permissionDeniedI18n" | "eventTime" | "createdAt", ExtArgs["result"]["traceEvent"]>
+  export type TraceEventOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "episodeId" | "actorAgentId" | "stepIndex" | "eventType" | "toolName" | "stepTitleI18n" | "status" | "shortResultI18n" | "inputSummaryI18n" | "decisionSummaryI18n" | "toolPayloadSummaryI18n" | "resultSummaryI18n" | "errorSummaryI18n" | "policyHitReasonI18n" | "permissionDeniedI18n" | "snapshot" | "eventTime" | "createdAt", ExtArgs["result"]["traceEvent"]>
   export type TraceEventInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     episode?: boolean | EpisodeDefaultArgs<ExtArgs>
     actorAgent?: boolean | TraceEvent$actorAgentArgs<ExtArgs>
@@ -11274,6 +11754,7 @@ export namespace Prisma {
       errorSummaryI18n: Prisma.JsonValue | null
       policyHitReasonI18n: Prisma.JsonValue | null
       permissionDeniedI18n: Prisma.JsonValue | null
+      snapshot: Prisma.JsonValue | null
       eventTime: Date
       createdAt: Date
     }, ExtArgs["result"]["traceEvent"]>
@@ -11355,13 +11836,13 @@ export namespace Prisma {
      * @example
      * // Get all TraceEvents
      * const traceEvents = await prisma.traceEvent.findMany()
-     * 
+     *
      * // Get first 10 TraceEvents
      * const traceEvents = await prisma.traceEvent.findMany({ take: 10 })
-     * 
+     *
      * // Only select the `id`
      * const traceEventWithIdOnly = await prisma.traceEvent.findMany({ select: { id: true } })
-     * 
+     *
      */
     findMany<T extends TraceEventFindManyArgs>(args?: SelectSubset<T, TraceEventFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TraceEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
 
@@ -11375,7 +11856,7 @@ export namespace Prisma {
      *     // ... data to create a TraceEvent
      *   }
      * })
-     * 
+     *
      */
     create<T extends TraceEventCreateArgs>(args: SelectSubset<T, TraceEventCreateArgs<ExtArgs>>): Prisma__TraceEventClient<$Result.GetResult<Prisma.$TraceEventPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -11389,7 +11870,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   ]
      * })
-     *     
+     *
      */
     createMany<T extends TraceEventCreateManyArgs>(args?: SelectSubset<T, TraceEventCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -11403,7 +11884,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   ]
      * })
-     * 
+     *
      * // Create many TraceEvents and only return the `id`
      * const traceEventWithIdOnly = await prisma.traceEvent.createManyAndReturn({
      *   select: { id: true },
@@ -11413,7 +11894,7 @@ export namespace Prisma {
      * })
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * 
+     *
      */
     createManyAndReturn<T extends TraceEventCreateManyAndReturnArgs>(args?: SelectSubset<T, TraceEventCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TraceEventPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
 
@@ -11427,7 +11908,7 @@ export namespace Prisma {
      *     // ... filter to delete one TraceEvent
      *   }
      * })
-     * 
+     *
      */
     delete<T extends TraceEventDeleteArgs>(args: SelectSubset<T, TraceEventDeleteArgs<ExtArgs>>): Prisma__TraceEventClient<$Result.GetResult<Prisma.$TraceEventPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -11444,7 +11925,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   }
      * })
-     * 
+     *
      */
     update<T extends TraceEventUpdateArgs>(args: SelectSubset<T, TraceEventUpdateArgs<ExtArgs>>): Prisma__TraceEventClient<$Result.GetResult<Prisma.$TraceEventPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -11458,7 +11939,7 @@ export namespace Prisma {
      *     // ... provide filter here
      *   }
      * })
-     * 
+     *
      */
     deleteMany<T extends TraceEventDeleteManyArgs>(args?: SelectSubset<T, TraceEventDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -11477,7 +11958,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   }
      * })
-     * 
+     *
      */
     updateMany<T extends TraceEventUpdateManyArgs>(args: SelectSubset<T, TraceEventUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -11494,7 +11975,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   ]
      * })
-     * 
+     *
      * // Update zero or more TraceEvents and only return the `id`
      * const traceEventWithIdOnly = await prisma.traceEvent.updateManyAndReturn({
      *   select: { id: true },
@@ -11507,7 +11988,7 @@ export namespace Prisma {
      * })
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * 
+     *
      */
     updateManyAndReturn<T extends TraceEventUpdateManyAndReturnArgs>(args: SelectSubset<T, TraceEventUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TraceEventPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
 
@@ -11596,7 +12077,7 @@ export namespace Prisma {
      *     _all: true
      *   },
      * })
-     * 
+     *
     **/
     groupBy<
       T extends TraceEventGroupByArgs,
@@ -11719,10 +12200,11 @@ export namespace Prisma {
     readonly errorSummaryI18n: FieldRef<"TraceEvent", 'Json'>
     readonly policyHitReasonI18n: FieldRef<"TraceEvent", 'Json'>
     readonly permissionDeniedI18n: FieldRef<"TraceEvent", 'Json'>
+    readonly snapshot: FieldRef<"TraceEvent", 'Json'>
     readonly eventTime: FieldRef<"TraceEvent", 'DateTime'>
     readonly createdAt: FieldRef<"TraceEvent", 'DateTime'>
   }
-    
+
 
   // Custom InputTypes
   /**
@@ -11791,31 +12273,31 @@ export namespace Prisma {
     where?: TraceEventWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of TraceEvents to fetch.
      */
     orderBy?: TraceEventOrderByWithRelationInput | TraceEventOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the position for searching for TraceEvents.
      */
     cursor?: TraceEventWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` TraceEvents from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` TraceEvents.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
+     *
      * Filter by unique combinations of TraceEvents.
      */
     distinct?: TraceEventScalarFieldEnum | TraceEventScalarFieldEnum[]
@@ -11843,31 +12325,31 @@ export namespace Prisma {
     where?: TraceEventWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of TraceEvents to fetch.
      */
     orderBy?: TraceEventOrderByWithRelationInput | TraceEventOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the position for searching for TraceEvents.
      */
     cursor?: TraceEventWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` TraceEvents from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` TraceEvents.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
+     *
      * Filter by unique combinations of TraceEvents.
      */
     distinct?: TraceEventScalarFieldEnum | TraceEventScalarFieldEnum[]
@@ -11895,25 +12377,25 @@ export namespace Prisma {
     where?: TraceEventWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of TraceEvents to fetch.
      */
     orderBy?: TraceEventOrderByWithRelationInput | TraceEventOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the position for listing TraceEvents.
      */
     cursor?: TraceEventWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` TraceEvents from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` TraceEvents.
      */
     skip?: number
@@ -12334,55 +12816,55 @@ export namespace Prisma {
     where?: ArtifactWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of Artifacts to fetch.
      */
     orderBy?: ArtifactOrderByWithRelationInput | ArtifactOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the start position
      */
     cursor?: ArtifactWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` Artifacts from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` Artifacts.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
+     *
      * Count returned Artifacts
     **/
     _count?: true | ArtifactCountAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
+     *
      * Select which fields to average
     **/
     _avg?: ArtifactAvgAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
+     *
      * Select which fields to sum
     **/
     _sum?: ArtifactSumAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
+     *
      * Select which fields to find the minimum value
     **/
     _min?: ArtifactMinAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
+     *
      * Select which fields to find the maximum value
     **/
     _max?: ArtifactMaxAggregateInputType
@@ -12649,13 +13131,13 @@ export namespace Prisma {
      * @example
      * // Get all Artifacts
      * const artifacts = await prisma.artifact.findMany()
-     * 
+     *
      * // Get first 10 Artifacts
      * const artifacts = await prisma.artifact.findMany({ take: 10 })
-     * 
+     *
      * // Only select the `id`
      * const artifactWithIdOnly = await prisma.artifact.findMany({ select: { id: true } })
-     * 
+     *
      */
     findMany<T extends ArtifactFindManyArgs>(args?: SelectSubset<T, ArtifactFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ArtifactPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
 
@@ -12669,7 +13151,7 @@ export namespace Prisma {
      *     // ... data to create a Artifact
      *   }
      * })
-     * 
+     *
      */
     create<T extends ArtifactCreateArgs>(args: SelectSubset<T, ArtifactCreateArgs<ExtArgs>>): Prisma__ArtifactClient<$Result.GetResult<Prisma.$ArtifactPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -12683,7 +13165,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   ]
      * })
-     *     
+     *
      */
     createMany<T extends ArtifactCreateManyArgs>(args?: SelectSubset<T, ArtifactCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -12697,7 +13179,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   ]
      * })
-     * 
+     *
      * // Create many Artifacts and only return the `id`
      * const artifactWithIdOnly = await prisma.artifact.createManyAndReturn({
      *   select: { id: true },
@@ -12707,7 +13189,7 @@ export namespace Prisma {
      * })
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * 
+     *
      */
     createManyAndReturn<T extends ArtifactCreateManyAndReturnArgs>(args?: SelectSubset<T, ArtifactCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ArtifactPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
 
@@ -12721,7 +13203,7 @@ export namespace Prisma {
      *     // ... filter to delete one Artifact
      *   }
      * })
-     * 
+     *
      */
     delete<T extends ArtifactDeleteArgs>(args: SelectSubset<T, ArtifactDeleteArgs<ExtArgs>>): Prisma__ArtifactClient<$Result.GetResult<Prisma.$ArtifactPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -12738,7 +13220,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   }
      * })
-     * 
+     *
      */
     update<T extends ArtifactUpdateArgs>(args: SelectSubset<T, ArtifactUpdateArgs<ExtArgs>>): Prisma__ArtifactClient<$Result.GetResult<Prisma.$ArtifactPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -12752,7 +13234,7 @@ export namespace Prisma {
      *     // ... provide filter here
      *   }
      * })
-     * 
+     *
      */
     deleteMany<T extends ArtifactDeleteManyArgs>(args?: SelectSubset<T, ArtifactDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -12771,7 +13253,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   }
      * })
-     * 
+     *
      */
     updateMany<T extends ArtifactUpdateManyArgs>(args: SelectSubset<T, ArtifactUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -12788,7 +13270,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   ]
      * })
-     * 
+     *
      * // Update zero or more Artifacts and only return the `id`
      * const artifactWithIdOnly = await prisma.artifact.updateManyAndReturn({
      *   select: { id: true },
@@ -12801,7 +13283,7 @@ export namespace Prisma {
      * })
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * 
+     *
      */
     updateManyAndReturn<T extends ArtifactUpdateManyAndReturnArgs>(args: SelectSubset<T, ArtifactUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ArtifactPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
 
@@ -12890,7 +13372,7 @@ export namespace Prisma {
      *     _all: true
      *   },
      * })
-     * 
+     *
     **/
     groupBy<
       T extends ArtifactGroupByArgs,
@@ -13012,7 +13494,7 @@ export namespace Prisma {
     readonly createdAt: FieldRef<"Artifact", 'DateTime'>
     readonly updatedAt: FieldRef<"Artifact", 'DateTime'>
   }
-    
+
 
   // Custom InputTypes
   /**
@@ -13081,31 +13563,31 @@ export namespace Prisma {
     where?: ArtifactWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of Artifacts to fetch.
      */
     orderBy?: ArtifactOrderByWithRelationInput | ArtifactOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the position for searching for Artifacts.
      */
     cursor?: ArtifactWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` Artifacts from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` Artifacts.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
+     *
      * Filter by unique combinations of Artifacts.
      */
     distinct?: ArtifactScalarFieldEnum | ArtifactScalarFieldEnum[]
@@ -13133,31 +13615,31 @@ export namespace Prisma {
     where?: ArtifactWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of Artifacts to fetch.
      */
     orderBy?: ArtifactOrderByWithRelationInput | ArtifactOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the position for searching for Artifacts.
      */
     cursor?: ArtifactWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` Artifacts from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` Artifacts.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
+     *
      * Filter by unique combinations of Artifacts.
      */
     distinct?: ArtifactScalarFieldEnum | ArtifactScalarFieldEnum[]
@@ -13185,25 +13667,25 @@ export namespace Prisma {
     where?: ArtifactWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of Artifacts to fetch.
      */
     orderBy?: ArtifactOrderByWithRelationInput | ArtifactOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the position for listing Artifacts.
      */
     cursor?: ArtifactWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` Artifacts from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` Artifacts.
      */
     skip?: number
@@ -13544,43 +14026,43 @@ export namespace Prisma {
     where?: PolicyWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of Policies to fetch.
      */
     orderBy?: PolicyOrderByWithRelationInput | PolicyOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the start position
      */
     cursor?: PolicyWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` Policies from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` Policies.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
+     *
      * Count returned Policies
     **/
     _count?: true | PolicyCountAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
+     *
      * Select which fields to find the minimum value
     **/
     _min?: PolicyMinAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
+     *
      * Select which fields to find the maximum value
     **/
     _max?: PolicyMaxAggregateInputType
@@ -13789,13 +14271,13 @@ export namespace Prisma {
      * @example
      * // Get all Policies
      * const policies = await prisma.policy.findMany()
-     * 
+     *
      * // Get first 10 Policies
      * const policies = await prisma.policy.findMany({ take: 10 })
-     * 
+     *
      * // Only select the `id`
      * const policyWithIdOnly = await prisma.policy.findMany({ select: { id: true } })
-     * 
+     *
      */
     findMany<T extends PolicyFindManyArgs>(args?: SelectSubset<T, PolicyFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PolicyPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
 
@@ -13809,7 +14291,7 @@ export namespace Prisma {
      *     // ... data to create a Policy
      *   }
      * })
-     * 
+     *
      */
     create<T extends PolicyCreateArgs>(args: SelectSubset<T, PolicyCreateArgs<ExtArgs>>): Prisma__PolicyClient<$Result.GetResult<Prisma.$PolicyPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -13823,7 +14305,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   ]
      * })
-     *     
+     *
      */
     createMany<T extends PolicyCreateManyArgs>(args?: SelectSubset<T, PolicyCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -13837,7 +14319,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   ]
      * })
-     * 
+     *
      * // Create many Policies and only return the `id`
      * const policyWithIdOnly = await prisma.policy.createManyAndReturn({
      *   select: { id: true },
@@ -13847,7 +14329,7 @@ export namespace Prisma {
      * })
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * 
+     *
      */
     createManyAndReturn<T extends PolicyCreateManyAndReturnArgs>(args?: SelectSubset<T, PolicyCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PolicyPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
 
@@ -13861,7 +14343,7 @@ export namespace Prisma {
      *     // ... filter to delete one Policy
      *   }
      * })
-     * 
+     *
      */
     delete<T extends PolicyDeleteArgs>(args: SelectSubset<T, PolicyDeleteArgs<ExtArgs>>): Prisma__PolicyClient<$Result.GetResult<Prisma.$PolicyPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -13878,7 +14360,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   }
      * })
-     * 
+     *
      */
     update<T extends PolicyUpdateArgs>(args: SelectSubset<T, PolicyUpdateArgs<ExtArgs>>): Prisma__PolicyClient<$Result.GetResult<Prisma.$PolicyPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -13892,7 +14374,7 @@ export namespace Prisma {
      *     // ... provide filter here
      *   }
      * })
-     * 
+     *
      */
     deleteMany<T extends PolicyDeleteManyArgs>(args?: SelectSubset<T, PolicyDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -13911,7 +14393,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   }
      * })
-     * 
+     *
      */
     updateMany<T extends PolicyUpdateManyArgs>(args: SelectSubset<T, PolicyUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -13928,7 +14410,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   ]
      * })
-     * 
+     *
      * // Update zero or more Policies and only return the `id`
      * const policyWithIdOnly = await prisma.policy.updateManyAndReturn({
      *   select: { id: true },
@@ -13941,7 +14423,7 @@ export namespace Prisma {
      * })
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * 
+     *
      */
     updateManyAndReturn<T extends PolicyUpdateManyAndReturnArgs>(args: SelectSubset<T, PolicyUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PolicyPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
 
@@ -14030,7 +14512,7 @@ export namespace Prisma {
      *     _all: true
      *   },
      * })
-     * 
+     *
     **/
     groupBy<
       T extends PolicyGroupByArgs,
@@ -14143,7 +14625,7 @@ export namespace Prisma {
     readonly rulesJson: FieldRef<"Policy", 'Json'>
     readonly createdAt: FieldRef<"Policy", 'DateTime'>
   }
-    
+
 
   // Custom InputTypes
   /**
@@ -14212,31 +14694,31 @@ export namespace Prisma {
     where?: PolicyWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of Policies to fetch.
      */
     orderBy?: PolicyOrderByWithRelationInput | PolicyOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the position for searching for Policies.
      */
     cursor?: PolicyWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` Policies from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` Policies.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
+     *
      * Filter by unique combinations of Policies.
      */
     distinct?: PolicyScalarFieldEnum | PolicyScalarFieldEnum[]
@@ -14264,31 +14746,31 @@ export namespace Prisma {
     where?: PolicyWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of Policies to fetch.
      */
     orderBy?: PolicyOrderByWithRelationInput | PolicyOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the position for searching for Policies.
      */
     cursor?: PolicyWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` Policies from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` Policies.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
+     *
      * Filter by unique combinations of Policies.
      */
     distinct?: PolicyScalarFieldEnum | PolicyScalarFieldEnum[]
@@ -14316,25 +14798,25 @@ export namespace Prisma {
     where?: PolicyWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of Policies to fetch.
      */
     orderBy?: PolicyOrderByWithRelationInput | PolicyOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the position for listing Policies.
      */
     cursor?: PolicyWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` Policies from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` Policies.
      */
     skip?: number
@@ -14661,43 +15143,43 @@ export namespace Prisma {
     where?: AccessGrantWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of AccessGrants to fetch.
      */
     orderBy?: AccessGrantOrderByWithRelationInput | AccessGrantOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the start position
      */
     cursor?: AccessGrantWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` AccessGrants from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` AccessGrants.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
+     *
      * Count returned AccessGrants
     **/
     _count?: true | AccessGrantCountAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
+     *
      * Select which fields to find the minimum value
     **/
     _min?: AccessGrantMinAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
+     *
      * Select which fields to find the maximum value
     **/
     _max?: AccessGrantMaxAggregateInputType
@@ -14912,13 +15394,13 @@ export namespace Prisma {
      * @example
      * // Get all AccessGrants
      * const accessGrants = await prisma.accessGrant.findMany()
-     * 
+     *
      * // Get first 10 AccessGrants
      * const accessGrants = await prisma.accessGrant.findMany({ take: 10 })
-     * 
+     *
      * // Only select the `id`
      * const accessGrantWithIdOnly = await prisma.accessGrant.findMany({ select: { id: true } })
-     * 
+     *
      */
     findMany<T extends AccessGrantFindManyArgs>(args?: SelectSubset<T, AccessGrantFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AccessGrantPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
 
@@ -14932,7 +15414,7 @@ export namespace Prisma {
      *     // ... data to create a AccessGrant
      *   }
      * })
-     * 
+     *
      */
     create<T extends AccessGrantCreateArgs>(args: SelectSubset<T, AccessGrantCreateArgs<ExtArgs>>): Prisma__AccessGrantClient<$Result.GetResult<Prisma.$AccessGrantPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -14946,7 +15428,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   ]
      * })
-     *     
+     *
      */
     createMany<T extends AccessGrantCreateManyArgs>(args?: SelectSubset<T, AccessGrantCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -14960,7 +15442,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   ]
      * })
-     * 
+     *
      * // Create many AccessGrants and only return the `id`
      * const accessGrantWithIdOnly = await prisma.accessGrant.createManyAndReturn({
      *   select: { id: true },
@@ -14970,7 +15452,7 @@ export namespace Prisma {
      * })
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * 
+     *
      */
     createManyAndReturn<T extends AccessGrantCreateManyAndReturnArgs>(args?: SelectSubset<T, AccessGrantCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AccessGrantPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
 
@@ -14984,7 +15466,7 @@ export namespace Prisma {
      *     // ... filter to delete one AccessGrant
      *   }
      * })
-     * 
+     *
      */
     delete<T extends AccessGrantDeleteArgs>(args: SelectSubset<T, AccessGrantDeleteArgs<ExtArgs>>): Prisma__AccessGrantClient<$Result.GetResult<Prisma.$AccessGrantPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -15001,7 +15483,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   }
      * })
-     * 
+     *
      */
     update<T extends AccessGrantUpdateArgs>(args: SelectSubset<T, AccessGrantUpdateArgs<ExtArgs>>): Prisma__AccessGrantClient<$Result.GetResult<Prisma.$AccessGrantPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -15015,7 +15497,7 @@ export namespace Prisma {
      *     // ... provide filter here
      *   }
      * })
-     * 
+     *
      */
     deleteMany<T extends AccessGrantDeleteManyArgs>(args?: SelectSubset<T, AccessGrantDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -15034,7 +15516,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   }
      * })
-     * 
+     *
      */
     updateMany<T extends AccessGrantUpdateManyArgs>(args: SelectSubset<T, AccessGrantUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -15051,7 +15533,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   ]
      * })
-     * 
+     *
      * // Update zero or more AccessGrants and only return the `id`
      * const accessGrantWithIdOnly = await prisma.accessGrant.updateManyAndReturn({
      *   select: { id: true },
@@ -15064,7 +15546,7 @@ export namespace Prisma {
      * })
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * 
+     *
      */
     updateManyAndReturn<T extends AccessGrantUpdateManyAndReturnArgs>(args: SelectSubset<T, AccessGrantUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AccessGrantPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
 
@@ -15153,7 +15635,7 @@ export namespace Prisma {
      *     _all: true
      *   },
      * })
-     * 
+     *
     **/
     groupBy<
       T extends AccessGrantGroupByArgs,
@@ -15267,7 +15749,7 @@ export namespace Prisma {
     readonly effect: FieldRef<"AccessGrant", 'String'>
     readonly createdAt: FieldRef<"AccessGrant", 'DateTime'>
   }
-    
+
 
   // Custom InputTypes
   /**
@@ -15336,31 +15818,31 @@ export namespace Prisma {
     where?: AccessGrantWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of AccessGrants to fetch.
      */
     orderBy?: AccessGrantOrderByWithRelationInput | AccessGrantOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the position for searching for AccessGrants.
      */
     cursor?: AccessGrantWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` AccessGrants from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` AccessGrants.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
+     *
      * Filter by unique combinations of AccessGrants.
      */
     distinct?: AccessGrantScalarFieldEnum | AccessGrantScalarFieldEnum[]
@@ -15388,31 +15870,31 @@ export namespace Prisma {
     where?: AccessGrantWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of AccessGrants to fetch.
      */
     orderBy?: AccessGrantOrderByWithRelationInput | AccessGrantOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the position for searching for AccessGrants.
      */
     cursor?: AccessGrantWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` AccessGrants from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` AccessGrants.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
+     *
      * Filter by unique combinations of AccessGrants.
      */
     distinct?: AccessGrantScalarFieldEnum | AccessGrantScalarFieldEnum[]
@@ -15440,25 +15922,25 @@ export namespace Prisma {
     where?: AccessGrantWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of AccessGrants to fetch.
      */
     orderBy?: AccessGrantOrderByWithRelationInput | AccessGrantOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the position for listing AccessGrants.
      */
     cursor?: AccessGrantWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` AccessGrants from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` AccessGrants.
      */
     skip?: number
@@ -15856,43 +16338,43 @@ export namespace Prisma {
     where?: AuditEventWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of AuditEvents to fetch.
      */
     orderBy?: AuditEventOrderByWithRelationInput | AuditEventOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the start position
      */
     cursor?: AuditEventWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` AuditEvents from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` AuditEvents.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
+     *
      * Count returned AuditEvents
     **/
     _count?: true | AuditEventCountAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
+     *
      * Select which fields to find the minimum value
     **/
     _min?: AuditEventMinAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
+     *
      * Select which fields to find the maximum value
     **/
     _max?: AuditEventMaxAggregateInputType
@@ -16195,13 +16677,13 @@ export namespace Prisma {
      * @example
      * // Get all AuditEvents
      * const auditEvents = await prisma.auditEvent.findMany()
-     * 
+     *
      * // Get first 10 AuditEvents
      * const auditEvents = await prisma.auditEvent.findMany({ take: 10 })
-     * 
+     *
      * // Only select the `id`
      * const auditEventWithIdOnly = await prisma.auditEvent.findMany({ select: { id: true } })
-     * 
+     *
      */
     findMany<T extends AuditEventFindManyArgs>(args?: SelectSubset<T, AuditEventFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AuditEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
 
@@ -16215,7 +16697,7 @@ export namespace Prisma {
      *     // ... data to create a AuditEvent
      *   }
      * })
-     * 
+     *
      */
     create<T extends AuditEventCreateArgs>(args: SelectSubset<T, AuditEventCreateArgs<ExtArgs>>): Prisma__AuditEventClient<$Result.GetResult<Prisma.$AuditEventPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -16229,7 +16711,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   ]
      * })
-     *     
+     *
      */
     createMany<T extends AuditEventCreateManyArgs>(args?: SelectSubset<T, AuditEventCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -16243,7 +16725,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   ]
      * })
-     * 
+     *
      * // Create many AuditEvents and only return the `id`
      * const auditEventWithIdOnly = await prisma.auditEvent.createManyAndReturn({
      *   select: { id: true },
@@ -16253,7 +16735,7 @@ export namespace Prisma {
      * })
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * 
+     *
      */
     createManyAndReturn<T extends AuditEventCreateManyAndReturnArgs>(args?: SelectSubset<T, AuditEventCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AuditEventPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
 
@@ -16267,7 +16749,7 @@ export namespace Prisma {
      *     // ... filter to delete one AuditEvent
      *   }
      * })
-     * 
+     *
      */
     delete<T extends AuditEventDeleteArgs>(args: SelectSubset<T, AuditEventDeleteArgs<ExtArgs>>): Prisma__AuditEventClient<$Result.GetResult<Prisma.$AuditEventPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -16284,7 +16766,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   }
      * })
-     * 
+     *
      */
     update<T extends AuditEventUpdateArgs>(args: SelectSubset<T, AuditEventUpdateArgs<ExtArgs>>): Prisma__AuditEventClient<$Result.GetResult<Prisma.$AuditEventPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -16298,7 +16780,7 @@ export namespace Prisma {
      *     // ... provide filter here
      *   }
      * })
-     * 
+     *
      */
     deleteMany<T extends AuditEventDeleteManyArgs>(args?: SelectSubset<T, AuditEventDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -16317,7 +16799,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   }
      * })
-     * 
+     *
      */
     updateMany<T extends AuditEventUpdateManyArgs>(args: SelectSubset<T, AuditEventUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -16334,7 +16816,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   ]
      * })
-     * 
+     *
      * // Update zero or more AuditEvents and only return the `id`
      * const auditEventWithIdOnly = await prisma.auditEvent.updateManyAndReturn({
      *   select: { id: true },
@@ -16347,7 +16829,7 @@ export namespace Prisma {
      * })
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * 
+     *
      */
     updateManyAndReturn<T extends AuditEventUpdateManyAndReturnArgs>(args: SelectSubset<T, AuditEventUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AuditEventPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
 
@@ -16436,7 +16918,7 @@ export namespace Prisma {
      *     _all: true
      *   },
      * })
-     * 
+     *
     **/
     groupBy<
       T extends AuditEventGroupByArgs,
@@ -16564,7 +17046,7 @@ export namespace Prisma {
     readonly permissionDecision: FieldRef<"AuditEvent", 'String'>
     readonly denyReasonI18n: FieldRef<"AuditEvent", 'Json'>
   }
-    
+
 
   // Custom InputTypes
   /**
@@ -16633,31 +17115,31 @@ export namespace Prisma {
     where?: AuditEventWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of AuditEvents to fetch.
      */
     orderBy?: AuditEventOrderByWithRelationInput | AuditEventOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the position for searching for AuditEvents.
      */
     cursor?: AuditEventWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` AuditEvents from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` AuditEvents.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
+     *
      * Filter by unique combinations of AuditEvents.
      */
     distinct?: AuditEventScalarFieldEnum | AuditEventScalarFieldEnum[]
@@ -16685,31 +17167,31 @@ export namespace Prisma {
     where?: AuditEventWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of AuditEvents to fetch.
      */
     orderBy?: AuditEventOrderByWithRelationInput | AuditEventOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the position for searching for AuditEvents.
      */
     cursor?: AuditEventWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` AuditEvents from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` AuditEvents.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
+     *
      * Filter by unique combinations of AuditEvents.
      */
     distinct?: AuditEventScalarFieldEnum | AuditEventScalarFieldEnum[]
@@ -16737,25 +17219,25 @@ export namespace Prisma {
     where?: AuditEventWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of AuditEvents to fetch.
      */
     orderBy?: AuditEventOrderByWithRelationInput | AuditEventOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the position for listing AuditEvents.
      */
     cursor?: AuditEventWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` AuditEvents from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` AuditEvents.
      */
     skip?: number
@@ -17152,43 +17634,43 @@ export namespace Prisma {
     where?: NodeEdgeWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of NodeEdges to fetch.
      */
     orderBy?: NodeEdgeOrderByWithRelationInput | NodeEdgeOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the start position
      */
     cursor?: NodeEdgeWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` NodeEdges from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` NodeEdges.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
+     *
      * Count returned NodeEdges
     **/
     _count?: true | NodeEdgeCountAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
+     *
      * Select which fields to find the minimum value
     **/
     _min?: NodeEdgeMinAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
+     *
      * Select which fields to find the maximum value
     **/
     _max?: NodeEdgeMaxAggregateInputType
@@ -17376,13 +17858,13 @@ export namespace Prisma {
      * @example
      * // Get all NodeEdges
      * const nodeEdges = await prisma.nodeEdge.findMany()
-     * 
+     *
      * // Get first 10 NodeEdges
      * const nodeEdges = await prisma.nodeEdge.findMany({ take: 10 })
-     * 
+     *
      * // Only select the `id`
      * const nodeEdgeWithIdOnly = await prisma.nodeEdge.findMany({ select: { id: true } })
-     * 
+     *
      */
     findMany<T extends NodeEdgeFindManyArgs>(args?: SelectSubset<T, NodeEdgeFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$NodeEdgePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
 
@@ -17396,7 +17878,7 @@ export namespace Prisma {
      *     // ... data to create a NodeEdge
      *   }
      * })
-     * 
+     *
      */
     create<T extends NodeEdgeCreateArgs>(args: SelectSubset<T, NodeEdgeCreateArgs<ExtArgs>>): Prisma__NodeEdgeClient<$Result.GetResult<Prisma.$NodeEdgePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -17410,7 +17892,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   ]
      * })
-     *     
+     *
      */
     createMany<T extends NodeEdgeCreateManyArgs>(args?: SelectSubset<T, NodeEdgeCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -17424,7 +17906,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   ]
      * })
-     * 
+     *
      * // Create many NodeEdges and only return the `id`
      * const nodeEdgeWithIdOnly = await prisma.nodeEdge.createManyAndReturn({
      *   select: { id: true },
@@ -17434,7 +17916,7 @@ export namespace Prisma {
      * })
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * 
+     *
      */
     createManyAndReturn<T extends NodeEdgeCreateManyAndReturnArgs>(args?: SelectSubset<T, NodeEdgeCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$NodeEdgePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
 
@@ -17448,7 +17930,7 @@ export namespace Prisma {
      *     // ... filter to delete one NodeEdge
      *   }
      * })
-     * 
+     *
      */
     delete<T extends NodeEdgeDeleteArgs>(args: SelectSubset<T, NodeEdgeDeleteArgs<ExtArgs>>): Prisma__NodeEdgeClient<$Result.GetResult<Prisma.$NodeEdgePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -17465,7 +17947,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   }
      * })
-     * 
+     *
      */
     update<T extends NodeEdgeUpdateArgs>(args: SelectSubset<T, NodeEdgeUpdateArgs<ExtArgs>>): Prisma__NodeEdgeClient<$Result.GetResult<Prisma.$NodeEdgePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
@@ -17479,7 +17961,7 @@ export namespace Prisma {
      *     // ... provide filter here
      *   }
      * })
-     * 
+     *
      */
     deleteMany<T extends NodeEdgeDeleteManyArgs>(args?: SelectSubset<T, NodeEdgeDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -17498,7 +17980,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   }
      * })
-     * 
+     *
      */
     updateMany<T extends NodeEdgeUpdateManyArgs>(args: SelectSubset<T, NodeEdgeUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
@@ -17515,7 +17997,7 @@ export namespace Prisma {
      *     // ... provide data here
      *   ]
      * })
-     * 
+     *
      * // Update zero or more NodeEdges and only return the `id`
      * const nodeEdgeWithIdOnly = await prisma.nodeEdge.updateManyAndReturn({
      *   select: { id: true },
@@ -17528,7 +18010,7 @@ export namespace Prisma {
      * })
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * 
+     *
      */
     updateManyAndReturn<T extends NodeEdgeUpdateManyAndReturnArgs>(args: SelectSubset<T, NodeEdgeUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$NodeEdgePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
 
@@ -17617,7 +18099,7 @@ export namespace Prisma {
      *     _all: true
      *   },
      * })
-     * 
+     *
     **/
     groupBy<
       T extends NodeEdgeGroupByArgs,
@@ -17728,7 +18210,7 @@ export namespace Prisma {
     readonly edgeType: FieldRef<"NodeEdge", 'EdgeType'>
     readonly createdAt: FieldRef<"NodeEdge", 'DateTime'>
   }
-    
+
 
   // Custom InputTypes
   /**
@@ -17785,31 +18267,31 @@ export namespace Prisma {
     where?: NodeEdgeWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of NodeEdges to fetch.
      */
     orderBy?: NodeEdgeOrderByWithRelationInput | NodeEdgeOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the position for searching for NodeEdges.
      */
     cursor?: NodeEdgeWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` NodeEdges from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` NodeEdges.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
+     *
      * Filter by unique combinations of NodeEdges.
      */
     distinct?: NodeEdgeScalarFieldEnum | NodeEdgeScalarFieldEnum[]
@@ -17833,31 +18315,31 @@ export namespace Prisma {
     where?: NodeEdgeWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of NodeEdges to fetch.
      */
     orderBy?: NodeEdgeOrderByWithRelationInput | NodeEdgeOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the position for searching for NodeEdges.
      */
     cursor?: NodeEdgeWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` NodeEdges from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` NodeEdges.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
+     *
      * Filter by unique combinations of NodeEdges.
      */
     distinct?: NodeEdgeScalarFieldEnum | NodeEdgeScalarFieldEnum[]
@@ -17881,25 +18363,25 @@ export namespace Prisma {
     where?: NodeEdgeWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
+     *
      * Determine the order of NodeEdges to fetch.
      */
     orderBy?: NodeEdgeOrderByWithRelationInput | NodeEdgeOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
+     *
      * Sets the position for listing NodeEdges.
      */
     cursor?: NodeEdgeWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Take `±n` NodeEdges from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
+     *
      * Skip the first `n` NodeEdges.
      */
     skip?: number
@@ -18094,6 +18576,2318 @@ export namespace Prisma {
 
 
   /**
+   * Model TaskGraph
+   */
+
+  export type AggregateTaskGraph = {
+    _count: TaskGraphCountAggregateOutputType | null
+    _min: TaskGraphMinAggregateOutputType | null
+    _max: TaskGraphMaxAggregateOutputType | null
+  }
+
+  export type TaskGraphMinAggregateOutputType = {
+    id: string | null
+    workspaceId: string | null
+    projectId: string | null
+    symphonyTaskId: string | null
+    orchestratorEpisodeId: string | null
+    status: $Enums.TaskGraphStatus | null
+    sensitivity: string | null
+    policyVersion: string | null
+    createdByAgentId: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type TaskGraphMaxAggregateOutputType = {
+    id: string | null
+    workspaceId: string | null
+    projectId: string | null
+    symphonyTaskId: string | null
+    orchestratorEpisodeId: string | null
+    status: $Enums.TaskGraphStatus | null
+    sensitivity: string | null
+    policyVersion: string | null
+    createdByAgentId: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type TaskGraphCountAggregateOutputType = {
+    id: number
+    workspaceId: number
+    projectId: number
+    symphonyTaskId: number
+    orchestratorEpisodeId: number
+    status: number
+    sensitivity: number
+    policyVersion: number
+    createdByAgentId: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type TaskGraphMinAggregateInputType = {
+    id?: true
+    workspaceId?: true
+    projectId?: true
+    symphonyTaskId?: true
+    orchestratorEpisodeId?: true
+    status?: true
+    sensitivity?: true
+    policyVersion?: true
+    createdByAgentId?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type TaskGraphMaxAggregateInputType = {
+    id?: true
+    workspaceId?: true
+    projectId?: true
+    symphonyTaskId?: true
+    orchestratorEpisodeId?: true
+    status?: true
+    sensitivity?: true
+    policyVersion?: true
+    createdByAgentId?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type TaskGraphCountAggregateInputType = {
+    id?: true
+    workspaceId?: true
+    projectId?: true
+    symphonyTaskId?: true
+    orchestratorEpisodeId?: true
+    status?: true
+    sensitivity?: true
+    policyVersion?: true
+    createdByAgentId?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type TaskGraphAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which TaskGraph to aggregate.
+     */
+    where?: TaskGraphWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of TaskGraphs to fetch.
+     */
+    orderBy?: TaskGraphOrderByWithRelationInput | TaskGraphOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the start position
+     */
+    cursor?: TaskGraphWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` TaskGraphs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` TaskGraphs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Count returned TaskGraphs
+    **/
+    _count?: true | TaskGraphCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Select which fields to find the minimum value
+    **/
+    _min?: TaskGraphMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Select which fields to find the maximum value
+    **/
+    _max?: TaskGraphMaxAggregateInputType
+  }
+
+  export type GetTaskGraphAggregateType<T extends TaskGraphAggregateArgs> = {
+        [P in keyof T & keyof AggregateTaskGraph]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateTaskGraph[P]>
+      : GetScalarType<T[P], AggregateTaskGraph[P]>
+  }
+
+
+
+
+  export type TaskGraphGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TaskGraphWhereInput
+    orderBy?: TaskGraphOrderByWithAggregationInput | TaskGraphOrderByWithAggregationInput[]
+    by: TaskGraphScalarFieldEnum[] | TaskGraphScalarFieldEnum
+    having?: TaskGraphScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: TaskGraphCountAggregateInputType | true
+    _min?: TaskGraphMinAggregateInputType
+    _max?: TaskGraphMaxAggregateInputType
+  }
+
+  export type TaskGraphGroupByOutputType = {
+    id: string
+    workspaceId: string
+    projectId: string
+    symphonyTaskId: string
+    orchestratorEpisodeId: string
+    status: $Enums.TaskGraphStatus
+    sensitivity: string
+    policyVersion: string
+    createdByAgentId: string
+    createdAt: Date
+    updatedAt: Date
+    _count: TaskGraphCountAggregateOutputType | null
+    _min: TaskGraphMinAggregateOutputType | null
+    _max: TaskGraphMaxAggregateOutputType | null
+  }
+
+  type GetTaskGraphGroupByPayload<T extends TaskGraphGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<TaskGraphGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof TaskGraphGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], TaskGraphGroupByOutputType[P]>
+            : GetScalarType<T[P], TaskGraphGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type TaskGraphSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    workspaceId?: boolean
+    projectId?: boolean
+    symphonyTaskId?: boolean
+    orchestratorEpisodeId?: boolean
+    status?: boolean
+    sensitivity?: boolean
+    policyVersion?: boolean
+    createdByAgentId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    workspace?: boolean | WorkspaceDefaultArgs<ExtArgs>
+    project?: boolean | ProjectDefaultArgs<ExtArgs>
+    orchestratorEpisode?: boolean | EpisodeDefaultArgs<ExtArgs>
+    createdByAgent?: boolean | AgentDefaultArgs<ExtArgs>
+    episodes?: boolean | TaskGraph$episodesArgs<ExtArgs>
+    _count?: boolean | TaskGraphCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["taskGraph"]>
+
+  export type TaskGraphSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    workspaceId?: boolean
+    projectId?: boolean
+    symphonyTaskId?: boolean
+    orchestratorEpisodeId?: boolean
+    status?: boolean
+    sensitivity?: boolean
+    policyVersion?: boolean
+    createdByAgentId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    workspace?: boolean | WorkspaceDefaultArgs<ExtArgs>
+    project?: boolean | ProjectDefaultArgs<ExtArgs>
+    orchestratorEpisode?: boolean | EpisodeDefaultArgs<ExtArgs>
+    createdByAgent?: boolean | AgentDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["taskGraph"]>
+
+  export type TaskGraphSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    workspaceId?: boolean
+    projectId?: boolean
+    symphonyTaskId?: boolean
+    orchestratorEpisodeId?: boolean
+    status?: boolean
+    sensitivity?: boolean
+    policyVersion?: boolean
+    createdByAgentId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    workspace?: boolean | WorkspaceDefaultArgs<ExtArgs>
+    project?: boolean | ProjectDefaultArgs<ExtArgs>
+    orchestratorEpisode?: boolean | EpisodeDefaultArgs<ExtArgs>
+    createdByAgent?: boolean | AgentDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["taskGraph"]>
+
+  export type TaskGraphSelectScalar = {
+    id?: boolean
+    workspaceId?: boolean
+    projectId?: boolean
+    symphonyTaskId?: boolean
+    orchestratorEpisodeId?: boolean
+    status?: boolean
+    sensitivity?: boolean
+    policyVersion?: boolean
+    createdByAgentId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type TaskGraphOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "workspaceId" | "projectId" | "symphonyTaskId" | "orchestratorEpisodeId" | "status" | "sensitivity" | "policyVersion" | "createdByAgentId" | "createdAt" | "updatedAt", ExtArgs["result"]["taskGraph"]>
+  export type TaskGraphInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    workspace?: boolean | WorkspaceDefaultArgs<ExtArgs>
+    project?: boolean | ProjectDefaultArgs<ExtArgs>
+    orchestratorEpisode?: boolean | EpisodeDefaultArgs<ExtArgs>
+    createdByAgent?: boolean | AgentDefaultArgs<ExtArgs>
+    episodes?: boolean | TaskGraph$episodesArgs<ExtArgs>
+    _count?: boolean | TaskGraphCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type TaskGraphIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    workspace?: boolean | WorkspaceDefaultArgs<ExtArgs>
+    project?: boolean | ProjectDefaultArgs<ExtArgs>
+    orchestratorEpisode?: boolean | EpisodeDefaultArgs<ExtArgs>
+    createdByAgent?: boolean | AgentDefaultArgs<ExtArgs>
+  }
+  export type TaskGraphIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    workspace?: boolean | WorkspaceDefaultArgs<ExtArgs>
+    project?: boolean | ProjectDefaultArgs<ExtArgs>
+    orchestratorEpisode?: boolean | EpisodeDefaultArgs<ExtArgs>
+    createdByAgent?: boolean | AgentDefaultArgs<ExtArgs>
+  }
+
+  export type $TaskGraphPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "TaskGraph"
+    objects: {
+      workspace: Prisma.$WorkspacePayload<ExtArgs>
+      project: Prisma.$ProjectPayload<ExtArgs>
+      orchestratorEpisode: Prisma.$EpisodePayload<ExtArgs>
+      createdByAgent: Prisma.$AgentPayload<ExtArgs>
+      episodes: Prisma.$TaskGraphEpisodePayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      workspaceId: string
+      projectId: string
+      symphonyTaskId: string
+      orchestratorEpisodeId: string
+      status: $Enums.TaskGraphStatus
+      sensitivity: string
+      policyVersion: string
+      createdByAgentId: string
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["taskGraph"]>
+    composites: {}
+  }
+
+  type TaskGraphGetPayload<S extends boolean | null | undefined | TaskGraphDefaultArgs> = $Result.GetResult<Prisma.$TaskGraphPayload, S>
+
+  type TaskGraphCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<TaskGraphFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: TaskGraphCountAggregateInputType | true
+    }
+
+  export interface TaskGraphDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['TaskGraph'], meta: { name: 'TaskGraph' } }
+    /**
+     * Find zero or one TaskGraph that matches the filter.
+     * @param {TaskGraphFindUniqueArgs} args - Arguments to find a TaskGraph
+     * @example
+     * // Get one TaskGraph
+     * const taskGraph = await prisma.taskGraph.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends TaskGraphFindUniqueArgs>(args: SelectSubset<T, TaskGraphFindUniqueArgs<ExtArgs>>): Prisma__TaskGraphClient<$Result.GetResult<Prisma.$TaskGraphPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one TaskGraph that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {TaskGraphFindUniqueOrThrowArgs} args - Arguments to find a TaskGraph
+     * @example
+     * // Get one TaskGraph
+     * const taskGraph = await prisma.taskGraph.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends TaskGraphFindUniqueOrThrowArgs>(args: SelectSubset<T, TaskGraphFindUniqueOrThrowArgs<ExtArgs>>): Prisma__TaskGraphClient<$Result.GetResult<Prisma.$TaskGraphPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first TaskGraph that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TaskGraphFindFirstArgs} args - Arguments to find a TaskGraph
+     * @example
+     * // Get one TaskGraph
+     * const taskGraph = await prisma.taskGraph.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends TaskGraphFindFirstArgs>(args?: SelectSubset<T, TaskGraphFindFirstArgs<ExtArgs>>): Prisma__TaskGraphClient<$Result.GetResult<Prisma.$TaskGraphPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first TaskGraph that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TaskGraphFindFirstOrThrowArgs} args - Arguments to find a TaskGraph
+     * @example
+     * // Get one TaskGraph
+     * const taskGraph = await prisma.taskGraph.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends TaskGraphFindFirstOrThrowArgs>(args?: SelectSubset<T, TaskGraphFindFirstOrThrowArgs<ExtArgs>>): Prisma__TaskGraphClient<$Result.GetResult<Prisma.$TaskGraphPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more TaskGraphs that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TaskGraphFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all TaskGraphs
+     * const taskGraphs = await prisma.taskGraph.findMany()
+     *
+     * // Get first 10 TaskGraphs
+     * const taskGraphs = await prisma.taskGraph.findMany({ take: 10 })
+     *
+     * // Only select the `id`
+     * const taskGraphWithIdOnly = await prisma.taskGraph.findMany({ select: { id: true } })
+     *
+     */
+    findMany<T extends TaskGraphFindManyArgs>(args?: SelectSubset<T, TaskGraphFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TaskGraphPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a TaskGraph.
+     * @param {TaskGraphCreateArgs} args - Arguments to create a TaskGraph.
+     * @example
+     * // Create one TaskGraph
+     * const TaskGraph = await prisma.taskGraph.create({
+     *   data: {
+     *     // ... data to create a TaskGraph
+     *   }
+     * })
+     *
+     */
+    create<T extends TaskGraphCreateArgs>(args: SelectSubset<T, TaskGraphCreateArgs<ExtArgs>>): Prisma__TaskGraphClient<$Result.GetResult<Prisma.$TaskGraphPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many TaskGraphs.
+     * @param {TaskGraphCreateManyArgs} args - Arguments to create many TaskGraphs.
+     * @example
+     * // Create many TaskGraphs
+     * const taskGraph = await prisma.taskGraph.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *
+     */
+    createMany<T extends TaskGraphCreateManyArgs>(args?: SelectSubset<T, TaskGraphCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many TaskGraphs and returns the data saved in the database.
+     * @param {TaskGraphCreateManyAndReturnArgs} args - Arguments to create many TaskGraphs.
+     * @example
+     * // Create many TaskGraphs
+     * const taskGraph = await prisma.taskGraph.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *
+     * // Create many TaskGraphs and only return the `id`
+     * const taskGraphWithIdOnly = await prisma.taskGraph.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     *
+     */
+    createManyAndReturn<T extends TaskGraphCreateManyAndReturnArgs>(args?: SelectSubset<T, TaskGraphCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TaskGraphPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a TaskGraph.
+     * @param {TaskGraphDeleteArgs} args - Arguments to delete one TaskGraph.
+     * @example
+     * // Delete one TaskGraph
+     * const TaskGraph = await prisma.taskGraph.delete({
+     *   where: {
+     *     // ... filter to delete one TaskGraph
+     *   }
+     * })
+     *
+     */
+    delete<T extends TaskGraphDeleteArgs>(args: SelectSubset<T, TaskGraphDeleteArgs<ExtArgs>>): Prisma__TaskGraphClient<$Result.GetResult<Prisma.$TaskGraphPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one TaskGraph.
+     * @param {TaskGraphUpdateArgs} args - Arguments to update one TaskGraph.
+     * @example
+     * // Update one TaskGraph
+     * const taskGraph = await prisma.taskGraph.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     *
+     */
+    update<T extends TaskGraphUpdateArgs>(args: SelectSubset<T, TaskGraphUpdateArgs<ExtArgs>>): Prisma__TaskGraphClient<$Result.GetResult<Prisma.$TaskGraphPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more TaskGraphs.
+     * @param {TaskGraphDeleteManyArgs} args - Arguments to filter TaskGraphs to delete.
+     * @example
+     * // Delete a few TaskGraphs
+     * const { count } = await prisma.taskGraph.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     *
+     */
+    deleteMany<T extends TaskGraphDeleteManyArgs>(args?: SelectSubset<T, TaskGraphDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more TaskGraphs.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TaskGraphUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many TaskGraphs
+     * const taskGraph = await prisma.taskGraph.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     *
+     */
+    updateMany<T extends TaskGraphUpdateManyArgs>(args: SelectSubset<T, TaskGraphUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more TaskGraphs and returns the data updated in the database.
+     * @param {TaskGraphUpdateManyAndReturnArgs} args - Arguments to update many TaskGraphs.
+     * @example
+     * // Update many TaskGraphs
+     * const taskGraph = await prisma.taskGraph.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *
+     * // Update zero or more TaskGraphs and only return the `id`
+     * const taskGraphWithIdOnly = await prisma.taskGraph.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     *
+     */
+    updateManyAndReturn<T extends TaskGraphUpdateManyAndReturnArgs>(args: SelectSubset<T, TaskGraphUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TaskGraphPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one TaskGraph.
+     * @param {TaskGraphUpsertArgs} args - Arguments to update or create a TaskGraph.
+     * @example
+     * // Update or create a TaskGraph
+     * const taskGraph = await prisma.taskGraph.upsert({
+     *   create: {
+     *     // ... data to create a TaskGraph
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the TaskGraph we want to update
+     *   }
+     * })
+     */
+    upsert<T extends TaskGraphUpsertArgs>(args: SelectSubset<T, TaskGraphUpsertArgs<ExtArgs>>): Prisma__TaskGraphClient<$Result.GetResult<Prisma.$TaskGraphPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of TaskGraphs.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TaskGraphCountArgs} args - Arguments to filter TaskGraphs to count.
+     * @example
+     * // Count the number of TaskGraphs
+     * const count = await prisma.taskGraph.count({
+     *   where: {
+     *     // ... the filter for the TaskGraphs we want to count
+     *   }
+     * })
+    **/
+    count<T extends TaskGraphCountArgs>(
+      args?: Subset<T, TaskGraphCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], TaskGraphCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a TaskGraph.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TaskGraphAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends TaskGraphAggregateArgs>(args: Subset<T, TaskGraphAggregateArgs>): Prisma.PrismaPromise<GetTaskGraphAggregateType<T>>
+
+    /**
+     * Group by TaskGraph.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TaskGraphGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     *
+    **/
+    groupBy<
+      T extends TaskGraphGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: TaskGraphGroupByArgs['orderBy'] }
+        : { orderBy?: TaskGraphGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, TaskGraphGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetTaskGraphGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the TaskGraph model
+   */
+  readonly fields: TaskGraphFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for TaskGraph.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__TaskGraphClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    workspace<T extends WorkspaceDefaultArgs<ExtArgs> = {}>(args?: Subset<T, WorkspaceDefaultArgs<ExtArgs>>): Prisma__WorkspaceClient<$Result.GetResult<Prisma.$WorkspacePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    project<T extends ProjectDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ProjectDefaultArgs<ExtArgs>>): Prisma__ProjectClient<$Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    orchestratorEpisode<T extends EpisodeDefaultArgs<ExtArgs> = {}>(args?: Subset<T, EpisodeDefaultArgs<ExtArgs>>): Prisma__EpisodeClient<$Result.GetResult<Prisma.$EpisodePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    createdByAgent<T extends AgentDefaultArgs<ExtArgs> = {}>(args?: Subset<T, AgentDefaultArgs<ExtArgs>>): Prisma__AgentClient<$Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    episodes<T extends TaskGraph$episodesArgs<ExtArgs> = {}>(args?: Subset<T, TaskGraph$episodesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TaskGraphEpisodePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the TaskGraph model
+   */
+  interface TaskGraphFieldRefs {
+    readonly id: FieldRef<"TaskGraph", 'String'>
+    readonly workspaceId: FieldRef<"TaskGraph", 'String'>
+    readonly projectId: FieldRef<"TaskGraph", 'String'>
+    readonly symphonyTaskId: FieldRef<"TaskGraph", 'String'>
+    readonly orchestratorEpisodeId: FieldRef<"TaskGraph", 'String'>
+    readonly status: FieldRef<"TaskGraph", 'TaskGraphStatus'>
+    readonly sensitivity: FieldRef<"TaskGraph", 'String'>
+    readonly policyVersion: FieldRef<"TaskGraph", 'String'>
+    readonly createdByAgentId: FieldRef<"TaskGraph", 'String'>
+    readonly createdAt: FieldRef<"TaskGraph", 'DateTime'>
+    readonly updatedAt: FieldRef<"TaskGraph", 'DateTime'>
+  }
+
+
+  // Custom InputTypes
+  /**
+   * TaskGraph findUnique
+   */
+  export type TaskGraphFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TaskGraph
+     */
+    select?: TaskGraphSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TaskGraph
+     */
+    omit?: TaskGraphOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TaskGraphInclude<ExtArgs> | null
+    /**
+     * Filter, which TaskGraph to fetch.
+     */
+    where: TaskGraphWhereUniqueInput
+  }
+
+  /**
+   * TaskGraph findUniqueOrThrow
+   */
+  export type TaskGraphFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TaskGraph
+     */
+    select?: TaskGraphSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TaskGraph
+     */
+    omit?: TaskGraphOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TaskGraphInclude<ExtArgs> | null
+    /**
+     * Filter, which TaskGraph to fetch.
+     */
+    where: TaskGraphWhereUniqueInput
+  }
+
+  /**
+   * TaskGraph findFirst
+   */
+  export type TaskGraphFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TaskGraph
+     */
+    select?: TaskGraphSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TaskGraph
+     */
+    omit?: TaskGraphOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TaskGraphInclude<ExtArgs> | null
+    /**
+     * Filter, which TaskGraph to fetch.
+     */
+    where?: TaskGraphWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of TaskGraphs to fetch.
+     */
+    orderBy?: TaskGraphOrderByWithRelationInput | TaskGraphOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the position for searching for TaskGraphs.
+     */
+    cursor?: TaskGraphWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` TaskGraphs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` TaskGraphs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     *
+     * Filter by unique combinations of TaskGraphs.
+     */
+    distinct?: TaskGraphScalarFieldEnum | TaskGraphScalarFieldEnum[]
+  }
+
+  /**
+   * TaskGraph findFirstOrThrow
+   */
+  export type TaskGraphFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TaskGraph
+     */
+    select?: TaskGraphSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TaskGraph
+     */
+    omit?: TaskGraphOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TaskGraphInclude<ExtArgs> | null
+    /**
+     * Filter, which TaskGraph to fetch.
+     */
+    where?: TaskGraphWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of TaskGraphs to fetch.
+     */
+    orderBy?: TaskGraphOrderByWithRelationInput | TaskGraphOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the position for searching for TaskGraphs.
+     */
+    cursor?: TaskGraphWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` TaskGraphs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` TaskGraphs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     *
+     * Filter by unique combinations of TaskGraphs.
+     */
+    distinct?: TaskGraphScalarFieldEnum | TaskGraphScalarFieldEnum[]
+  }
+
+  /**
+   * TaskGraph findMany
+   */
+  export type TaskGraphFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TaskGraph
+     */
+    select?: TaskGraphSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TaskGraph
+     */
+    omit?: TaskGraphOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TaskGraphInclude<ExtArgs> | null
+    /**
+     * Filter, which TaskGraphs to fetch.
+     */
+    where?: TaskGraphWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of TaskGraphs to fetch.
+     */
+    orderBy?: TaskGraphOrderByWithRelationInput | TaskGraphOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the position for listing TaskGraphs.
+     */
+    cursor?: TaskGraphWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` TaskGraphs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` TaskGraphs.
+     */
+    skip?: number
+    distinct?: TaskGraphScalarFieldEnum | TaskGraphScalarFieldEnum[]
+  }
+
+  /**
+   * TaskGraph create
+   */
+  export type TaskGraphCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TaskGraph
+     */
+    select?: TaskGraphSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TaskGraph
+     */
+    omit?: TaskGraphOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TaskGraphInclude<ExtArgs> | null
+    /**
+     * The data needed to create a TaskGraph.
+     */
+    data: XOR<TaskGraphCreateInput, TaskGraphUncheckedCreateInput>
+  }
+
+  /**
+   * TaskGraph createMany
+   */
+  export type TaskGraphCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many TaskGraphs.
+     */
+    data: TaskGraphCreateManyInput | TaskGraphCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * TaskGraph createManyAndReturn
+   */
+  export type TaskGraphCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TaskGraph
+     */
+    select?: TaskGraphSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the TaskGraph
+     */
+    omit?: TaskGraphOmit<ExtArgs> | null
+    /**
+     * The data used to create many TaskGraphs.
+     */
+    data: TaskGraphCreateManyInput | TaskGraphCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TaskGraphIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * TaskGraph update
+   */
+  export type TaskGraphUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TaskGraph
+     */
+    select?: TaskGraphSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TaskGraph
+     */
+    omit?: TaskGraphOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TaskGraphInclude<ExtArgs> | null
+    /**
+     * The data needed to update a TaskGraph.
+     */
+    data: XOR<TaskGraphUpdateInput, TaskGraphUncheckedUpdateInput>
+    /**
+     * Choose, which TaskGraph to update.
+     */
+    where: TaskGraphWhereUniqueInput
+  }
+
+  /**
+   * TaskGraph updateMany
+   */
+  export type TaskGraphUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update TaskGraphs.
+     */
+    data: XOR<TaskGraphUpdateManyMutationInput, TaskGraphUncheckedUpdateManyInput>
+    /**
+     * Filter which TaskGraphs to update
+     */
+    where?: TaskGraphWhereInput
+    /**
+     * Limit how many TaskGraphs to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * TaskGraph updateManyAndReturn
+   */
+  export type TaskGraphUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TaskGraph
+     */
+    select?: TaskGraphSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the TaskGraph
+     */
+    omit?: TaskGraphOmit<ExtArgs> | null
+    /**
+     * The data used to update TaskGraphs.
+     */
+    data: XOR<TaskGraphUpdateManyMutationInput, TaskGraphUncheckedUpdateManyInput>
+    /**
+     * Filter which TaskGraphs to update
+     */
+    where?: TaskGraphWhereInput
+    /**
+     * Limit how many TaskGraphs to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TaskGraphIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * TaskGraph upsert
+   */
+  export type TaskGraphUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TaskGraph
+     */
+    select?: TaskGraphSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TaskGraph
+     */
+    omit?: TaskGraphOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TaskGraphInclude<ExtArgs> | null
+    /**
+     * The filter to search for the TaskGraph to update in case it exists.
+     */
+    where: TaskGraphWhereUniqueInput
+    /**
+     * In case the TaskGraph found by the `where` argument doesn't exist, create a new TaskGraph with this data.
+     */
+    create: XOR<TaskGraphCreateInput, TaskGraphUncheckedCreateInput>
+    /**
+     * In case the TaskGraph was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<TaskGraphUpdateInput, TaskGraphUncheckedUpdateInput>
+  }
+
+  /**
+   * TaskGraph delete
+   */
+  export type TaskGraphDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TaskGraph
+     */
+    select?: TaskGraphSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TaskGraph
+     */
+    omit?: TaskGraphOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TaskGraphInclude<ExtArgs> | null
+    /**
+     * Filter which TaskGraph to delete.
+     */
+    where: TaskGraphWhereUniqueInput
+  }
+
+  /**
+   * TaskGraph deleteMany
+   */
+  export type TaskGraphDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which TaskGraphs to delete
+     */
+    where?: TaskGraphWhereInput
+    /**
+     * Limit how many TaskGraphs to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * TaskGraph.episodes
+   */
+  export type TaskGraph$episodesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TaskGraphEpisode
+     */
+    select?: TaskGraphEpisodeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TaskGraphEpisode
+     */
+    omit?: TaskGraphEpisodeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TaskGraphEpisodeInclude<ExtArgs> | null
+    where?: TaskGraphEpisodeWhereInput
+    orderBy?: TaskGraphEpisodeOrderByWithRelationInput | TaskGraphEpisodeOrderByWithRelationInput[]
+    cursor?: TaskGraphEpisodeWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: TaskGraphEpisodeScalarFieldEnum | TaskGraphEpisodeScalarFieldEnum[]
+  }
+
+  /**
+   * TaskGraph without action
+   */
+  export type TaskGraphDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TaskGraph
+     */
+    select?: TaskGraphSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TaskGraph
+     */
+    omit?: TaskGraphOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TaskGraphInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model TaskGraphEpisode
+   */
+
+  export type AggregateTaskGraphEpisode = {
+    _count: TaskGraphEpisodeCountAggregateOutputType | null
+    _min: TaskGraphEpisodeMinAggregateOutputType | null
+    _max: TaskGraphEpisodeMaxAggregateOutputType | null
+  }
+
+  export type TaskGraphEpisodeMinAggregateOutputType = {
+    id: string | null
+    taskGraphId: string | null
+    episodeId: string | null
+    role: $Enums.TaskGraphEpisodeRole | null
+    agentId: string | null
+    assignedSubtask: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type TaskGraphEpisodeMaxAggregateOutputType = {
+    id: string | null
+    taskGraphId: string | null
+    episodeId: string | null
+    role: $Enums.TaskGraphEpisodeRole | null
+    agentId: string | null
+    assignedSubtask: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type TaskGraphEpisodeCountAggregateOutputType = {
+    id: number
+    taskGraphId: number
+    episodeId: number
+    role: number
+    agentId: number
+    assignedSubtask: number
+    dependencyEpisodeIds: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type TaskGraphEpisodeMinAggregateInputType = {
+    id?: true
+    taskGraphId?: true
+    episodeId?: true
+    role?: true
+    agentId?: true
+    assignedSubtask?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type TaskGraphEpisodeMaxAggregateInputType = {
+    id?: true
+    taskGraphId?: true
+    episodeId?: true
+    role?: true
+    agentId?: true
+    assignedSubtask?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type TaskGraphEpisodeCountAggregateInputType = {
+    id?: true
+    taskGraphId?: true
+    episodeId?: true
+    role?: true
+    agentId?: true
+    assignedSubtask?: true
+    dependencyEpisodeIds?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type TaskGraphEpisodeAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which TaskGraphEpisode to aggregate.
+     */
+    where?: TaskGraphEpisodeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of TaskGraphEpisodes to fetch.
+     */
+    orderBy?: TaskGraphEpisodeOrderByWithRelationInput | TaskGraphEpisodeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the start position
+     */
+    cursor?: TaskGraphEpisodeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` TaskGraphEpisodes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` TaskGraphEpisodes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Count returned TaskGraphEpisodes
+    **/
+    _count?: true | TaskGraphEpisodeCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Select which fields to find the minimum value
+    **/
+    _min?: TaskGraphEpisodeMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Select which fields to find the maximum value
+    **/
+    _max?: TaskGraphEpisodeMaxAggregateInputType
+  }
+
+  export type GetTaskGraphEpisodeAggregateType<T extends TaskGraphEpisodeAggregateArgs> = {
+        [P in keyof T & keyof AggregateTaskGraphEpisode]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateTaskGraphEpisode[P]>
+      : GetScalarType<T[P], AggregateTaskGraphEpisode[P]>
+  }
+
+
+
+
+  export type TaskGraphEpisodeGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TaskGraphEpisodeWhereInput
+    orderBy?: TaskGraphEpisodeOrderByWithAggregationInput | TaskGraphEpisodeOrderByWithAggregationInput[]
+    by: TaskGraphEpisodeScalarFieldEnum[] | TaskGraphEpisodeScalarFieldEnum
+    having?: TaskGraphEpisodeScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: TaskGraphEpisodeCountAggregateInputType | true
+    _min?: TaskGraphEpisodeMinAggregateInputType
+    _max?: TaskGraphEpisodeMaxAggregateInputType
+  }
+
+  export type TaskGraphEpisodeGroupByOutputType = {
+    id: string
+    taskGraphId: string
+    episodeId: string
+    role: $Enums.TaskGraphEpisodeRole
+    agentId: string
+    assignedSubtask: string
+    dependencyEpisodeIds: string[]
+    createdAt: Date
+    updatedAt: Date
+    _count: TaskGraphEpisodeCountAggregateOutputType | null
+    _min: TaskGraphEpisodeMinAggregateOutputType | null
+    _max: TaskGraphEpisodeMaxAggregateOutputType | null
+  }
+
+  type GetTaskGraphEpisodeGroupByPayload<T extends TaskGraphEpisodeGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<TaskGraphEpisodeGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof TaskGraphEpisodeGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], TaskGraphEpisodeGroupByOutputType[P]>
+            : GetScalarType<T[P], TaskGraphEpisodeGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type TaskGraphEpisodeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    taskGraphId?: boolean
+    episodeId?: boolean
+    role?: boolean
+    agentId?: boolean
+    assignedSubtask?: boolean
+    dependencyEpisodeIds?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    taskGraph?: boolean | TaskGraphDefaultArgs<ExtArgs>
+    episode?: boolean | EpisodeDefaultArgs<ExtArgs>
+    agent?: boolean | AgentDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["taskGraphEpisode"]>
+
+  export type TaskGraphEpisodeSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    taskGraphId?: boolean
+    episodeId?: boolean
+    role?: boolean
+    agentId?: boolean
+    assignedSubtask?: boolean
+    dependencyEpisodeIds?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    taskGraph?: boolean | TaskGraphDefaultArgs<ExtArgs>
+    episode?: boolean | EpisodeDefaultArgs<ExtArgs>
+    agent?: boolean | AgentDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["taskGraphEpisode"]>
+
+  export type TaskGraphEpisodeSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    taskGraphId?: boolean
+    episodeId?: boolean
+    role?: boolean
+    agentId?: boolean
+    assignedSubtask?: boolean
+    dependencyEpisodeIds?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    taskGraph?: boolean | TaskGraphDefaultArgs<ExtArgs>
+    episode?: boolean | EpisodeDefaultArgs<ExtArgs>
+    agent?: boolean | AgentDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["taskGraphEpisode"]>
+
+  export type TaskGraphEpisodeSelectScalar = {
+    id?: boolean
+    taskGraphId?: boolean
+    episodeId?: boolean
+    role?: boolean
+    agentId?: boolean
+    assignedSubtask?: boolean
+    dependencyEpisodeIds?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type TaskGraphEpisodeOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "taskGraphId" | "episodeId" | "role" | "agentId" | "assignedSubtask" | "dependencyEpisodeIds" | "createdAt" | "updatedAt", ExtArgs["result"]["taskGraphEpisode"]>
+  export type TaskGraphEpisodeInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    taskGraph?: boolean | TaskGraphDefaultArgs<ExtArgs>
+    episode?: boolean | EpisodeDefaultArgs<ExtArgs>
+    agent?: boolean | AgentDefaultArgs<ExtArgs>
+  }
+  export type TaskGraphEpisodeIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    taskGraph?: boolean | TaskGraphDefaultArgs<ExtArgs>
+    episode?: boolean | EpisodeDefaultArgs<ExtArgs>
+    agent?: boolean | AgentDefaultArgs<ExtArgs>
+  }
+  export type TaskGraphEpisodeIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    taskGraph?: boolean | TaskGraphDefaultArgs<ExtArgs>
+    episode?: boolean | EpisodeDefaultArgs<ExtArgs>
+    agent?: boolean | AgentDefaultArgs<ExtArgs>
+  }
+
+  export type $TaskGraphEpisodePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "TaskGraphEpisode"
+    objects: {
+      taskGraph: Prisma.$TaskGraphPayload<ExtArgs>
+      episode: Prisma.$EpisodePayload<ExtArgs>
+      agent: Prisma.$AgentPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      taskGraphId: string
+      episodeId: string
+      role: $Enums.TaskGraphEpisodeRole
+      agentId: string
+      assignedSubtask: string
+      dependencyEpisodeIds: string[]
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["taskGraphEpisode"]>
+    composites: {}
+  }
+
+  type TaskGraphEpisodeGetPayload<S extends boolean | null | undefined | TaskGraphEpisodeDefaultArgs> = $Result.GetResult<Prisma.$TaskGraphEpisodePayload, S>
+
+  type TaskGraphEpisodeCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<TaskGraphEpisodeFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: TaskGraphEpisodeCountAggregateInputType | true
+    }
+
+  export interface TaskGraphEpisodeDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['TaskGraphEpisode'], meta: { name: 'TaskGraphEpisode' } }
+    /**
+     * Find zero or one TaskGraphEpisode that matches the filter.
+     * @param {TaskGraphEpisodeFindUniqueArgs} args - Arguments to find a TaskGraphEpisode
+     * @example
+     * // Get one TaskGraphEpisode
+     * const taskGraphEpisode = await prisma.taskGraphEpisode.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends TaskGraphEpisodeFindUniqueArgs>(args: SelectSubset<T, TaskGraphEpisodeFindUniqueArgs<ExtArgs>>): Prisma__TaskGraphEpisodeClient<$Result.GetResult<Prisma.$TaskGraphEpisodePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one TaskGraphEpisode that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {TaskGraphEpisodeFindUniqueOrThrowArgs} args - Arguments to find a TaskGraphEpisode
+     * @example
+     * // Get one TaskGraphEpisode
+     * const taskGraphEpisode = await prisma.taskGraphEpisode.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends TaskGraphEpisodeFindUniqueOrThrowArgs>(args: SelectSubset<T, TaskGraphEpisodeFindUniqueOrThrowArgs<ExtArgs>>): Prisma__TaskGraphEpisodeClient<$Result.GetResult<Prisma.$TaskGraphEpisodePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first TaskGraphEpisode that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TaskGraphEpisodeFindFirstArgs} args - Arguments to find a TaskGraphEpisode
+     * @example
+     * // Get one TaskGraphEpisode
+     * const taskGraphEpisode = await prisma.taskGraphEpisode.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends TaskGraphEpisodeFindFirstArgs>(args?: SelectSubset<T, TaskGraphEpisodeFindFirstArgs<ExtArgs>>): Prisma__TaskGraphEpisodeClient<$Result.GetResult<Prisma.$TaskGraphEpisodePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first TaskGraphEpisode that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TaskGraphEpisodeFindFirstOrThrowArgs} args - Arguments to find a TaskGraphEpisode
+     * @example
+     * // Get one TaskGraphEpisode
+     * const taskGraphEpisode = await prisma.taskGraphEpisode.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends TaskGraphEpisodeFindFirstOrThrowArgs>(args?: SelectSubset<T, TaskGraphEpisodeFindFirstOrThrowArgs<ExtArgs>>): Prisma__TaskGraphEpisodeClient<$Result.GetResult<Prisma.$TaskGraphEpisodePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more TaskGraphEpisodes that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TaskGraphEpisodeFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all TaskGraphEpisodes
+     * const taskGraphEpisodes = await prisma.taskGraphEpisode.findMany()
+     *
+     * // Get first 10 TaskGraphEpisodes
+     * const taskGraphEpisodes = await prisma.taskGraphEpisode.findMany({ take: 10 })
+     *
+     * // Only select the `id`
+     * const taskGraphEpisodeWithIdOnly = await prisma.taskGraphEpisode.findMany({ select: { id: true } })
+     *
+     */
+    findMany<T extends TaskGraphEpisodeFindManyArgs>(args?: SelectSubset<T, TaskGraphEpisodeFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TaskGraphEpisodePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a TaskGraphEpisode.
+     * @param {TaskGraphEpisodeCreateArgs} args - Arguments to create a TaskGraphEpisode.
+     * @example
+     * // Create one TaskGraphEpisode
+     * const TaskGraphEpisode = await prisma.taskGraphEpisode.create({
+     *   data: {
+     *     // ... data to create a TaskGraphEpisode
+     *   }
+     * })
+     *
+     */
+    create<T extends TaskGraphEpisodeCreateArgs>(args: SelectSubset<T, TaskGraphEpisodeCreateArgs<ExtArgs>>): Prisma__TaskGraphEpisodeClient<$Result.GetResult<Prisma.$TaskGraphEpisodePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many TaskGraphEpisodes.
+     * @param {TaskGraphEpisodeCreateManyArgs} args - Arguments to create many TaskGraphEpisodes.
+     * @example
+     * // Create many TaskGraphEpisodes
+     * const taskGraphEpisode = await prisma.taskGraphEpisode.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *
+     */
+    createMany<T extends TaskGraphEpisodeCreateManyArgs>(args?: SelectSubset<T, TaskGraphEpisodeCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many TaskGraphEpisodes and returns the data saved in the database.
+     * @param {TaskGraphEpisodeCreateManyAndReturnArgs} args - Arguments to create many TaskGraphEpisodes.
+     * @example
+     * // Create many TaskGraphEpisodes
+     * const taskGraphEpisode = await prisma.taskGraphEpisode.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *
+     * // Create many TaskGraphEpisodes and only return the `id`
+     * const taskGraphEpisodeWithIdOnly = await prisma.taskGraphEpisode.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     *
+     */
+    createManyAndReturn<T extends TaskGraphEpisodeCreateManyAndReturnArgs>(args?: SelectSubset<T, TaskGraphEpisodeCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TaskGraphEpisodePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a TaskGraphEpisode.
+     * @param {TaskGraphEpisodeDeleteArgs} args - Arguments to delete one TaskGraphEpisode.
+     * @example
+     * // Delete one TaskGraphEpisode
+     * const TaskGraphEpisode = await prisma.taskGraphEpisode.delete({
+     *   where: {
+     *     // ... filter to delete one TaskGraphEpisode
+     *   }
+     * })
+     *
+     */
+    delete<T extends TaskGraphEpisodeDeleteArgs>(args: SelectSubset<T, TaskGraphEpisodeDeleteArgs<ExtArgs>>): Prisma__TaskGraphEpisodeClient<$Result.GetResult<Prisma.$TaskGraphEpisodePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one TaskGraphEpisode.
+     * @param {TaskGraphEpisodeUpdateArgs} args - Arguments to update one TaskGraphEpisode.
+     * @example
+     * // Update one TaskGraphEpisode
+     * const taskGraphEpisode = await prisma.taskGraphEpisode.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     *
+     */
+    update<T extends TaskGraphEpisodeUpdateArgs>(args: SelectSubset<T, TaskGraphEpisodeUpdateArgs<ExtArgs>>): Prisma__TaskGraphEpisodeClient<$Result.GetResult<Prisma.$TaskGraphEpisodePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more TaskGraphEpisodes.
+     * @param {TaskGraphEpisodeDeleteManyArgs} args - Arguments to filter TaskGraphEpisodes to delete.
+     * @example
+     * // Delete a few TaskGraphEpisodes
+     * const { count } = await prisma.taskGraphEpisode.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     *
+     */
+    deleteMany<T extends TaskGraphEpisodeDeleteManyArgs>(args?: SelectSubset<T, TaskGraphEpisodeDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more TaskGraphEpisodes.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TaskGraphEpisodeUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many TaskGraphEpisodes
+     * const taskGraphEpisode = await prisma.taskGraphEpisode.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     *
+     */
+    updateMany<T extends TaskGraphEpisodeUpdateManyArgs>(args: SelectSubset<T, TaskGraphEpisodeUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more TaskGraphEpisodes and returns the data updated in the database.
+     * @param {TaskGraphEpisodeUpdateManyAndReturnArgs} args - Arguments to update many TaskGraphEpisodes.
+     * @example
+     * // Update many TaskGraphEpisodes
+     * const taskGraphEpisode = await prisma.taskGraphEpisode.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *
+     * // Update zero or more TaskGraphEpisodes and only return the `id`
+     * const taskGraphEpisodeWithIdOnly = await prisma.taskGraphEpisode.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     *
+     */
+    updateManyAndReturn<T extends TaskGraphEpisodeUpdateManyAndReturnArgs>(args: SelectSubset<T, TaskGraphEpisodeUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TaskGraphEpisodePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one TaskGraphEpisode.
+     * @param {TaskGraphEpisodeUpsertArgs} args - Arguments to update or create a TaskGraphEpisode.
+     * @example
+     * // Update or create a TaskGraphEpisode
+     * const taskGraphEpisode = await prisma.taskGraphEpisode.upsert({
+     *   create: {
+     *     // ... data to create a TaskGraphEpisode
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the TaskGraphEpisode we want to update
+     *   }
+     * })
+     */
+    upsert<T extends TaskGraphEpisodeUpsertArgs>(args: SelectSubset<T, TaskGraphEpisodeUpsertArgs<ExtArgs>>): Prisma__TaskGraphEpisodeClient<$Result.GetResult<Prisma.$TaskGraphEpisodePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of TaskGraphEpisodes.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TaskGraphEpisodeCountArgs} args - Arguments to filter TaskGraphEpisodes to count.
+     * @example
+     * // Count the number of TaskGraphEpisodes
+     * const count = await prisma.taskGraphEpisode.count({
+     *   where: {
+     *     // ... the filter for the TaskGraphEpisodes we want to count
+     *   }
+     * })
+    **/
+    count<T extends TaskGraphEpisodeCountArgs>(
+      args?: Subset<T, TaskGraphEpisodeCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], TaskGraphEpisodeCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a TaskGraphEpisode.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TaskGraphEpisodeAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends TaskGraphEpisodeAggregateArgs>(args: Subset<T, TaskGraphEpisodeAggregateArgs>): Prisma.PrismaPromise<GetTaskGraphEpisodeAggregateType<T>>
+
+    /**
+     * Group by TaskGraphEpisode.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TaskGraphEpisodeGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     *
+    **/
+    groupBy<
+      T extends TaskGraphEpisodeGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: TaskGraphEpisodeGroupByArgs['orderBy'] }
+        : { orderBy?: TaskGraphEpisodeGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, TaskGraphEpisodeGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetTaskGraphEpisodeGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the TaskGraphEpisode model
+   */
+  readonly fields: TaskGraphEpisodeFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for TaskGraphEpisode.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__TaskGraphEpisodeClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    taskGraph<T extends TaskGraphDefaultArgs<ExtArgs> = {}>(args?: Subset<T, TaskGraphDefaultArgs<ExtArgs>>): Prisma__TaskGraphClient<$Result.GetResult<Prisma.$TaskGraphPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    episode<T extends EpisodeDefaultArgs<ExtArgs> = {}>(args?: Subset<T, EpisodeDefaultArgs<ExtArgs>>): Prisma__EpisodeClient<$Result.GetResult<Prisma.$EpisodePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    agent<T extends AgentDefaultArgs<ExtArgs> = {}>(args?: Subset<T, AgentDefaultArgs<ExtArgs>>): Prisma__AgentClient<$Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the TaskGraphEpisode model
+   */
+  interface TaskGraphEpisodeFieldRefs {
+    readonly id: FieldRef<"TaskGraphEpisode", 'String'>
+    readonly taskGraphId: FieldRef<"TaskGraphEpisode", 'String'>
+    readonly episodeId: FieldRef<"TaskGraphEpisode", 'String'>
+    readonly role: FieldRef<"TaskGraphEpisode", 'TaskGraphEpisodeRole'>
+    readonly agentId: FieldRef<"TaskGraphEpisode", 'String'>
+    readonly assignedSubtask: FieldRef<"TaskGraphEpisode", 'String'>
+    readonly dependencyEpisodeIds: FieldRef<"TaskGraphEpisode", 'String[]'>
+    readonly createdAt: FieldRef<"TaskGraphEpisode", 'DateTime'>
+    readonly updatedAt: FieldRef<"TaskGraphEpisode", 'DateTime'>
+  }
+
+
+  // Custom InputTypes
+  /**
+   * TaskGraphEpisode findUnique
+   */
+  export type TaskGraphEpisodeFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TaskGraphEpisode
+     */
+    select?: TaskGraphEpisodeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TaskGraphEpisode
+     */
+    omit?: TaskGraphEpisodeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TaskGraphEpisodeInclude<ExtArgs> | null
+    /**
+     * Filter, which TaskGraphEpisode to fetch.
+     */
+    where: TaskGraphEpisodeWhereUniqueInput
+  }
+
+  /**
+   * TaskGraphEpisode findUniqueOrThrow
+   */
+  export type TaskGraphEpisodeFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TaskGraphEpisode
+     */
+    select?: TaskGraphEpisodeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TaskGraphEpisode
+     */
+    omit?: TaskGraphEpisodeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TaskGraphEpisodeInclude<ExtArgs> | null
+    /**
+     * Filter, which TaskGraphEpisode to fetch.
+     */
+    where: TaskGraphEpisodeWhereUniqueInput
+  }
+
+  /**
+   * TaskGraphEpisode findFirst
+   */
+  export type TaskGraphEpisodeFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TaskGraphEpisode
+     */
+    select?: TaskGraphEpisodeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TaskGraphEpisode
+     */
+    omit?: TaskGraphEpisodeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TaskGraphEpisodeInclude<ExtArgs> | null
+    /**
+     * Filter, which TaskGraphEpisode to fetch.
+     */
+    where?: TaskGraphEpisodeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of TaskGraphEpisodes to fetch.
+     */
+    orderBy?: TaskGraphEpisodeOrderByWithRelationInput | TaskGraphEpisodeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the position for searching for TaskGraphEpisodes.
+     */
+    cursor?: TaskGraphEpisodeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` TaskGraphEpisodes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` TaskGraphEpisodes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     *
+     * Filter by unique combinations of TaskGraphEpisodes.
+     */
+    distinct?: TaskGraphEpisodeScalarFieldEnum | TaskGraphEpisodeScalarFieldEnum[]
+  }
+
+  /**
+   * TaskGraphEpisode findFirstOrThrow
+   */
+  export type TaskGraphEpisodeFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TaskGraphEpisode
+     */
+    select?: TaskGraphEpisodeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TaskGraphEpisode
+     */
+    omit?: TaskGraphEpisodeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TaskGraphEpisodeInclude<ExtArgs> | null
+    /**
+     * Filter, which TaskGraphEpisode to fetch.
+     */
+    where?: TaskGraphEpisodeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of TaskGraphEpisodes to fetch.
+     */
+    orderBy?: TaskGraphEpisodeOrderByWithRelationInput | TaskGraphEpisodeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the position for searching for TaskGraphEpisodes.
+     */
+    cursor?: TaskGraphEpisodeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` TaskGraphEpisodes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` TaskGraphEpisodes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     *
+     * Filter by unique combinations of TaskGraphEpisodes.
+     */
+    distinct?: TaskGraphEpisodeScalarFieldEnum | TaskGraphEpisodeScalarFieldEnum[]
+  }
+
+  /**
+   * TaskGraphEpisode findMany
+   */
+  export type TaskGraphEpisodeFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TaskGraphEpisode
+     */
+    select?: TaskGraphEpisodeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TaskGraphEpisode
+     */
+    omit?: TaskGraphEpisodeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TaskGraphEpisodeInclude<ExtArgs> | null
+    /**
+     * Filter, which TaskGraphEpisodes to fetch.
+     */
+    where?: TaskGraphEpisodeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of TaskGraphEpisodes to fetch.
+     */
+    orderBy?: TaskGraphEpisodeOrderByWithRelationInput | TaskGraphEpisodeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the position for listing TaskGraphEpisodes.
+     */
+    cursor?: TaskGraphEpisodeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` TaskGraphEpisodes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` TaskGraphEpisodes.
+     */
+    skip?: number
+    distinct?: TaskGraphEpisodeScalarFieldEnum | TaskGraphEpisodeScalarFieldEnum[]
+  }
+
+  /**
+   * TaskGraphEpisode create
+   */
+  export type TaskGraphEpisodeCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TaskGraphEpisode
+     */
+    select?: TaskGraphEpisodeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TaskGraphEpisode
+     */
+    omit?: TaskGraphEpisodeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TaskGraphEpisodeInclude<ExtArgs> | null
+    /**
+     * The data needed to create a TaskGraphEpisode.
+     */
+    data: XOR<TaskGraphEpisodeCreateInput, TaskGraphEpisodeUncheckedCreateInput>
+  }
+
+  /**
+   * TaskGraphEpisode createMany
+   */
+  export type TaskGraphEpisodeCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many TaskGraphEpisodes.
+     */
+    data: TaskGraphEpisodeCreateManyInput | TaskGraphEpisodeCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * TaskGraphEpisode createManyAndReturn
+   */
+  export type TaskGraphEpisodeCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TaskGraphEpisode
+     */
+    select?: TaskGraphEpisodeSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the TaskGraphEpisode
+     */
+    omit?: TaskGraphEpisodeOmit<ExtArgs> | null
+    /**
+     * The data used to create many TaskGraphEpisodes.
+     */
+    data: TaskGraphEpisodeCreateManyInput | TaskGraphEpisodeCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TaskGraphEpisodeIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * TaskGraphEpisode update
+   */
+  export type TaskGraphEpisodeUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TaskGraphEpisode
+     */
+    select?: TaskGraphEpisodeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TaskGraphEpisode
+     */
+    omit?: TaskGraphEpisodeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TaskGraphEpisodeInclude<ExtArgs> | null
+    /**
+     * The data needed to update a TaskGraphEpisode.
+     */
+    data: XOR<TaskGraphEpisodeUpdateInput, TaskGraphEpisodeUncheckedUpdateInput>
+    /**
+     * Choose, which TaskGraphEpisode to update.
+     */
+    where: TaskGraphEpisodeWhereUniqueInput
+  }
+
+  /**
+   * TaskGraphEpisode updateMany
+   */
+  export type TaskGraphEpisodeUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update TaskGraphEpisodes.
+     */
+    data: XOR<TaskGraphEpisodeUpdateManyMutationInput, TaskGraphEpisodeUncheckedUpdateManyInput>
+    /**
+     * Filter which TaskGraphEpisodes to update
+     */
+    where?: TaskGraphEpisodeWhereInput
+    /**
+     * Limit how many TaskGraphEpisodes to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * TaskGraphEpisode updateManyAndReturn
+   */
+  export type TaskGraphEpisodeUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TaskGraphEpisode
+     */
+    select?: TaskGraphEpisodeSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the TaskGraphEpisode
+     */
+    omit?: TaskGraphEpisodeOmit<ExtArgs> | null
+    /**
+     * The data used to update TaskGraphEpisodes.
+     */
+    data: XOR<TaskGraphEpisodeUpdateManyMutationInput, TaskGraphEpisodeUncheckedUpdateManyInput>
+    /**
+     * Filter which TaskGraphEpisodes to update
+     */
+    where?: TaskGraphEpisodeWhereInput
+    /**
+     * Limit how many TaskGraphEpisodes to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TaskGraphEpisodeIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * TaskGraphEpisode upsert
+   */
+  export type TaskGraphEpisodeUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TaskGraphEpisode
+     */
+    select?: TaskGraphEpisodeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TaskGraphEpisode
+     */
+    omit?: TaskGraphEpisodeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TaskGraphEpisodeInclude<ExtArgs> | null
+    /**
+     * The filter to search for the TaskGraphEpisode to update in case it exists.
+     */
+    where: TaskGraphEpisodeWhereUniqueInput
+    /**
+     * In case the TaskGraphEpisode found by the `where` argument doesn't exist, create a new TaskGraphEpisode with this data.
+     */
+    create: XOR<TaskGraphEpisodeCreateInput, TaskGraphEpisodeUncheckedCreateInput>
+    /**
+     * In case the TaskGraphEpisode was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<TaskGraphEpisodeUpdateInput, TaskGraphEpisodeUncheckedUpdateInput>
+  }
+
+  /**
+   * TaskGraphEpisode delete
+   */
+  export type TaskGraphEpisodeDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TaskGraphEpisode
+     */
+    select?: TaskGraphEpisodeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TaskGraphEpisode
+     */
+    omit?: TaskGraphEpisodeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TaskGraphEpisodeInclude<ExtArgs> | null
+    /**
+     * Filter which TaskGraphEpisode to delete.
+     */
+    where: TaskGraphEpisodeWhereUniqueInput
+  }
+
+  /**
+   * TaskGraphEpisode deleteMany
+   */
+  export type TaskGraphEpisodeDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which TaskGraphEpisodes to delete
+     */
+    where?: TaskGraphEpisodeWhereInput
+    /**
+     * Limit how many TaskGraphEpisodes to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * TaskGraphEpisode without action
+   */
+  export type TaskGraphEpisodeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TaskGraphEpisode
+     */
+    select?: TaskGraphEpisodeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TaskGraphEpisode
+     */
+    omit?: TaskGraphEpisodeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TaskGraphEpisodeInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -18164,6 +20958,7 @@ export namespace Prisma {
     projectId: 'projectId',
     primaryAgentId: 'primaryAgentId',
     parentEpisodeId: 'parentEpisodeId',
+    forkPointTraceId: 'forkPointTraceId',
     titleI18n: 'titleI18n',
     summaryI18n: 'summaryI18n',
     goalI18n: 'goalI18n',
@@ -18229,6 +21024,7 @@ export namespace Prisma {
     errorSummaryI18n: 'errorSummaryI18n',
     policyHitReasonI18n: 'policyHitReasonI18n',
     permissionDeniedI18n: 'permissionDeniedI18n',
+    snapshot: 'snapshot',
     eventTime: 'eventTime',
     createdAt: 'createdAt'
   };
@@ -18320,6 +21116,38 @@ export namespace Prisma {
   export type NodeEdgeScalarFieldEnum = (typeof NodeEdgeScalarFieldEnum)[keyof typeof NodeEdgeScalarFieldEnum]
 
 
+  export const TaskGraphScalarFieldEnum: {
+    id: 'id',
+    workspaceId: 'workspaceId',
+    projectId: 'projectId',
+    symphonyTaskId: 'symphonyTaskId',
+    orchestratorEpisodeId: 'orchestratorEpisodeId',
+    status: 'status',
+    sensitivity: 'sensitivity',
+    policyVersion: 'policyVersion',
+    createdByAgentId: 'createdByAgentId',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type TaskGraphScalarFieldEnum = (typeof TaskGraphScalarFieldEnum)[keyof typeof TaskGraphScalarFieldEnum]
+
+
+  export const TaskGraphEpisodeScalarFieldEnum: {
+    id: 'id',
+    taskGraphId: 'taskGraphId',
+    episodeId: 'episodeId',
+    role: 'role',
+    agentId: 'agentId',
+    assignedSubtask: 'assignedSubtask',
+    dependencyEpisodeIds: 'dependencyEpisodeIds',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type TaskGraphEpisodeScalarFieldEnum = (typeof TaskGraphEpisodeScalarFieldEnum)[keyof typeof TaskGraphEpisodeScalarFieldEnum]
+
+
   export const SortOrder: {
     asc: 'asc',
     desc: 'desc'
@@ -18377,182 +21205,210 @@ export namespace Prisma {
    * Reference to a field of type 'String'
    */
   export type StringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'String'>
-    
+
 
 
   /**
    * Reference to a field of type 'String[]'
    */
   export type ListStringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'String[]'>
-    
+
 
 
   /**
    * Reference to a field of type 'DateTime'
    */
   export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
-    
+
 
 
   /**
    * Reference to a field of type 'DateTime[]'
    */
   export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
-    
+
 
 
   /**
    * Reference to a field of type 'Json'
    */
   export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
-    
+
 
 
   /**
    * Reference to a field of type 'QueryMode'
    */
   export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
-    
+
 
 
   /**
    * Reference to a field of type 'ProjectStatus'
    */
   export type EnumProjectStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ProjectStatus'>
-    
+
 
 
   /**
    * Reference to a field of type 'ProjectStatus[]'
    */
   export type ListEnumProjectStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ProjectStatus[]'>
-    
+
 
 
   /**
    * Reference to a field of type 'WorkType'
    */
   export type EnumWorkTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'WorkType'>
-    
+
 
 
   /**
    * Reference to a field of type 'WorkType[]'
    */
   export type ListEnumWorkTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'WorkType[]'>
-    
+
 
 
   /**
    * Reference to a field of type 'EdgeType'
    */
   export type EnumEdgeTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EdgeType'>
-    
+
 
 
   /**
    * Reference to a field of type 'EdgeType[]'
    */
   export type ListEnumEdgeTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EdgeType[]'>
-    
+
 
 
   /**
    * Reference to a field of type 'EpisodeStatus'
    */
   export type EnumEpisodeStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EpisodeStatus'>
-    
+
 
 
   /**
    * Reference to a field of type 'EpisodeStatus[]'
    */
   export type ListEnumEpisodeStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EpisodeStatus[]'>
-    
+
 
 
   /**
    * Reference to a field of type 'ReviewOutcome'
    */
   export type EnumReviewOutcomeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ReviewOutcome'>
-    
+
 
 
   /**
    * Reference to a field of type 'ReviewOutcome[]'
    */
   export type ListEnumReviewOutcomeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ReviewOutcome[]'>
-    
+
 
 
   /**
    * Reference to a field of type 'MemoryType'
    */
   export type EnumMemoryTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MemoryType'>
-    
+
 
 
   /**
    * Reference to a field of type 'MemoryType[]'
    */
   export type ListEnumMemoryTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MemoryType[]'>
-    
+
 
 
   /**
    * Reference to a field of type 'Int'
    */
   export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
-    
+
 
 
   /**
    * Reference to a field of type 'Int[]'
    */
   export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
-    
+
 
 
   /**
    * Reference to a field of type 'TraceStatus'
    */
   export type EnumTraceStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TraceStatus'>
-    
+
 
 
   /**
    * Reference to a field of type 'TraceStatus[]'
    */
   export type ListEnumTraceStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TraceStatus[]'>
-    
+
 
 
   /**
    * Reference to a field of type 'FileType'
    */
   export type EnumFileTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FileType'>
-    
+
 
 
   /**
    * Reference to a field of type 'FileType[]'
    */
   export type ListEnumFileTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FileType[]'>
-    
+
+
+
+  /**
+   * Reference to a field of type 'TaskGraphStatus'
+   */
+  export type EnumTaskGraphStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TaskGraphStatus'>
+
+
+
+  /**
+   * Reference to a field of type 'TaskGraphStatus[]'
+   */
+  export type ListEnumTaskGraphStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TaskGraphStatus[]'>
+
+
+
+  /**
+   * Reference to a field of type 'TaskGraphEpisodeRole'
+   */
+  export type EnumTaskGraphEpisodeRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TaskGraphEpisodeRole'>
+
+
+
+  /**
+   * Reference to a field of type 'TaskGraphEpisodeRole[]'
+   */
+  export type ListEnumTaskGraphEpisodeRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TaskGraphEpisodeRole[]'>
+
 
 
   /**
    * Reference to a field of type 'Float'
    */
   export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
-    
+
 
 
   /**
    * Reference to a field of type 'Float[]'
    */
   export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
-    
+
   /**
    * Deep Input Types
    */
@@ -18571,6 +21427,7 @@ export namespace Prisma {
     projects?: ProjectListRelationFilter
     policies?: PolicyListRelationFilter
     auditEvents?: AuditEventListRelationFilter
+    taskGraphs?: TaskGraphListRelationFilter
   }
 
   export type WorkspaceOrderByWithRelationInput = {
@@ -18583,6 +21440,7 @@ export namespace Prisma {
     projects?: ProjectOrderByRelationAggregateInput
     policies?: PolicyOrderByRelationAggregateInput
     auditEvents?: AuditEventOrderByRelationAggregateInput
+    taskGraphs?: TaskGraphOrderByRelationAggregateInput
   }
 
   export type WorkspaceWhereUniqueInput = Prisma.AtLeast<{
@@ -18598,6 +21456,7 @@ export namespace Prisma {
     projects?: ProjectListRelationFilter
     policies?: PolicyListRelationFilter
     auditEvents?: AuditEventListRelationFilter
+    taskGraphs?: TaskGraphListRelationFilter
   }, "id" | "slug">
 
   export type WorkspaceOrderByWithAggregationInput = {
@@ -18644,6 +21503,7 @@ export namespace Prisma {
     policies?: PolicyListRelationFilter
     accessGrants?: AccessGrantListRelationFilter
     auditEvents?: AuditEventListRelationFilter
+    taskGraphs?: TaskGraphListRelationFilter
   }
 
   export type ProjectOrderByWithRelationInput = {
@@ -18663,6 +21523,7 @@ export namespace Prisma {
     policies?: PolicyOrderByRelationAggregateInput
     accessGrants?: AccessGrantOrderByRelationAggregateInput
     auditEvents?: AuditEventOrderByRelationAggregateInput
+    taskGraphs?: TaskGraphOrderByRelationAggregateInput
   }
 
   export type ProjectWhereUniqueInput = Prisma.AtLeast<{
@@ -18685,6 +21546,7 @@ export namespace Prisma {
     policies?: PolicyListRelationFilter
     accessGrants?: AccessGrantListRelationFilter
     auditEvents?: AuditEventListRelationFilter
+    taskGraphs?: TaskGraphListRelationFilter
   }, "id" | "slug">
 
   export type ProjectOrderByWithAggregationInput = {
@@ -18738,6 +21600,8 @@ export namespace Prisma {
     memoryItems?: MemoryItemListRelationFilter
     traceEvents?: TraceEventListRelationFilter
     artifacts?: ArtifactListRelationFilter
+    createdTaskGraphs?: TaskGraphListRelationFilter
+    taskGraphEpisodes?: TaskGraphEpisodeListRelationFilter
   }
 
   export type AgentOrderByWithRelationInput = {
@@ -18756,6 +21620,8 @@ export namespace Prisma {
     memoryItems?: MemoryItemOrderByRelationAggregateInput
     traceEvents?: TraceEventOrderByRelationAggregateInput
     artifacts?: ArtifactOrderByRelationAggregateInput
+    createdTaskGraphs?: TaskGraphOrderByRelationAggregateInput
+    taskGraphEpisodes?: TaskGraphEpisodeOrderByRelationAggregateInput
   }
 
   export type AgentWhereUniqueInput = Prisma.AtLeast<{
@@ -18777,6 +21643,8 @@ export namespace Prisma {
     memoryItems?: MemoryItemListRelationFilter
     traceEvents?: TraceEventListRelationFilter
     artifacts?: ArtifactListRelationFilter
+    createdTaskGraphs?: TaskGraphListRelationFilter
+    taskGraphEpisodes?: TaskGraphEpisodeListRelationFilter
   }, "id" | "slug">
 
   export type AgentOrderByWithAggregationInput = {
@@ -18866,6 +21734,7 @@ export namespace Prisma {
     projectId?: StringFilter<"Episode"> | string
     primaryAgentId?: StringFilter<"Episode"> | string
     parentEpisodeId?: StringNullableFilter<"Episode"> | string | null
+    forkPointTraceId?: StringNullableFilter<"Episode"> | string | null
     titleI18n?: JsonFilter<"Episode">
     summaryI18n?: JsonNullableFilter<"Episode">
     goalI18n?: JsonNullableFilter<"Episode">
@@ -18893,6 +21762,8 @@ export namespace Prisma {
     artifacts?: ArtifactListRelationFilter
     auditEvents?: AuditEventListRelationFilter
     accessGrants?: AccessGrantListRelationFilter
+    orchestratedTaskGraphs?: TaskGraphListRelationFilter
+    taskGraphEpisodes?: TaskGraphEpisodeListRelationFilter
   }
 
   export type EpisodeOrderByWithRelationInput = {
@@ -18900,6 +21771,7 @@ export namespace Prisma {
     projectId?: SortOrder
     primaryAgentId?: SortOrder
     parentEpisodeId?: SortOrderInput | SortOrder
+    forkPointTraceId?: SortOrderInput | SortOrder
     titleI18n?: SortOrder
     summaryI18n?: SortOrderInput | SortOrder
     goalI18n?: SortOrderInput | SortOrder
@@ -18927,6 +21799,8 @@ export namespace Prisma {
     artifacts?: ArtifactOrderByRelationAggregateInput
     auditEvents?: AuditEventOrderByRelationAggregateInput
     accessGrants?: AccessGrantOrderByRelationAggregateInput
+    orchestratedTaskGraphs?: TaskGraphOrderByRelationAggregateInput
+    taskGraphEpisodes?: TaskGraphEpisodeOrderByRelationAggregateInput
   }
 
   export type EpisodeWhereUniqueInput = Prisma.AtLeast<{
@@ -18937,6 +21811,7 @@ export namespace Prisma {
     projectId?: StringFilter<"Episode"> | string
     primaryAgentId?: StringFilter<"Episode"> | string
     parentEpisodeId?: StringNullableFilter<"Episode"> | string | null
+    forkPointTraceId?: StringNullableFilter<"Episode"> | string | null
     titleI18n?: JsonFilter<"Episode">
     summaryI18n?: JsonNullableFilter<"Episode">
     goalI18n?: JsonNullableFilter<"Episode">
@@ -18964,6 +21839,8 @@ export namespace Prisma {
     artifacts?: ArtifactListRelationFilter
     auditEvents?: AuditEventListRelationFilter
     accessGrants?: AccessGrantListRelationFilter
+    orchestratedTaskGraphs?: TaskGraphListRelationFilter
+    taskGraphEpisodes?: TaskGraphEpisodeListRelationFilter
   }, "id">
 
   export type EpisodeOrderByWithAggregationInput = {
@@ -18971,6 +21848,7 @@ export namespace Prisma {
     projectId?: SortOrder
     primaryAgentId?: SortOrder
     parentEpisodeId?: SortOrderInput | SortOrder
+    forkPointTraceId?: SortOrderInput | SortOrder
     titleI18n?: SortOrder
     summaryI18n?: SortOrderInput | SortOrder
     goalI18n?: SortOrderInput | SortOrder
@@ -19001,6 +21879,7 @@ export namespace Prisma {
     projectId?: StringWithAggregatesFilter<"Episode"> | string
     primaryAgentId?: StringWithAggregatesFilter<"Episode"> | string
     parentEpisodeId?: StringNullableWithAggregatesFilter<"Episode"> | string | null
+    forkPointTraceId?: StringNullableWithAggregatesFilter<"Episode"> | string | null
     titleI18n?: JsonWithAggregatesFilter<"Episode">
     summaryI18n?: JsonNullableWithAggregatesFilter<"Episode">
     goalI18n?: JsonNullableWithAggregatesFilter<"Episode">
@@ -19182,6 +22061,7 @@ export namespace Prisma {
     errorSummaryI18n?: JsonNullableFilter<"TraceEvent">
     policyHitReasonI18n?: JsonNullableFilter<"TraceEvent">
     permissionDeniedI18n?: JsonNullableFilter<"TraceEvent">
+    snapshot?: JsonNullableFilter<"TraceEvent">
     eventTime?: DateTimeFilter<"TraceEvent"> | Date | string
     createdAt?: DateTimeFilter<"TraceEvent"> | Date | string
     episode?: XOR<EpisodeScalarRelationFilter, EpisodeWhereInput>
@@ -19207,6 +22087,7 @@ export namespace Prisma {
     errorSummaryI18n?: SortOrderInput | SortOrder
     policyHitReasonI18n?: SortOrderInput | SortOrder
     permissionDeniedI18n?: SortOrderInput | SortOrder
+    snapshot?: SortOrderInput | SortOrder
     eventTime?: SortOrder
     createdAt?: SortOrder
     episode?: EpisodeOrderByWithRelationInput
@@ -19235,6 +22116,7 @@ export namespace Prisma {
     errorSummaryI18n?: JsonNullableFilter<"TraceEvent">
     policyHitReasonI18n?: JsonNullableFilter<"TraceEvent">
     permissionDeniedI18n?: JsonNullableFilter<"TraceEvent">
+    snapshot?: JsonNullableFilter<"TraceEvent">
     eventTime?: DateTimeFilter<"TraceEvent"> | Date | string
     createdAt?: DateTimeFilter<"TraceEvent"> | Date | string
     episode?: XOR<EpisodeScalarRelationFilter, EpisodeWhereInput>
@@ -19260,6 +22142,7 @@ export namespace Prisma {
     errorSummaryI18n?: SortOrderInput | SortOrder
     policyHitReasonI18n?: SortOrderInput | SortOrder
     permissionDeniedI18n?: SortOrderInput | SortOrder
+    snapshot?: SortOrderInput | SortOrder
     eventTime?: SortOrder
     createdAt?: SortOrder
     _count?: TraceEventCountOrderByAggregateInput
@@ -19289,6 +22172,7 @@ export namespace Prisma {
     errorSummaryI18n?: JsonNullableWithAggregatesFilter<"TraceEvent">
     policyHitReasonI18n?: JsonNullableWithAggregatesFilter<"TraceEvent">
     permissionDeniedI18n?: JsonNullableWithAggregatesFilter<"TraceEvent">
+    snapshot?: JsonNullableWithAggregatesFilter<"TraceEvent">
     eventTime?: DateTimeWithAggregatesFilter<"TraceEvent"> | Date | string
     createdAt?: DateTimeWithAggregatesFilter<"TraceEvent"> | Date | string
   }
@@ -19743,6 +22627,185 @@ export namespace Prisma {
     createdAt?: DateTimeWithAggregatesFilter<"NodeEdge"> | Date | string
   }
 
+  export type TaskGraphWhereInput = {
+    AND?: TaskGraphWhereInput | TaskGraphWhereInput[]
+    OR?: TaskGraphWhereInput[]
+    NOT?: TaskGraphWhereInput | TaskGraphWhereInput[]
+    id?: StringFilter<"TaskGraph"> | string
+    workspaceId?: StringFilter<"TaskGraph"> | string
+    projectId?: StringFilter<"TaskGraph"> | string
+    symphonyTaskId?: StringFilter<"TaskGraph"> | string
+    orchestratorEpisodeId?: StringFilter<"TaskGraph"> | string
+    status?: EnumTaskGraphStatusFilter<"TaskGraph"> | $Enums.TaskGraphStatus
+    sensitivity?: StringFilter<"TaskGraph"> | string
+    policyVersion?: StringFilter<"TaskGraph"> | string
+    createdByAgentId?: StringFilter<"TaskGraph"> | string
+    createdAt?: DateTimeFilter<"TaskGraph"> | Date | string
+    updatedAt?: DateTimeFilter<"TaskGraph"> | Date | string
+    workspace?: XOR<WorkspaceScalarRelationFilter, WorkspaceWhereInput>
+    project?: XOR<ProjectScalarRelationFilter, ProjectWhereInput>
+    orchestratorEpisode?: XOR<EpisodeScalarRelationFilter, EpisodeWhereInput>
+    createdByAgent?: XOR<AgentScalarRelationFilter, AgentWhereInput>
+    episodes?: TaskGraphEpisodeListRelationFilter
+  }
+
+  export type TaskGraphOrderByWithRelationInput = {
+    id?: SortOrder
+    workspaceId?: SortOrder
+    projectId?: SortOrder
+    symphonyTaskId?: SortOrder
+    orchestratorEpisodeId?: SortOrder
+    status?: SortOrder
+    sensitivity?: SortOrder
+    policyVersion?: SortOrder
+    createdByAgentId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    workspace?: WorkspaceOrderByWithRelationInput
+    project?: ProjectOrderByWithRelationInput
+    orchestratorEpisode?: EpisodeOrderByWithRelationInput
+    createdByAgent?: AgentOrderByWithRelationInput
+    episodes?: TaskGraphEpisodeOrderByRelationAggregateInput
+  }
+
+  export type TaskGraphWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    symphonyTaskId?: string
+    AND?: TaskGraphWhereInput | TaskGraphWhereInput[]
+    OR?: TaskGraphWhereInput[]
+    NOT?: TaskGraphWhereInput | TaskGraphWhereInput[]
+    workspaceId?: StringFilter<"TaskGraph"> | string
+    projectId?: StringFilter<"TaskGraph"> | string
+    orchestratorEpisodeId?: StringFilter<"TaskGraph"> | string
+    status?: EnumTaskGraphStatusFilter<"TaskGraph"> | $Enums.TaskGraphStatus
+    sensitivity?: StringFilter<"TaskGraph"> | string
+    policyVersion?: StringFilter<"TaskGraph"> | string
+    createdByAgentId?: StringFilter<"TaskGraph"> | string
+    createdAt?: DateTimeFilter<"TaskGraph"> | Date | string
+    updatedAt?: DateTimeFilter<"TaskGraph"> | Date | string
+    workspace?: XOR<WorkspaceScalarRelationFilter, WorkspaceWhereInput>
+    project?: XOR<ProjectScalarRelationFilter, ProjectWhereInput>
+    orchestratorEpisode?: XOR<EpisodeScalarRelationFilter, EpisodeWhereInput>
+    createdByAgent?: XOR<AgentScalarRelationFilter, AgentWhereInput>
+    episodes?: TaskGraphEpisodeListRelationFilter
+  }, "id" | "symphonyTaskId">
+
+  export type TaskGraphOrderByWithAggregationInput = {
+    id?: SortOrder
+    workspaceId?: SortOrder
+    projectId?: SortOrder
+    symphonyTaskId?: SortOrder
+    orchestratorEpisodeId?: SortOrder
+    status?: SortOrder
+    sensitivity?: SortOrder
+    policyVersion?: SortOrder
+    createdByAgentId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: TaskGraphCountOrderByAggregateInput
+    _max?: TaskGraphMaxOrderByAggregateInput
+    _min?: TaskGraphMinOrderByAggregateInput
+  }
+
+  export type TaskGraphScalarWhereWithAggregatesInput = {
+    AND?: TaskGraphScalarWhereWithAggregatesInput | TaskGraphScalarWhereWithAggregatesInput[]
+    OR?: TaskGraphScalarWhereWithAggregatesInput[]
+    NOT?: TaskGraphScalarWhereWithAggregatesInput | TaskGraphScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"TaskGraph"> | string
+    workspaceId?: StringWithAggregatesFilter<"TaskGraph"> | string
+    projectId?: StringWithAggregatesFilter<"TaskGraph"> | string
+    symphonyTaskId?: StringWithAggregatesFilter<"TaskGraph"> | string
+    orchestratorEpisodeId?: StringWithAggregatesFilter<"TaskGraph"> | string
+    status?: EnumTaskGraphStatusWithAggregatesFilter<"TaskGraph"> | $Enums.TaskGraphStatus
+    sensitivity?: StringWithAggregatesFilter<"TaskGraph"> | string
+    policyVersion?: StringWithAggregatesFilter<"TaskGraph"> | string
+    createdByAgentId?: StringWithAggregatesFilter<"TaskGraph"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"TaskGraph"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"TaskGraph"> | Date | string
+  }
+
+  export type TaskGraphEpisodeWhereInput = {
+    AND?: TaskGraphEpisodeWhereInput | TaskGraphEpisodeWhereInput[]
+    OR?: TaskGraphEpisodeWhereInput[]
+    NOT?: TaskGraphEpisodeWhereInput | TaskGraphEpisodeWhereInput[]
+    id?: StringFilter<"TaskGraphEpisode"> | string
+    taskGraphId?: StringFilter<"TaskGraphEpisode"> | string
+    episodeId?: StringFilter<"TaskGraphEpisode"> | string
+    role?: EnumTaskGraphEpisodeRoleFilter<"TaskGraphEpisode"> | $Enums.TaskGraphEpisodeRole
+    agentId?: StringFilter<"TaskGraphEpisode"> | string
+    assignedSubtask?: StringFilter<"TaskGraphEpisode"> | string
+    dependencyEpisodeIds?: StringNullableListFilter<"TaskGraphEpisode">
+    createdAt?: DateTimeFilter<"TaskGraphEpisode"> | Date | string
+    updatedAt?: DateTimeFilter<"TaskGraphEpisode"> | Date | string
+    taskGraph?: XOR<TaskGraphScalarRelationFilter, TaskGraphWhereInput>
+    episode?: XOR<EpisodeScalarRelationFilter, EpisodeWhereInput>
+    agent?: XOR<AgentScalarRelationFilter, AgentWhereInput>
+  }
+
+  export type TaskGraphEpisodeOrderByWithRelationInput = {
+    id?: SortOrder
+    taskGraphId?: SortOrder
+    episodeId?: SortOrder
+    role?: SortOrder
+    agentId?: SortOrder
+    assignedSubtask?: SortOrder
+    dependencyEpisodeIds?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    taskGraph?: TaskGraphOrderByWithRelationInput
+    episode?: EpisodeOrderByWithRelationInput
+    agent?: AgentOrderByWithRelationInput
+  }
+
+  export type TaskGraphEpisodeWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    taskGraphId_episodeId?: TaskGraphEpisodeTaskGraphIdEpisodeIdCompoundUniqueInput
+    AND?: TaskGraphEpisodeWhereInput | TaskGraphEpisodeWhereInput[]
+    OR?: TaskGraphEpisodeWhereInput[]
+    NOT?: TaskGraphEpisodeWhereInput | TaskGraphEpisodeWhereInput[]
+    taskGraphId?: StringFilter<"TaskGraphEpisode"> | string
+    episodeId?: StringFilter<"TaskGraphEpisode"> | string
+    role?: EnumTaskGraphEpisodeRoleFilter<"TaskGraphEpisode"> | $Enums.TaskGraphEpisodeRole
+    agentId?: StringFilter<"TaskGraphEpisode"> | string
+    assignedSubtask?: StringFilter<"TaskGraphEpisode"> | string
+    dependencyEpisodeIds?: StringNullableListFilter<"TaskGraphEpisode">
+    createdAt?: DateTimeFilter<"TaskGraphEpisode"> | Date | string
+    updatedAt?: DateTimeFilter<"TaskGraphEpisode"> | Date | string
+    taskGraph?: XOR<TaskGraphScalarRelationFilter, TaskGraphWhereInput>
+    episode?: XOR<EpisodeScalarRelationFilter, EpisodeWhereInput>
+    agent?: XOR<AgentScalarRelationFilter, AgentWhereInput>
+  }, "id" | "taskGraphId_episodeId">
+
+  export type TaskGraphEpisodeOrderByWithAggregationInput = {
+    id?: SortOrder
+    taskGraphId?: SortOrder
+    episodeId?: SortOrder
+    role?: SortOrder
+    agentId?: SortOrder
+    assignedSubtask?: SortOrder
+    dependencyEpisodeIds?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: TaskGraphEpisodeCountOrderByAggregateInput
+    _max?: TaskGraphEpisodeMaxOrderByAggregateInput
+    _min?: TaskGraphEpisodeMinOrderByAggregateInput
+  }
+
+  export type TaskGraphEpisodeScalarWhereWithAggregatesInput = {
+    AND?: TaskGraphEpisodeScalarWhereWithAggregatesInput | TaskGraphEpisodeScalarWhereWithAggregatesInput[]
+    OR?: TaskGraphEpisodeScalarWhereWithAggregatesInput[]
+    NOT?: TaskGraphEpisodeScalarWhereWithAggregatesInput | TaskGraphEpisodeScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"TaskGraphEpisode"> | string
+    taskGraphId?: StringWithAggregatesFilter<"TaskGraphEpisode"> | string
+    episodeId?: StringWithAggregatesFilter<"TaskGraphEpisode"> | string
+    role?: EnumTaskGraphEpisodeRoleWithAggregatesFilter<"TaskGraphEpisode"> | $Enums.TaskGraphEpisodeRole
+    agentId?: StringWithAggregatesFilter<"TaskGraphEpisode"> | string
+    assignedSubtask?: StringWithAggregatesFilter<"TaskGraphEpisode"> | string
+    dependencyEpisodeIds?: StringNullableListFilter<"TaskGraphEpisode">
+    createdAt?: DateTimeWithAggregatesFilter<"TaskGraphEpisode"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"TaskGraphEpisode"> | Date | string
+  }
+
   export type WorkspaceCreateInput = {
     id?: string
     name: string
@@ -19753,6 +22816,7 @@ export namespace Prisma {
     projects?: ProjectCreateNestedManyWithoutWorkspaceInput
     policies?: PolicyCreateNestedManyWithoutWorkspaceInput
     auditEvents?: AuditEventCreateNestedManyWithoutWorkspaceInput
+    taskGraphs?: TaskGraphCreateNestedManyWithoutWorkspaceInput
   }
 
   export type WorkspaceUncheckedCreateInput = {
@@ -19765,6 +22829,7 @@ export namespace Prisma {
     projects?: ProjectUncheckedCreateNestedManyWithoutWorkspaceInput
     policies?: PolicyUncheckedCreateNestedManyWithoutWorkspaceInput
     auditEvents?: AuditEventUncheckedCreateNestedManyWithoutWorkspaceInput
+    taskGraphs?: TaskGraphUncheckedCreateNestedManyWithoutWorkspaceInput
   }
 
   export type WorkspaceUpdateInput = {
@@ -19777,6 +22842,7 @@ export namespace Prisma {
     projects?: ProjectUpdateManyWithoutWorkspaceNestedInput
     policies?: PolicyUpdateManyWithoutWorkspaceNestedInput
     auditEvents?: AuditEventUpdateManyWithoutWorkspaceNestedInput
+    taskGraphs?: TaskGraphUpdateManyWithoutWorkspaceNestedInput
   }
 
   export type WorkspaceUncheckedUpdateInput = {
@@ -19789,6 +22855,7 @@ export namespace Prisma {
     projects?: ProjectUncheckedUpdateManyWithoutWorkspaceNestedInput
     policies?: PolicyUncheckedUpdateManyWithoutWorkspaceNestedInput
     auditEvents?: AuditEventUncheckedUpdateManyWithoutWorkspaceNestedInput
+    taskGraphs?: TaskGraphUncheckedUpdateManyWithoutWorkspaceNestedInput
   }
 
   export type WorkspaceCreateManyInput = {
@@ -19834,6 +22901,7 @@ export namespace Prisma {
     policies?: PolicyCreateNestedManyWithoutProjectInput
     accessGrants?: AccessGrantCreateNestedManyWithoutProjectInput
     auditEvents?: AuditEventCreateNestedManyWithoutProjectInput
+    taskGraphs?: TaskGraphCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUncheckedCreateInput = {
@@ -19852,6 +22920,7 @@ export namespace Prisma {
     policies?: PolicyUncheckedCreateNestedManyWithoutProjectInput
     accessGrants?: AccessGrantUncheckedCreateNestedManyWithoutProjectInput
     auditEvents?: AuditEventUncheckedCreateNestedManyWithoutProjectInput
+    taskGraphs?: TaskGraphUncheckedCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUpdateInput = {
@@ -19870,6 +22939,7 @@ export namespace Prisma {
     policies?: PolicyUpdateManyWithoutProjectNestedInput
     accessGrants?: AccessGrantUpdateManyWithoutProjectNestedInput
     auditEvents?: AuditEventUpdateManyWithoutProjectNestedInput
+    taskGraphs?: TaskGraphUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateInput = {
@@ -19888,6 +22958,7 @@ export namespace Prisma {
     policies?: PolicyUncheckedUpdateManyWithoutProjectNestedInput
     accessGrants?: AccessGrantUncheckedUpdateManyWithoutProjectNestedInput
     auditEvents?: AuditEventUncheckedUpdateManyWithoutProjectNestedInput
+    taskGraphs?: TaskGraphUncheckedUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectCreateManyInput = {
@@ -19944,6 +23015,8 @@ export namespace Prisma {
     memoryItems?: MemoryItemCreateNestedManyWithoutAgentInput
     traceEvents?: TraceEventCreateNestedManyWithoutActorAgentInput
     artifacts?: ArtifactCreateNestedManyWithoutCreatedByAgentInput
+    createdTaskGraphs?: TaskGraphCreateNestedManyWithoutCreatedByAgentInput
+    taskGraphEpisodes?: TaskGraphEpisodeCreateNestedManyWithoutAgentInput
   }
 
   export type AgentUncheckedCreateInput = {
@@ -19962,6 +23035,8 @@ export namespace Prisma {
     memoryItems?: MemoryItemUncheckedCreateNestedManyWithoutAgentInput
     traceEvents?: TraceEventUncheckedCreateNestedManyWithoutActorAgentInput
     artifacts?: ArtifactUncheckedCreateNestedManyWithoutCreatedByAgentInput
+    createdTaskGraphs?: TaskGraphUncheckedCreateNestedManyWithoutCreatedByAgentInput
+    taskGraphEpisodes?: TaskGraphEpisodeUncheckedCreateNestedManyWithoutAgentInput
   }
 
   export type AgentUpdateInput = {
@@ -19980,6 +23055,8 @@ export namespace Prisma {
     memoryItems?: MemoryItemUpdateManyWithoutAgentNestedInput
     traceEvents?: TraceEventUpdateManyWithoutActorAgentNestedInput
     artifacts?: ArtifactUpdateManyWithoutCreatedByAgentNestedInput
+    createdTaskGraphs?: TaskGraphUpdateManyWithoutCreatedByAgentNestedInput
+    taskGraphEpisodes?: TaskGraphEpisodeUpdateManyWithoutAgentNestedInput
   }
 
   export type AgentUncheckedUpdateInput = {
@@ -19998,6 +23075,8 @@ export namespace Prisma {
     memoryItems?: MemoryItemUncheckedUpdateManyWithoutAgentNestedInput
     traceEvents?: TraceEventUncheckedUpdateManyWithoutActorAgentNestedInput
     artifacts?: ArtifactUncheckedUpdateManyWithoutCreatedByAgentNestedInput
+    createdTaskGraphs?: TaskGraphUncheckedUpdateManyWithoutCreatedByAgentNestedInput
+    taskGraphEpisodes?: TaskGraphEpisodeUncheckedUpdateManyWithoutAgentNestedInput
   }
 
   export type AgentCreateManyInput = {
@@ -20078,6 +23157,7 @@ export namespace Prisma {
 
   export type EpisodeCreateInput = {
     id?: string
+    forkPointTraceId?: string | null
     titleI18n: JsonNullValueInput | InputJsonValue
     summaryI18n?: NullableJsonNullValueInput | InputJsonValue
     goalI18n?: NullableJsonNullValueInput | InputJsonValue
@@ -20105,6 +23185,8 @@ export namespace Prisma {
     artifacts?: ArtifactCreateNestedManyWithoutEpisodeInput
     auditEvents?: AuditEventCreateNestedManyWithoutEpisodeInput
     accessGrants?: AccessGrantCreateNestedManyWithoutEpisodeInput
+    orchestratedTaskGraphs?: TaskGraphCreateNestedManyWithoutOrchestratorEpisodeInput
+    taskGraphEpisodes?: TaskGraphEpisodeCreateNestedManyWithoutEpisodeInput
   }
 
   export type EpisodeUncheckedCreateInput = {
@@ -20112,6 +23194,7 @@ export namespace Prisma {
     projectId: string
     primaryAgentId: string
     parentEpisodeId?: string | null
+    forkPointTraceId?: string | null
     titleI18n: JsonNullValueInput | InputJsonValue
     summaryI18n?: NullableJsonNullValueInput | InputJsonValue
     goalI18n?: NullableJsonNullValueInput | InputJsonValue
@@ -20136,10 +23219,13 @@ export namespace Prisma {
     artifacts?: ArtifactUncheckedCreateNestedManyWithoutEpisodeInput
     auditEvents?: AuditEventUncheckedCreateNestedManyWithoutEpisodeInput
     accessGrants?: AccessGrantUncheckedCreateNestedManyWithoutEpisodeInput
+    orchestratedTaskGraphs?: TaskGraphUncheckedCreateNestedManyWithoutOrchestratorEpisodeInput
+    taskGraphEpisodes?: TaskGraphEpisodeUncheckedCreateNestedManyWithoutEpisodeInput
   }
 
   export type EpisodeUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
+    forkPointTraceId?: NullableStringFieldUpdateOperationsInput | string | null
     titleI18n?: JsonNullValueInput | InputJsonValue
     summaryI18n?: NullableJsonNullValueInput | InputJsonValue
     goalI18n?: NullableJsonNullValueInput | InputJsonValue
@@ -20167,6 +23253,8 @@ export namespace Prisma {
     artifacts?: ArtifactUpdateManyWithoutEpisodeNestedInput
     auditEvents?: AuditEventUpdateManyWithoutEpisodeNestedInput
     accessGrants?: AccessGrantUpdateManyWithoutEpisodeNestedInput
+    orchestratedTaskGraphs?: TaskGraphUpdateManyWithoutOrchestratorEpisodeNestedInput
+    taskGraphEpisodes?: TaskGraphEpisodeUpdateManyWithoutEpisodeNestedInput
   }
 
   export type EpisodeUncheckedUpdateInput = {
@@ -20174,6 +23262,7 @@ export namespace Prisma {
     projectId?: StringFieldUpdateOperationsInput | string
     primaryAgentId?: StringFieldUpdateOperationsInput | string
     parentEpisodeId?: NullableStringFieldUpdateOperationsInput | string | null
+    forkPointTraceId?: NullableStringFieldUpdateOperationsInput | string | null
     titleI18n?: JsonNullValueInput | InputJsonValue
     summaryI18n?: NullableJsonNullValueInput | InputJsonValue
     goalI18n?: NullableJsonNullValueInput | InputJsonValue
@@ -20198,6 +23287,8 @@ export namespace Prisma {
     artifacts?: ArtifactUncheckedUpdateManyWithoutEpisodeNestedInput
     auditEvents?: AuditEventUncheckedUpdateManyWithoutEpisodeNestedInput
     accessGrants?: AccessGrantUncheckedUpdateManyWithoutEpisodeNestedInput
+    orchestratedTaskGraphs?: TaskGraphUncheckedUpdateManyWithoutOrchestratorEpisodeNestedInput
+    taskGraphEpisodes?: TaskGraphEpisodeUncheckedUpdateManyWithoutEpisodeNestedInput
   }
 
   export type EpisodeCreateManyInput = {
@@ -20205,6 +23296,7 @@ export namespace Prisma {
     projectId: string
     primaryAgentId: string
     parentEpisodeId?: string | null
+    forkPointTraceId?: string | null
     titleI18n: JsonNullValueInput | InputJsonValue
     summaryI18n?: NullableJsonNullValueInput | InputJsonValue
     goalI18n?: NullableJsonNullValueInput | InputJsonValue
@@ -20226,6 +23318,7 @@ export namespace Prisma {
 
   export type EpisodeUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
+    forkPointTraceId?: NullableStringFieldUpdateOperationsInput | string | null
     titleI18n?: JsonNullValueInput | InputJsonValue
     summaryI18n?: NullableJsonNullValueInput | InputJsonValue
     goalI18n?: NullableJsonNullValueInput | InputJsonValue
@@ -20250,6 +23343,7 @@ export namespace Prisma {
     projectId?: StringFieldUpdateOperationsInput | string
     primaryAgentId?: StringFieldUpdateOperationsInput | string
     parentEpisodeId?: NullableStringFieldUpdateOperationsInput | string | null
+    forkPointTraceId?: NullableStringFieldUpdateOperationsInput | string | null
     titleI18n?: JsonNullValueInput | InputJsonValue
     summaryI18n?: NullableJsonNullValueInput | InputJsonValue
     goalI18n?: NullableJsonNullValueInput | InputJsonValue
@@ -20424,6 +23518,7 @@ export namespace Prisma {
     errorSummaryI18n?: NullableJsonNullValueInput | InputJsonValue
     policyHitReasonI18n?: NullableJsonNullValueInput | InputJsonValue
     permissionDeniedI18n?: NullableJsonNullValueInput | InputJsonValue
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
     eventTime: Date | string
     createdAt?: Date | string
     episode: EpisodeCreateNestedOneWithoutTraceEventsInput
@@ -20449,6 +23544,7 @@ export namespace Prisma {
     errorSummaryI18n?: NullableJsonNullValueInput | InputJsonValue
     policyHitReasonI18n?: NullableJsonNullValueInput | InputJsonValue
     permissionDeniedI18n?: NullableJsonNullValueInput | InputJsonValue
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
     eventTime: Date | string
     createdAt?: Date | string
     sourceArtifacts?: ArtifactUncheckedCreateNestedManyWithoutSourceTraceEventInput
@@ -20470,6 +23566,7 @@ export namespace Prisma {
     errorSummaryI18n?: NullableJsonNullValueInput | InputJsonValue
     policyHitReasonI18n?: NullableJsonNullValueInput | InputJsonValue
     permissionDeniedI18n?: NullableJsonNullValueInput | InputJsonValue
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
     eventTime?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     episode?: EpisodeUpdateOneRequiredWithoutTraceEventsNestedInput
@@ -20495,6 +23592,7 @@ export namespace Prisma {
     errorSummaryI18n?: NullableJsonNullValueInput | InputJsonValue
     policyHitReasonI18n?: NullableJsonNullValueInput | InputJsonValue
     permissionDeniedI18n?: NullableJsonNullValueInput | InputJsonValue
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
     eventTime?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sourceArtifacts?: ArtifactUncheckedUpdateManyWithoutSourceTraceEventNestedInput
@@ -20518,6 +23616,7 @@ export namespace Prisma {
     errorSummaryI18n?: NullableJsonNullValueInput | InputJsonValue
     policyHitReasonI18n?: NullableJsonNullValueInput | InputJsonValue
     permissionDeniedI18n?: NullableJsonNullValueInput | InputJsonValue
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
     eventTime: Date | string
     createdAt?: Date | string
   }
@@ -20537,6 +23636,7 @@ export namespace Prisma {
     errorSummaryI18n?: NullableJsonNullValueInput | InputJsonValue
     policyHitReasonI18n?: NullableJsonNullValueInput | InputJsonValue
     permissionDeniedI18n?: NullableJsonNullValueInput | InputJsonValue
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
     eventTime?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -20558,6 +23658,7 @@ export namespace Prisma {
     errorSummaryI18n?: NullableJsonNullValueInput | InputJsonValue
     policyHitReasonI18n?: NullableJsonNullValueInput | InputJsonValue
     permissionDeniedI18n?: NullableJsonNullValueInput | InputJsonValue
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
     eventTime?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -21036,6 +24137,185 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type TaskGraphCreateInput = {
+    id?: string
+    symphonyTaskId: string
+    status?: $Enums.TaskGraphStatus
+    sensitivity?: string
+    policyVersion: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    workspace: WorkspaceCreateNestedOneWithoutTaskGraphsInput
+    project: ProjectCreateNestedOneWithoutTaskGraphsInput
+    orchestratorEpisode: EpisodeCreateNestedOneWithoutOrchestratedTaskGraphsInput
+    createdByAgent: AgentCreateNestedOneWithoutCreatedTaskGraphsInput
+    episodes?: TaskGraphEpisodeCreateNestedManyWithoutTaskGraphInput
+  }
+
+  export type TaskGraphUncheckedCreateInput = {
+    id?: string
+    workspaceId: string
+    projectId: string
+    symphonyTaskId: string
+    orchestratorEpisodeId: string
+    status?: $Enums.TaskGraphStatus
+    sensitivity?: string
+    policyVersion: string
+    createdByAgentId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    episodes?: TaskGraphEpisodeUncheckedCreateNestedManyWithoutTaskGraphInput
+  }
+
+  export type TaskGraphUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    symphonyTaskId?: StringFieldUpdateOperationsInput | string
+    status?: EnumTaskGraphStatusFieldUpdateOperationsInput | $Enums.TaskGraphStatus
+    sensitivity?: StringFieldUpdateOperationsInput | string
+    policyVersion?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    workspace?: WorkspaceUpdateOneRequiredWithoutTaskGraphsNestedInput
+    project?: ProjectUpdateOneRequiredWithoutTaskGraphsNestedInput
+    orchestratorEpisode?: EpisodeUpdateOneRequiredWithoutOrchestratedTaskGraphsNestedInput
+    createdByAgent?: AgentUpdateOneRequiredWithoutCreatedTaskGraphsNestedInput
+    episodes?: TaskGraphEpisodeUpdateManyWithoutTaskGraphNestedInput
+  }
+
+  export type TaskGraphUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    workspaceId?: StringFieldUpdateOperationsInput | string
+    projectId?: StringFieldUpdateOperationsInput | string
+    symphonyTaskId?: StringFieldUpdateOperationsInput | string
+    orchestratorEpisodeId?: StringFieldUpdateOperationsInput | string
+    status?: EnumTaskGraphStatusFieldUpdateOperationsInput | $Enums.TaskGraphStatus
+    sensitivity?: StringFieldUpdateOperationsInput | string
+    policyVersion?: StringFieldUpdateOperationsInput | string
+    createdByAgentId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    episodes?: TaskGraphEpisodeUncheckedUpdateManyWithoutTaskGraphNestedInput
+  }
+
+  export type TaskGraphCreateManyInput = {
+    id?: string
+    workspaceId: string
+    projectId: string
+    symphonyTaskId: string
+    orchestratorEpisodeId: string
+    status?: $Enums.TaskGraphStatus
+    sensitivity?: string
+    policyVersion: string
+    createdByAgentId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type TaskGraphUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    symphonyTaskId?: StringFieldUpdateOperationsInput | string
+    status?: EnumTaskGraphStatusFieldUpdateOperationsInput | $Enums.TaskGraphStatus
+    sensitivity?: StringFieldUpdateOperationsInput | string
+    policyVersion?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TaskGraphUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    workspaceId?: StringFieldUpdateOperationsInput | string
+    projectId?: StringFieldUpdateOperationsInput | string
+    symphonyTaskId?: StringFieldUpdateOperationsInput | string
+    orchestratorEpisodeId?: StringFieldUpdateOperationsInput | string
+    status?: EnumTaskGraphStatusFieldUpdateOperationsInput | $Enums.TaskGraphStatus
+    sensitivity?: StringFieldUpdateOperationsInput | string
+    policyVersion?: StringFieldUpdateOperationsInput | string
+    createdByAgentId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TaskGraphEpisodeCreateInput = {
+    id?: string
+    role: $Enums.TaskGraphEpisodeRole
+    assignedSubtask: string
+    dependencyEpisodeIds?: TaskGraphEpisodeCreatedependencyEpisodeIdsInput | string[]
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    taskGraph: TaskGraphCreateNestedOneWithoutEpisodesInput
+    episode: EpisodeCreateNestedOneWithoutTaskGraphEpisodesInput
+    agent: AgentCreateNestedOneWithoutTaskGraphEpisodesInput
+  }
+
+  export type TaskGraphEpisodeUncheckedCreateInput = {
+    id?: string
+    taskGraphId: string
+    episodeId: string
+    role: $Enums.TaskGraphEpisodeRole
+    agentId: string
+    assignedSubtask: string
+    dependencyEpisodeIds?: TaskGraphEpisodeCreatedependencyEpisodeIdsInput | string[]
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type TaskGraphEpisodeUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    role?: EnumTaskGraphEpisodeRoleFieldUpdateOperationsInput | $Enums.TaskGraphEpisodeRole
+    assignedSubtask?: StringFieldUpdateOperationsInput | string
+    dependencyEpisodeIds?: TaskGraphEpisodeUpdatedependencyEpisodeIdsInput | string[]
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    taskGraph?: TaskGraphUpdateOneRequiredWithoutEpisodesNestedInput
+    episode?: EpisodeUpdateOneRequiredWithoutTaskGraphEpisodesNestedInput
+    agent?: AgentUpdateOneRequiredWithoutTaskGraphEpisodesNestedInput
+  }
+
+  export type TaskGraphEpisodeUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    taskGraphId?: StringFieldUpdateOperationsInput | string
+    episodeId?: StringFieldUpdateOperationsInput | string
+    role?: EnumTaskGraphEpisodeRoleFieldUpdateOperationsInput | $Enums.TaskGraphEpisodeRole
+    agentId?: StringFieldUpdateOperationsInput | string
+    assignedSubtask?: StringFieldUpdateOperationsInput | string
+    dependencyEpisodeIds?: TaskGraphEpisodeUpdatedependencyEpisodeIdsInput | string[]
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TaskGraphEpisodeCreateManyInput = {
+    id?: string
+    taskGraphId: string
+    episodeId: string
+    role: $Enums.TaskGraphEpisodeRole
+    agentId: string
+    assignedSubtask: string
+    dependencyEpisodeIds?: TaskGraphEpisodeCreatedependencyEpisodeIdsInput | string[]
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type TaskGraphEpisodeUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    role?: EnumTaskGraphEpisodeRoleFieldUpdateOperationsInput | $Enums.TaskGraphEpisodeRole
+    assignedSubtask?: StringFieldUpdateOperationsInput | string
+    dependencyEpisodeIds?: TaskGraphEpisodeUpdatedependencyEpisodeIdsInput | string[]
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TaskGraphEpisodeUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    taskGraphId?: StringFieldUpdateOperationsInput | string
+    episodeId?: StringFieldUpdateOperationsInput | string
+    role?: EnumTaskGraphEpisodeRoleFieldUpdateOperationsInput | $Enums.TaskGraphEpisodeRole
+    agentId?: StringFieldUpdateOperationsInput | string
+    assignedSubtask?: StringFieldUpdateOperationsInput | string
+    dependencyEpisodeIds?: TaskGraphEpisodeUpdatedependencyEpisodeIdsInput | string[]
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type StringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -21080,6 +24360,12 @@ export namespace Prisma {
     none?: AuditEventWhereInput
   }
 
+  export type TaskGraphListRelationFilter = {
+    every?: TaskGraphWhereInput
+    some?: TaskGraphWhereInput
+    none?: TaskGraphWhereInput
+  }
+
   export type ProjectOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -21089,6 +24375,10 @@ export namespace Prisma {
   }
 
   export type AuditEventOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type TaskGraphOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -21376,6 +24666,12 @@ export namespace Prisma {
     none?: ArtifactWhereInput
   }
 
+  export type TaskGraphEpisodeListRelationFilter = {
+    every?: TaskGraphEpisodeWhereInput
+    some?: TaskGraphEpisodeWhereInput
+    none?: TaskGraphEpisodeWhereInput
+  }
+
   export type EpisodeAgentOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -21389,6 +24685,10 @@ export namespace Prisma {
   }
 
   export type ArtifactOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type TaskGraphEpisodeOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -21524,6 +24824,7 @@ export namespace Prisma {
     projectId?: SortOrder
     primaryAgentId?: SortOrder
     parentEpisodeId?: SortOrder
+    forkPointTraceId?: SortOrder
     titleI18n?: SortOrder
     summaryI18n?: SortOrder
     goalI18n?: SortOrder
@@ -21548,6 +24849,7 @@ export namespace Prisma {
     projectId?: SortOrder
     primaryAgentId?: SortOrder
     parentEpisodeId?: SortOrder
+    forkPointTraceId?: SortOrder
     primaryActor?: SortOrder
     workType?: SortOrder
     relationIntent?: SortOrder
@@ -21565,6 +24867,7 @@ export namespace Prisma {
     projectId?: SortOrder
     primaryAgentId?: SortOrder
     parentEpisodeId?: SortOrder
+    forkPointTraceId?: SortOrder
     primaryActor?: SortOrder
     workType?: SortOrder
     relationIntent?: SortOrder
@@ -21811,6 +25114,7 @@ export namespace Prisma {
     errorSummaryI18n?: SortOrder
     policyHitReasonI18n?: SortOrder
     permissionDeniedI18n?: SortOrder
+    snapshot?: SortOrder
     eventTime?: SortOrder
     createdAt?: SortOrder
   }
@@ -22121,6 +25425,134 @@ export namespace Prisma {
     _max?: NestedEnumEdgeTypeFilter<$PrismaModel>
   }
 
+  export type EnumTaskGraphStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.TaskGraphStatus | EnumTaskGraphStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.TaskGraphStatus[] | ListEnumTaskGraphStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.TaskGraphStatus[] | ListEnumTaskGraphStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumTaskGraphStatusFilter<$PrismaModel> | $Enums.TaskGraphStatus
+  }
+
+  export type TaskGraphCountOrderByAggregateInput = {
+    id?: SortOrder
+    workspaceId?: SortOrder
+    projectId?: SortOrder
+    symphonyTaskId?: SortOrder
+    orchestratorEpisodeId?: SortOrder
+    status?: SortOrder
+    sensitivity?: SortOrder
+    policyVersion?: SortOrder
+    createdByAgentId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type TaskGraphMaxOrderByAggregateInput = {
+    id?: SortOrder
+    workspaceId?: SortOrder
+    projectId?: SortOrder
+    symphonyTaskId?: SortOrder
+    orchestratorEpisodeId?: SortOrder
+    status?: SortOrder
+    sensitivity?: SortOrder
+    policyVersion?: SortOrder
+    createdByAgentId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type TaskGraphMinOrderByAggregateInput = {
+    id?: SortOrder
+    workspaceId?: SortOrder
+    projectId?: SortOrder
+    symphonyTaskId?: SortOrder
+    orchestratorEpisodeId?: SortOrder
+    status?: SortOrder
+    sensitivity?: SortOrder
+    policyVersion?: SortOrder
+    createdByAgentId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type EnumTaskGraphStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.TaskGraphStatus | EnumTaskGraphStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.TaskGraphStatus[] | ListEnumTaskGraphStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.TaskGraphStatus[] | ListEnumTaskGraphStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumTaskGraphStatusWithAggregatesFilter<$PrismaModel> | $Enums.TaskGraphStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumTaskGraphStatusFilter<$PrismaModel>
+    _max?: NestedEnumTaskGraphStatusFilter<$PrismaModel>
+  }
+
+  export type EnumTaskGraphEpisodeRoleFilter<$PrismaModel = never> = {
+    equals?: $Enums.TaskGraphEpisodeRole | EnumTaskGraphEpisodeRoleFieldRefInput<$PrismaModel>
+    in?: $Enums.TaskGraphEpisodeRole[] | ListEnumTaskGraphEpisodeRoleFieldRefInput<$PrismaModel>
+    notIn?: $Enums.TaskGraphEpisodeRole[] | ListEnumTaskGraphEpisodeRoleFieldRefInput<$PrismaModel>
+    not?: NestedEnumTaskGraphEpisodeRoleFilter<$PrismaModel> | $Enums.TaskGraphEpisodeRole
+  }
+
+  export type StringNullableListFilter<$PrismaModel = never> = {
+    equals?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    has?: string | StringFieldRefInput<$PrismaModel> | null
+    hasEvery?: string[] | ListStringFieldRefInput<$PrismaModel>
+    hasSome?: string[] | ListStringFieldRefInput<$PrismaModel>
+    isEmpty?: boolean
+  }
+
+  export type TaskGraphScalarRelationFilter = {
+    is?: TaskGraphWhereInput
+    isNot?: TaskGraphWhereInput
+  }
+
+  export type TaskGraphEpisodeTaskGraphIdEpisodeIdCompoundUniqueInput = {
+    taskGraphId: string
+    episodeId: string
+  }
+
+  export type TaskGraphEpisodeCountOrderByAggregateInput = {
+    id?: SortOrder
+    taskGraphId?: SortOrder
+    episodeId?: SortOrder
+    role?: SortOrder
+    agentId?: SortOrder
+    assignedSubtask?: SortOrder
+    dependencyEpisodeIds?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type TaskGraphEpisodeMaxOrderByAggregateInput = {
+    id?: SortOrder
+    taskGraphId?: SortOrder
+    episodeId?: SortOrder
+    role?: SortOrder
+    agentId?: SortOrder
+    assignedSubtask?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type TaskGraphEpisodeMinOrderByAggregateInput = {
+    id?: SortOrder
+    taskGraphId?: SortOrder
+    episodeId?: SortOrder
+    role?: SortOrder
+    agentId?: SortOrder
+    assignedSubtask?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type EnumTaskGraphEpisodeRoleWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.TaskGraphEpisodeRole | EnumTaskGraphEpisodeRoleFieldRefInput<$PrismaModel>
+    in?: $Enums.TaskGraphEpisodeRole[] | ListEnumTaskGraphEpisodeRoleFieldRefInput<$PrismaModel>
+    notIn?: $Enums.TaskGraphEpisodeRole[] | ListEnumTaskGraphEpisodeRoleFieldRefInput<$PrismaModel>
+    not?: NestedEnumTaskGraphEpisodeRoleWithAggregatesFilter<$PrismaModel> | $Enums.TaskGraphEpisodeRole
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumTaskGraphEpisodeRoleFilter<$PrismaModel>
+    _max?: NestedEnumTaskGraphEpisodeRoleFilter<$PrismaModel>
+  }
+
   export type ProjectCreateNestedManyWithoutWorkspaceInput = {
     create?: XOR<ProjectCreateWithoutWorkspaceInput, ProjectUncheckedCreateWithoutWorkspaceInput> | ProjectCreateWithoutWorkspaceInput[] | ProjectUncheckedCreateWithoutWorkspaceInput[]
     connectOrCreate?: ProjectCreateOrConnectWithoutWorkspaceInput | ProjectCreateOrConnectWithoutWorkspaceInput[]
@@ -22142,6 +25574,13 @@ export namespace Prisma {
     connect?: AuditEventWhereUniqueInput | AuditEventWhereUniqueInput[]
   }
 
+  export type TaskGraphCreateNestedManyWithoutWorkspaceInput = {
+    create?: XOR<TaskGraphCreateWithoutWorkspaceInput, TaskGraphUncheckedCreateWithoutWorkspaceInput> | TaskGraphCreateWithoutWorkspaceInput[] | TaskGraphUncheckedCreateWithoutWorkspaceInput[]
+    connectOrCreate?: TaskGraphCreateOrConnectWithoutWorkspaceInput | TaskGraphCreateOrConnectWithoutWorkspaceInput[]
+    createMany?: TaskGraphCreateManyWorkspaceInputEnvelope
+    connect?: TaskGraphWhereUniqueInput | TaskGraphWhereUniqueInput[]
+  }
+
   export type ProjectUncheckedCreateNestedManyWithoutWorkspaceInput = {
     create?: XOR<ProjectCreateWithoutWorkspaceInput, ProjectUncheckedCreateWithoutWorkspaceInput> | ProjectCreateWithoutWorkspaceInput[] | ProjectUncheckedCreateWithoutWorkspaceInput[]
     connectOrCreate?: ProjectCreateOrConnectWithoutWorkspaceInput | ProjectCreateOrConnectWithoutWorkspaceInput[]
@@ -22161,6 +25600,13 @@ export namespace Prisma {
     connectOrCreate?: AuditEventCreateOrConnectWithoutWorkspaceInput | AuditEventCreateOrConnectWithoutWorkspaceInput[]
     createMany?: AuditEventCreateManyWorkspaceInputEnvelope
     connect?: AuditEventWhereUniqueInput | AuditEventWhereUniqueInput[]
+  }
+
+  export type TaskGraphUncheckedCreateNestedManyWithoutWorkspaceInput = {
+    create?: XOR<TaskGraphCreateWithoutWorkspaceInput, TaskGraphUncheckedCreateWithoutWorkspaceInput> | TaskGraphCreateWithoutWorkspaceInput[] | TaskGraphUncheckedCreateWithoutWorkspaceInput[]
+    connectOrCreate?: TaskGraphCreateOrConnectWithoutWorkspaceInput | TaskGraphCreateOrConnectWithoutWorkspaceInput[]
+    createMany?: TaskGraphCreateManyWorkspaceInputEnvelope
+    connect?: TaskGraphWhereUniqueInput | TaskGraphWhereUniqueInput[]
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -22213,6 +25659,20 @@ export namespace Prisma {
     deleteMany?: AuditEventScalarWhereInput | AuditEventScalarWhereInput[]
   }
 
+  export type TaskGraphUpdateManyWithoutWorkspaceNestedInput = {
+    create?: XOR<TaskGraphCreateWithoutWorkspaceInput, TaskGraphUncheckedCreateWithoutWorkspaceInput> | TaskGraphCreateWithoutWorkspaceInput[] | TaskGraphUncheckedCreateWithoutWorkspaceInput[]
+    connectOrCreate?: TaskGraphCreateOrConnectWithoutWorkspaceInput | TaskGraphCreateOrConnectWithoutWorkspaceInput[]
+    upsert?: TaskGraphUpsertWithWhereUniqueWithoutWorkspaceInput | TaskGraphUpsertWithWhereUniqueWithoutWorkspaceInput[]
+    createMany?: TaskGraphCreateManyWorkspaceInputEnvelope
+    set?: TaskGraphWhereUniqueInput | TaskGraphWhereUniqueInput[]
+    disconnect?: TaskGraphWhereUniqueInput | TaskGraphWhereUniqueInput[]
+    delete?: TaskGraphWhereUniqueInput | TaskGraphWhereUniqueInput[]
+    connect?: TaskGraphWhereUniqueInput | TaskGraphWhereUniqueInput[]
+    update?: TaskGraphUpdateWithWhereUniqueWithoutWorkspaceInput | TaskGraphUpdateWithWhereUniqueWithoutWorkspaceInput[]
+    updateMany?: TaskGraphUpdateManyWithWhereWithoutWorkspaceInput | TaskGraphUpdateManyWithWhereWithoutWorkspaceInput[]
+    deleteMany?: TaskGraphScalarWhereInput | TaskGraphScalarWhereInput[]
+  }
+
   export type ProjectUncheckedUpdateManyWithoutWorkspaceNestedInput = {
     create?: XOR<ProjectCreateWithoutWorkspaceInput, ProjectUncheckedCreateWithoutWorkspaceInput> | ProjectCreateWithoutWorkspaceInput[] | ProjectUncheckedCreateWithoutWorkspaceInput[]
     connectOrCreate?: ProjectCreateOrConnectWithoutWorkspaceInput | ProjectCreateOrConnectWithoutWorkspaceInput[]
@@ -22253,6 +25713,20 @@ export namespace Prisma {
     update?: AuditEventUpdateWithWhereUniqueWithoutWorkspaceInput | AuditEventUpdateWithWhereUniqueWithoutWorkspaceInput[]
     updateMany?: AuditEventUpdateManyWithWhereWithoutWorkspaceInput | AuditEventUpdateManyWithWhereWithoutWorkspaceInput[]
     deleteMany?: AuditEventScalarWhereInput | AuditEventScalarWhereInput[]
+  }
+
+  export type TaskGraphUncheckedUpdateManyWithoutWorkspaceNestedInput = {
+    create?: XOR<TaskGraphCreateWithoutWorkspaceInput, TaskGraphUncheckedCreateWithoutWorkspaceInput> | TaskGraphCreateWithoutWorkspaceInput[] | TaskGraphUncheckedCreateWithoutWorkspaceInput[]
+    connectOrCreate?: TaskGraphCreateOrConnectWithoutWorkspaceInput | TaskGraphCreateOrConnectWithoutWorkspaceInput[]
+    upsert?: TaskGraphUpsertWithWhereUniqueWithoutWorkspaceInput | TaskGraphUpsertWithWhereUniqueWithoutWorkspaceInput[]
+    createMany?: TaskGraphCreateManyWorkspaceInputEnvelope
+    set?: TaskGraphWhereUniqueInput | TaskGraphWhereUniqueInput[]
+    disconnect?: TaskGraphWhereUniqueInput | TaskGraphWhereUniqueInput[]
+    delete?: TaskGraphWhereUniqueInput | TaskGraphWhereUniqueInput[]
+    connect?: TaskGraphWhereUniqueInput | TaskGraphWhereUniqueInput[]
+    update?: TaskGraphUpdateWithWhereUniqueWithoutWorkspaceInput | TaskGraphUpdateWithWhereUniqueWithoutWorkspaceInput[]
+    updateMany?: TaskGraphUpdateManyWithWhereWithoutWorkspaceInput | TaskGraphUpdateManyWithWhereWithoutWorkspaceInput[]
+    deleteMany?: TaskGraphScalarWhereInput | TaskGraphScalarWhereInput[]
   }
 
   export type WorkspaceCreateNestedOneWithoutProjectsInput = {
@@ -22296,6 +25770,13 @@ export namespace Prisma {
     connect?: AuditEventWhereUniqueInput | AuditEventWhereUniqueInput[]
   }
 
+  export type TaskGraphCreateNestedManyWithoutProjectInput = {
+    create?: XOR<TaskGraphCreateWithoutProjectInput, TaskGraphUncheckedCreateWithoutProjectInput> | TaskGraphCreateWithoutProjectInput[] | TaskGraphUncheckedCreateWithoutProjectInput[]
+    connectOrCreate?: TaskGraphCreateOrConnectWithoutProjectInput | TaskGraphCreateOrConnectWithoutProjectInput[]
+    createMany?: TaskGraphCreateManyProjectInputEnvelope
+    connect?: TaskGraphWhereUniqueInput | TaskGraphWhereUniqueInput[]
+  }
+
   export type EpisodeUncheckedCreateNestedManyWithoutProjectInput = {
     create?: XOR<EpisodeCreateWithoutProjectInput, EpisodeUncheckedCreateWithoutProjectInput> | EpisodeCreateWithoutProjectInput[] | EpisodeUncheckedCreateWithoutProjectInput[]
     connectOrCreate?: EpisodeCreateOrConnectWithoutProjectInput | EpisodeCreateOrConnectWithoutProjectInput[]
@@ -22329,6 +25810,13 @@ export namespace Prisma {
     connectOrCreate?: AuditEventCreateOrConnectWithoutProjectInput | AuditEventCreateOrConnectWithoutProjectInput[]
     createMany?: AuditEventCreateManyProjectInputEnvelope
     connect?: AuditEventWhereUniqueInput | AuditEventWhereUniqueInput[]
+  }
+
+  export type TaskGraphUncheckedCreateNestedManyWithoutProjectInput = {
+    create?: XOR<TaskGraphCreateWithoutProjectInput, TaskGraphUncheckedCreateWithoutProjectInput> | TaskGraphCreateWithoutProjectInput[] | TaskGraphUncheckedCreateWithoutProjectInput[]
+    connectOrCreate?: TaskGraphCreateOrConnectWithoutProjectInput | TaskGraphCreateOrConnectWithoutProjectInput[]
+    createMany?: TaskGraphCreateManyProjectInputEnvelope
+    connect?: TaskGraphWhereUniqueInput | TaskGraphWhereUniqueInput[]
   }
 
   export type EnumProjectStatusFieldUpdateOperationsInput = {
@@ -22413,6 +25901,20 @@ export namespace Prisma {
     deleteMany?: AuditEventScalarWhereInput | AuditEventScalarWhereInput[]
   }
 
+  export type TaskGraphUpdateManyWithoutProjectNestedInput = {
+    create?: XOR<TaskGraphCreateWithoutProjectInput, TaskGraphUncheckedCreateWithoutProjectInput> | TaskGraphCreateWithoutProjectInput[] | TaskGraphUncheckedCreateWithoutProjectInput[]
+    connectOrCreate?: TaskGraphCreateOrConnectWithoutProjectInput | TaskGraphCreateOrConnectWithoutProjectInput[]
+    upsert?: TaskGraphUpsertWithWhereUniqueWithoutProjectInput | TaskGraphUpsertWithWhereUniqueWithoutProjectInput[]
+    createMany?: TaskGraphCreateManyProjectInputEnvelope
+    set?: TaskGraphWhereUniqueInput | TaskGraphWhereUniqueInput[]
+    disconnect?: TaskGraphWhereUniqueInput | TaskGraphWhereUniqueInput[]
+    delete?: TaskGraphWhereUniqueInput | TaskGraphWhereUniqueInput[]
+    connect?: TaskGraphWhereUniqueInput | TaskGraphWhereUniqueInput[]
+    update?: TaskGraphUpdateWithWhereUniqueWithoutProjectInput | TaskGraphUpdateWithWhereUniqueWithoutProjectInput[]
+    updateMany?: TaskGraphUpdateManyWithWhereWithoutProjectInput | TaskGraphUpdateManyWithWhereWithoutProjectInput[]
+    deleteMany?: TaskGraphScalarWhereInput | TaskGraphScalarWhereInput[]
+  }
+
   export type EpisodeUncheckedUpdateManyWithoutProjectNestedInput = {
     create?: XOR<EpisodeCreateWithoutProjectInput, EpisodeUncheckedCreateWithoutProjectInput> | EpisodeCreateWithoutProjectInput[] | EpisodeUncheckedCreateWithoutProjectInput[]
     connectOrCreate?: EpisodeCreateOrConnectWithoutProjectInput | EpisodeCreateOrConnectWithoutProjectInput[]
@@ -22483,6 +25985,20 @@ export namespace Prisma {
     deleteMany?: AuditEventScalarWhereInput | AuditEventScalarWhereInput[]
   }
 
+  export type TaskGraphUncheckedUpdateManyWithoutProjectNestedInput = {
+    create?: XOR<TaskGraphCreateWithoutProjectInput, TaskGraphUncheckedCreateWithoutProjectInput> | TaskGraphCreateWithoutProjectInput[] | TaskGraphUncheckedCreateWithoutProjectInput[]
+    connectOrCreate?: TaskGraphCreateOrConnectWithoutProjectInput | TaskGraphCreateOrConnectWithoutProjectInput[]
+    upsert?: TaskGraphUpsertWithWhereUniqueWithoutProjectInput | TaskGraphUpsertWithWhereUniqueWithoutProjectInput[]
+    createMany?: TaskGraphCreateManyProjectInputEnvelope
+    set?: TaskGraphWhereUniqueInput | TaskGraphWhereUniqueInput[]
+    disconnect?: TaskGraphWhereUniqueInput | TaskGraphWhereUniqueInput[]
+    delete?: TaskGraphWhereUniqueInput | TaskGraphWhereUniqueInput[]
+    connect?: TaskGraphWhereUniqueInput | TaskGraphWhereUniqueInput[]
+    update?: TaskGraphUpdateWithWhereUniqueWithoutProjectInput | TaskGraphUpdateWithWhereUniqueWithoutProjectInput[]
+    updateMany?: TaskGraphUpdateManyWithWhereWithoutProjectInput | TaskGraphUpdateManyWithWhereWithoutProjectInput[]
+    deleteMany?: TaskGraphScalarWhereInput | TaskGraphScalarWhereInput[]
+  }
+
   export type EpisodeCreateNestedManyWithoutPrimaryAgentInput = {
     create?: XOR<EpisodeCreateWithoutPrimaryAgentInput, EpisodeUncheckedCreateWithoutPrimaryAgentInput> | EpisodeCreateWithoutPrimaryAgentInput[] | EpisodeUncheckedCreateWithoutPrimaryAgentInput[]
     connectOrCreate?: EpisodeCreateOrConnectWithoutPrimaryAgentInput | EpisodeCreateOrConnectWithoutPrimaryAgentInput[]
@@ -22525,6 +26041,20 @@ export namespace Prisma {
     connect?: ArtifactWhereUniqueInput | ArtifactWhereUniqueInput[]
   }
 
+  export type TaskGraphCreateNestedManyWithoutCreatedByAgentInput = {
+    create?: XOR<TaskGraphCreateWithoutCreatedByAgentInput, TaskGraphUncheckedCreateWithoutCreatedByAgentInput> | TaskGraphCreateWithoutCreatedByAgentInput[] | TaskGraphUncheckedCreateWithoutCreatedByAgentInput[]
+    connectOrCreate?: TaskGraphCreateOrConnectWithoutCreatedByAgentInput | TaskGraphCreateOrConnectWithoutCreatedByAgentInput[]
+    createMany?: TaskGraphCreateManyCreatedByAgentInputEnvelope
+    connect?: TaskGraphWhereUniqueInput | TaskGraphWhereUniqueInput[]
+  }
+
+  export type TaskGraphEpisodeCreateNestedManyWithoutAgentInput = {
+    create?: XOR<TaskGraphEpisodeCreateWithoutAgentInput, TaskGraphEpisodeUncheckedCreateWithoutAgentInput> | TaskGraphEpisodeCreateWithoutAgentInput[] | TaskGraphEpisodeUncheckedCreateWithoutAgentInput[]
+    connectOrCreate?: TaskGraphEpisodeCreateOrConnectWithoutAgentInput | TaskGraphEpisodeCreateOrConnectWithoutAgentInput[]
+    createMany?: TaskGraphEpisodeCreateManyAgentInputEnvelope
+    connect?: TaskGraphEpisodeWhereUniqueInput | TaskGraphEpisodeWhereUniqueInput[]
+  }
+
   export type EpisodeUncheckedCreateNestedManyWithoutPrimaryAgentInput = {
     create?: XOR<EpisodeCreateWithoutPrimaryAgentInput, EpisodeUncheckedCreateWithoutPrimaryAgentInput> | EpisodeCreateWithoutPrimaryAgentInput[] | EpisodeUncheckedCreateWithoutPrimaryAgentInput[]
     connectOrCreate?: EpisodeCreateOrConnectWithoutPrimaryAgentInput | EpisodeCreateOrConnectWithoutPrimaryAgentInput[]
@@ -22565,6 +26095,20 @@ export namespace Prisma {
     connectOrCreate?: ArtifactCreateOrConnectWithoutCreatedByAgentInput | ArtifactCreateOrConnectWithoutCreatedByAgentInput[]
     createMany?: ArtifactCreateManyCreatedByAgentInputEnvelope
     connect?: ArtifactWhereUniqueInput | ArtifactWhereUniqueInput[]
+  }
+
+  export type TaskGraphUncheckedCreateNestedManyWithoutCreatedByAgentInput = {
+    create?: XOR<TaskGraphCreateWithoutCreatedByAgentInput, TaskGraphUncheckedCreateWithoutCreatedByAgentInput> | TaskGraphCreateWithoutCreatedByAgentInput[] | TaskGraphUncheckedCreateWithoutCreatedByAgentInput[]
+    connectOrCreate?: TaskGraphCreateOrConnectWithoutCreatedByAgentInput | TaskGraphCreateOrConnectWithoutCreatedByAgentInput[]
+    createMany?: TaskGraphCreateManyCreatedByAgentInputEnvelope
+    connect?: TaskGraphWhereUniqueInput | TaskGraphWhereUniqueInput[]
+  }
+
+  export type TaskGraphEpisodeUncheckedCreateNestedManyWithoutAgentInput = {
+    create?: XOR<TaskGraphEpisodeCreateWithoutAgentInput, TaskGraphEpisodeUncheckedCreateWithoutAgentInput> | TaskGraphEpisodeCreateWithoutAgentInput[] | TaskGraphEpisodeUncheckedCreateWithoutAgentInput[]
+    connectOrCreate?: TaskGraphEpisodeCreateOrConnectWithoutAgentInput | TaskGraphEpisodeCreateOrConnectWithoutAgentInput[]
+    createMany?: TaskGraphEpisodeCreateManyAgentInputEnvelope
+    connect?: TaskGraphEpisodeWhereUniqueInput | TaskGraphEpisodeWhereUniqueInput[]
   }
 
   export type NullableDateTimeFieldUpdateOperationsInput = {
@@ -22655,6 +26199,34 @@ export namespace Prisma {
     deleteMany?: ArtifactScalarWhereInput | ArtifactScalarWhereInput[]
   }
 
+  export type TaskGraphUpdateManyWithoutCreatedByAgentNestedInput = {
+    create?: XOR<TaskGraphCreateWithoutCreatedByAgentInput, TaskGraphUncheckedCreateWithoutCreatedByAgentInput> | TaskGraphCreateWithoutCreatedByAgentInput[] | TaskGraphUncheckedCreateWithoutCreatedByAgentInput[]
+    connectOrCreate?: TaskGraphCreateOrConnectWithoutCreatedByAgentInput | TaskGraphCreateOrConnectWithoutCreatedByAgentInput[]
+    upsert?: TaskGraphUpsertWithWhereUniqueWithoutCreatedByAgentInput | TaskGraphUpsertWithWhereUniqueWithoutCreatedByAgentInput[]
+    createMany?: TaskGraphCreateManyCreatedByAgentInputEnvelope
+    set?: TaskGraphWhereUniqueInput | TaskGraphWhereUniqueInput[]
+    disconnect?: TaskGraphWhereUniqueInput | TaskGraphWhereUniqueInput[]
+    delete?: TaskGraphWhereUniqueInput | TaskGraphWhereUniqueInput[]
+    connect?: TaskGraphWhereUniqueInput | TaskGraphWhereUniqueInput[]
+    update?: TaskGraphUpdateWithWhereUniqueWithoutCreatedByAgentInput | TaskGraphUpdateWithWhereUniqueWithoutCreatedByAgentInput[]
+    updateMany?: TaskGraphUpdateManyWithWhereWithoutCreatedByAgentInput | TaskGraphUpdateManyWithWhereWithoutCreatedByAgentInput[]
+    deleteMany?: TaskGraphScalarWhereInput | TaskGraphScalarWhereInput[]
+  }
+
+  export type TaskGraphEpisodeUpdateManyWithoutAgentNestedInput = {
+    create?: XOR<TaskGraphEpisodeCreateWithoutAgentInput, TaskGraphEpisodeUncheckedCreateWithoutAgentInput> | TaskGraphEpisodeCreateWithoutAgentInput[] | TaskGraphEpisodeUncheckedCreateWithoutAgentInput[]
+    connectOrCreate?: TaskGraphEpisodeCreateOrConnectWithoutAgentInput | TaskGraphEpisodeCreateOrConnectWithoutAgentInput[]
+    upsert?: TaskGraphEpisodeUpsertWithWhereUniqueWithoutAgentInput | TaskGraphEpisodeUpsertWithWhereUniqueWithoutAgentInput[]
+    createMany?: TaskGraphEpisodeCreateManyAgentInputEnvelope
+    set?: TaskGraphEpisodeWhereUniqueInput | TaskGraphEpisodeWhereUniqueInput[]
+    disconnect?: TaskGraphEpisodeWhereUniqueInput | TaskGraphEpisodeWhereUniqueInput[]
+    delete?: TaskGraphEpisodeWhereUniqueInput | TaskGraphEpisodeWhereUniqueInput[]
+    connect?: TaskGraphEpisodeWhereUniqueInput | TaskGraphEpisodeWhereUniqueInput[]
+    update?: TaskGraphEpisodeUpdateWithWhereUniqueWithoutAgentInput | TaskGraphEpisodeUpdateWithWhereUniqueWithoutAgentInput[]
+    updateMany?: TaskGraphEpisodeUpdateManyWithWhereWithoutAgentInput | TaskGraphEpisodeUpdateManyWithWhereWithoutAgentInput[]
+    deleteMany?: TaskGraphEpisodeScalarWhereInput | TaskGraphEpisodeScalarWhereInput[]
+  }
+
   export type EpisodeUncheckedUpdateManyWithoutPrimaryAgentNestedInput = {
     create?: XOR<EpisodeCreateWithoutPrimaryAgentInput, EpisodeUncheckedCreateWithoutPrimaryAgentInput> | EpisodeCreateWithoutPrimaryAgentInput[] | EpisodeUncheckedCreateWithoutPrimaryAgentInput[]
     connectOrCreate?: EpisodeCreateOrConnectWithoutPrimaryAgentInput | EpisodeCreateOrConnectWithoutPrimaryAgentInput[]
@@ -22737,6 +26309,34 @@ export namespace Prisma {
     update?: ArtifactUpdateWithWhereUniqueWithoutCreatedByAgentInput | ArtifactUpdateWithWhereUniqueWithoutCreatedByAgentInput[]
     updateMany?: ArtifactUpdateManyWithWhereWithoutCreatedByAgentInput | ArtifactUpdateManyWithWhereWithoutCreatedByAgentInput[]
     deleteMany?: ArtifactScalarWhereInput | ArtifactScalarWhereInput[]
+  }
+
+  export type TaskGraphUncheckedUpdateManyWithoutCreatedByAgentNestedInput = {
+    create?: XOR<TaskGraphCreateWithoutCreatedByAgentInput, TaskGraphUncheckedCreateWithoutCreatedByAgentInput> | TaskGraphCreateWithoutCreatedByAgentInput[] | TaskGraphUncheckedCreateWithoutCreatedByAgentInput[]
+    connectOrCreate?: TaskGraphCreateOrConnectWithoutCreatedByAgentInput | TaskGraphCreateOrConnectWithoutCreatedByAgentInput[]
+    upsert?: TaskGraphUpsertWithWhereUniqueWithoutCreatedByAgentInput | TaskGraphUpsertWithWhereUniqueWithoutCreatedByAgentInput[]
+    createMany?: TaskGraphCreateManyCreatedByAgentInputEnvelope
+    set?: TaskGraphWhereUniqueInput | TaskGraphWhereUniqueInput[]
+    disconnect?: TaskGraphWhereUniqueInput | TaskGraphWhereUniqueInput[]
+    delete?: TaskGraphWhereUniqueInput | TaskGraphWhereUniqueInput[]
+    connect?: TaskGraphWhereUniqueInput | TaskGraphWhereUniqueInput[]
+    update?: TaskGraphUpdateWithWhereUniqueWithoutCreatedByAgentInput | TaskGraphUpdateWithWhereUniqueWithoutCreatedByAgentInput[]
+    updateMany?: TaskGraphUpdateManyWithWhereWithoutCreatedByAgentInput | TaskGraphUpdateManyWithWhereWithoutCreatedByAgentInput[]
+    deleteMany?: TaskGraphScalarWhereInput | TaskGraphScalarWhereInput[]
+  }
+
+  export type TaskGraphEpisodeUncheckedUpdateManyWithoutAgentNestedInput = {
+    create?: XOR<TaskGraphEpisodeCreateWithoutAgentInput, TaskGraphEpisodeUncheckedCreateWithoutAgentInput> | TaskGraphEpisodeCreateWithoutAgentInput[] | TaskGraphEpisodeUncheckedCreateWithoutAgentInput[]
+    connectOrCreate?: TaskGraphEpisodeCreateOrConnectWithoutAgentInput | TaskGraphEpisodeCreateOrConnectWithoutAgentInput[]
+    upsert?: TaskGraphEpisodeUpsertWithWhereUniqueWithoutAgentInput | TaskGraphEpisodeUpsertWithWhereUniqueWithoutAgentInput[]
+    createMany?: TaskGraphEpisodeCreateManyAgentInputEnvelope
+    set?: TaskGraphEpisodeWhereUniqueInput | TaskGraphEpisodeWhereUniqueInput[]
+    disconnect?: TaskGraphEpisodeWhereUniqueInput | TaskGraphEpisodeWhereUniqueInput[]
+    delete?: TaskGraphEpisodeWhereUniqueInput | TaskGraphEpisodeWhereUniqueInput[]
+    connect?: TaskGraphEpisodeWhereUniqueInput | TaskGraphEpisodeWhereUniqueInput[]
+    update?: TaskGraphEpisodeUpdateWithWhereUniqueWithoutAgentInput | TaskGraphEpisodeUpdateWithWhereUniqueWithoutAgentInput[]
+    updateMany?: TaskGraphEpisodeUpdateManyWithWhereWithoutAgentInput | TaskGraphEpisodeUpdateManyWithWhereWithoutAgentInput[]
+    deleteMany?: TaskGraphEpisodeScalarWhereInput | TaskGraphEpisodeScalarWhereInput[]
   }
 
   export type ProjectCreateNestedOneWithoutProjectAgentsInput = {
@@ -22834,6 +26434,20 @@ export namespace Prisma {
     connect?: AccessGrantWhereUniqueInput | AccessGrantWhereUniqueInput[]
   }
 
+  export type TaskGraphCreateNestedManyWithoutOrchestratorEpisodeInput = {
+    create?: XOR<TaskGraphCreateWithoutOrchestratorEpisodeInput, TaskGraphUncheckedCreateWithoutOrchestratorEpisodeInput> | TaskGraphCreateWithoutOrchestratorEpisodeInput[] | TaskGraphUncheckedCreateWithoutOrchestratorEpisodeInput[]
+    connectOrCreate?: TaskGraphCreateOrConnectWithoutOrchestratorEpisodeInput | TaskGraphCreateOrConnectWithoutOrchestratorEpisodeInput[]
+    createMany?: TaskGraphCreateManyOrchestratorEpisodeInputEnvelope
+    connect?: TaskGraphWhereUniqueInput | TaskGraphWhereUniqueInput[]
+  }
+
+  export type TaskGraphEpisodeCreateNestedManyWithoutEpisodeInput = {
+    create?: XOR<TaskGraphEpisodeCreateWithoutEpisodeInput, TaskGraphEpisodeUncheckedCreateWithoutEpisodeInput> | TaskGraphEpisodeCreateWithoutEpisodeInput[] | TaskGraphEpisodeUncheckedCreateWithoutEpisodeInput[]
+    connectOrCreate?: TaskGraphEpisodeCreateOrConnectWithoutEpisodeInput | TaskGraphEpisodeCreateOrConnectWithoutEpisodeInput[]
+    createMany?: TaskGraphEpisodeCreateManyEpisodeInputEnvelope
+    connect?: TaskGraphEpisodeWhereUniqueInput | TaskGraphEpisodeWhereUniqueInput[]
+  }
+
   export type EpisodeUncheckedCreateNestedManyWithoutParentEpisodeInput = {
     create?: XOR<EpisodeCreateWithoutParentEpisodeInput, EpisodeUncheckedCreateWithoutParentEpisodeInput> | EpisodeCreateWithoutParentEpisodeInput[] | EpisodeUncheckedCreateWithoutParentEpisodeInput[]
     connectOrCreate?: EpisodeCreateOrConnectWithoutParentEpisodeInput | EpisodeCreateOrConnectWithoutParentEpisodeInput[]
@@ -22881,6 +26495,20 @@ export namespace Prisma {
     connectOrCreate?: AccessGrantCreateOrConnectWithoutEpisodeInput | AccessGrantCreateOrConnectWithoutEpisodeInput[]
     createMany?: AccessGrantCreateManyEpisodeInputEnvelope
     connect?: AccessGrantWhereUniqueInput | AccessGrantWhereUniqueInput[]
+  }
+
+  export type TaskGraphUncheckedCreateNestedManyWithoutOrchestratorEpisodeInput = {
+    create?: XOR<TaskGraphCreateWithoutOrchestratorEpisodeInput, TaskGraphUncheckedCreateWithoutOrchestratorEpisodeInput> | TaskGraphCreateWithoutOrchestratorEpisodeInput[] | TaskGraphUncheckedCreateWithoutOrchestratorEpisodeInput[]
+    connectOrCreate?: TaskGraphCreateOrConnectWithoutOrchestratorEpisodeInput | TaskGraphCreateOrConnectWithoutOrchestratorEpisodeInput[]
+    createMany?: TaskGraphCreateManyOrchestratorEpisodeInputEnvelope
+    connect?: TaskGraphWhereUniqueInput | TaskGraphWhereUniqueInput[]
+  }
+
+  export type TaskGraphEpisodeUncheckedCreateNestedManyWithoutEpisodeInput = {
+    create?: XOR<TaskGraphEpisodeCreateWithoutEpisodeInput, TaskGraphEpisodeUncheckedCreateWithoutEpisodeInput> | TaskGraphEpisodeCreateWithoutEpisodeInput[] | TaskGraphEpisodeUncheckedCreateWithoutEpisodeInput[]
+    connectOrCreate?: TaskGraphEpisodeCreateOrConnectWithoutEpisodeInput | TaskGraphEpisodeCreateOrConnectWithoutEpisodeInput[]
+    createMany?: TaskGraphEpisodeCreateManyEpisodeInputEnvelope
+    connect?: TaskGraphEpisodeWhereUniqueInput | TaskGraphEpisodeWhereUniqueInput[]
   }
 
   export type NullableStringFieldUpdateOperationsInput = {
@@ -23027,6 +26655,34 @@ export namespace Prisma {
     deleteMany?: AccessGrantScalarWhereInput | AccessGrantScalarWhereInput[]
   }
 
+  export type TaskGraphUpdateManyWithoutOrchestratorEpisodeNestedInput = {
+    create?: XOR<TaskGraphCreateWithoutOrchestratorEpisodeInput, TaskGraphUncheckedCreateWithoutOrchestratorEpisodeInput> | TaskGraphCreateWithoutOrchestratorEpisodeInput[] | TaskGraphUncheckedCreateWithoutOrchestratorEpisodeInput[]
+    connectOrCreate?: TaskGraphCreateOrConnectWithoutOrchestratorEpisodeInput | TaskGraphCreateOrConnectWithoutOrchestratorEpisodeInput[]
+    upsert?: TaskGraphUpsertWithWhereUniqueWithoutOrchestratorEpisodeInput | TaskGraphUpsertWithWhereUniqueWithoutOrchestratorEpisodeInput[]
+    createMany?: TaskGraphCreateManyOrchestratorEpisodeInputEnvelope
+    set?: TaskGraphWhereUniqueInput | TaskGraphWhereUniqueInput[]
+    disconnect?: TaskGraphWhereUniqueInput | TaskGraphWhereUniqueInput[]
+    delete?: TaskGraphWhereUniqueInput | TaskGraphWhereUniqueInput[]
+    connect?: TaskGraphWhereUniqueInput | TaskGraphWhereUniqueInput[]
+    update?: TaskGraphUpdateWithWhereUniqueWithoutOrchestratorEpisodeInput | TaskGraphUpdateWithWhereUniqueWithoutOrchestratorEpisodeInput[]
+    updateMany?: TaskGraphUpdateManyWithWhereWithoutOrchestratorEpisodeInput | TaskGraphUpdateManyWithWhereWithoutOrchestratorEpisodeInput[]
+    deleteMany?: TaskGraphScalarWhereInput | TaskGraphScalarWhereInput[]
+  }
+
+  export type TaskGraphEpisodeUpdateManyWithoutEpisodeNestedInput = {
+    create?: XOR<TaskGraphEpisodeCreateWithoutEpisodeInput, TaskGraphEpisodeUncheckedCreateWithoutEpisodeInput> | TaskGraphEpisodeCreateWithoutEpisodeInput[] | TaskGraphEpisodeUncheckedCreateWithoutEpisodeInput[]
+    connectOrCreate?: TaskGraphEpisodeCreateOrConnectWithoutEpisodeInput | TaskGraphEpisodeCreateOrConnectWithoutEpisodeInput[]
+    upsert?: TaskGraphEpisodeUpsertWithWhereUniqueWithoutEpisodeInput | TaskGraphEpisodeUpsertWithWhereUniqueWithoutEpisodeInput[]
+    createMany?: TaskGraphEpisodeCreateManyEpisodeInputEnvelope
+    set?: TaskGraphEpisodeWhereUniqueInput | TaskGraphEpisodeWhereUniqueInput[]
+    disconnect?: TaskGraphEpisodeWhereUniqueInput | TaskGraphEpisodeWhereUniqueInput[]
+    delete?: TaskGraphEpisodeWhereUniqueInput | TaskGraphEpisodeWhereUniqueInput[]
+    connect?: TaskGraphEpisodeWhereUniqueInput | TaskGraphEpisodeWhereUniqueInput[]
+    update?: TaskGraphEpisodeUpdateWithWhereUniqueWithoutEpisodeInput | TaskGraphEpisodeUpdateWithWhereUniqueWithoutEpisodeInput[]
+    updateMany?: TaskGraphEpisodeUpdateManyWithWhereWithoutEpisodeInput | TaskGraphEpisodeUpdateManyWithWhereWithoutEpisodeInput[]
+    deleteMany?: TaskGraphEpisodeScalarWhereInput | TaskGraphEpisodeScalarWhereInput[]
+  }
+
   export type EpisodeUncheckedUpdateManyWithoutParentEpisodeNestedInput = {
     create?: XOR<EpisodeCreateWithoutParentEpisodeInput, EpisodeUncheckedCreateWithoutParentEpisodeInput> | EpisodeCreateWithoutParentEpisodeInput[] | EpisodeUncheckedCreateWithoutParentEpisodeInput[]
     connectOrCreate?: EpisodeCreateOrConnectWithoutParentEpisodeInput | EpisodeCreateOrConnectWithoutParentEpisodeInput[]
@@ -23123,6 +26779,34 @@ export namespace Prisma {
     update?: AccessGrantUpdateWithWhereUniqueWithoutEpisodeInput | AccessGrantUpdateWithWhereUniqueWithoutEpisodeInput[]
     updateMany?: AccessGrantUpdateManyWithWhereWithoutEpisodeInput | AccessGrantUpdateManyWithWhereWithoutEpisodeInput[]
     deleteMany?: AccessGrantScalarWhereInput | AccessGrantScalarWhereInput[]
+  }
+
+  export type TaskGraphUncheckedUpdateManyWithoutOrchestratorEpisodeNestedInput = {
+    create?: XOR<TaskGraphCreateWithoutOrchestratorEpisodeInput, TaskGraphUncheckedCreateWithoutOrchestratorEpisodeInput> | TaskGraphCreateWithoutOrchestratorEpisodeInput[] | TaskGraphUncheckedCreateWithoutOrchestratorEpisodeInput[]
+    connectOrCreate?: TaskGraphCreateOrConnectWithoutOrchestratorEpisodeInput | TaskGraphCreateOrConnectWithoutOrchestratorEpisodeInput[]
+    upsert?: TaskGraphUpsertWithWhereUniqueWithoutOrchestratorEpisodeInput | TaskGraphUpsertWithWhereUniqueWithoutOrchestratorEpisodeInput[]
+    createMany?: TaskGraphCreateManyOrchestratorEpisodeInputEnvelope
+    set?: TaskGraphWhereUniqueInput | TaskGraphWhereUniqueInput[]
+    disconnect?: TaskGraphWhereUniqueInput | TaskGraphWhereUniqueInput[]
+    delete?: TaskGraphWhereUniqueInput | TaskGraphWhereUniqueInput[]
+    connect?: TaskGraphWhereUniqueInput | TaskGraphWhereUniqueInput[]
+    update?: TaskGraphUpdateWithWhereUniqueWithoutOrchestratorEpisodeInput | TaskGraphUpdateWithWhereUniqueWithoutOrchestratorEpisodeInput[]
+    updateMany?: TaskGraphUpdateManyWithWhereWithoutOrchestratorEpisodeInput | TaskGraphUpdateManyWithWhereWithoutOrchestratorEpisodeInput[]
+    deleteMany?: TaskGraphScalarWhereInput | TaskGraphScalarWhereInput[]
+  }
+
+  export type TaskGraphEpisodeUncheckedUpdateManyWithoutEpisodeNestedInput = {
+    create?: XOR<TaskGraphEpisodeCreateWithoutEpisodeInput, TaskGraphEpisodeUncheckedCreateWithoutEpisodeInput> | TaskGraphEpisodeCreateWithoutEpisodeInput[] | TaskGraphEpisodeUncheckedCreateWithoutEpisodeInput[]
+    connectOrCreate?: TaskGraphEpisodeCreateOrConnectWithoutEpisodeInput | TaskGraphEpisodeCreateOrConnectWithoutEpisodeInput[]
+    upsert?: TaskGraphEpisodeUpsertWithWhereUniqueWithoutEpisodeInput | TaskGraphEpisodeUpsertWithWhereUniqueWithoutEpisodeInput[]
+    createMany?: TaskGraphEpisodeCreateManyEpisodeInputEnvelope
+    set?: TaskGraphEpisodeWhereUniqueInput | TaskGraphEpisodeWhereUniqueInput[]
+    disconnect?: TaskGraphEpisodeWhereUniqueInput | TaskGraphEpisodeWhereUniqueInput[]
+    delete?: TaskGraphEpisodeWhereUniqueInput | TaskGraphEpisodeWhereUniqueInput[]
+    connect?: TaskGraphEpisodeWhereUniqueInput | TaskGraphEpisodeWhereUniqueInput[]
+    update?: TaskGraphEpisodeUpdateWithWhereUniqueWithoutEpisodeInput | TaskGraphEpisodeUpdateWithWhereUniqueWithoutEpisodeInput[]
+    updateMany?: TaskGraphEpisodeUpdateManyWithWhereWithoutEpisodeInput | TaskGraphEpisodeUpdateManyWithWhereWithoutEpisodeInput[]
+    deleteMany?: TaskGraphEpisodeScalarWhereInput | TaskGraphEpisodeScalarWhereInput[]
   }
 
   export type EpisodeCreateNestedOneWithoutEpisodeAgentsInput = {
@@ -23613,6 +27297,163 @@ export namespace Prisma {
     set?: $Enums.EdgeType
   }
 
+  export type WorkspaceCreateNestedOneWithoutTaskGraphsInput = {
+    create?: XOR<WorkspaceCreateWithoutTaskGraphsInput, WorkspaceUncheckedCreateWithoutTaskGraphsInput>
+    connectOrCreate?: WorkspaceCreateOrConnectWithoutTaskGraphsInput
+    connect?: WorkspaceWhereUniqueInput
+  }
+
+  export type ProjectCreateNestedOneWithoutTaskGraphsInput = {
+    create?: XOR<ProjectCreateWithoutTaskGraphsInput, ProjectUncheckedCreateWithoutTaskGraphsInput>
+    connectOrCreate?: ProjectCreateOrConnectWithoutTaskGraphsInput
+    connect?: ProjectWhereUniqueInput
+  }
+
+  export type EpisodeCreateNestedOneWithoutOrchestratedTaskGraphsInput = {
+    create?: XOR<EpisodeCreateWithoutOrchestratedTaskGraphsInput, EpisodeUncheckedCreateWithoutOrchestratedTaskGraphsInput>
+    connectOrCreate?: EpisodeCreateOrConnectWithoutOrchestratedTaskGraphsInput
+    connect?: EpisodeWhereUniqueInput
+  }
+
+  export type AgentCreateNestedOneWithoutCreatedTaskGraphsInput = {
+    create?: XOR<AgentCreateWithoutCreatedTaskGraphsInput, AgentUncheckedCreateWithoutCreatedTaskGraphsInput>
+    connectOrCreate?: AgentCreateOrConnectWithoutCreatedTaskGraphsInput
+    connect?: AgentWhereUniqueInput
+  }
+
+  export type TaskGraphEpisodeCreateNestedManyWithoutTaskGraphInput = {
+    create?: XOR<TaskGraphEpisodeCreateWithoutTaskGraphInput, TaskGraphEpisodeUncheckedCreateWithoutTaskGraphInput> | TaskGraphEpisodeCreateWithoutTaskGraphInput[] | TaskGraphEpisodeUncheckedCreateWithoutTaskGraphInput[]
+    connectOrCreate?: TaskGraphEpisodeCreateOrConnectWithoutTaskGraphInput | TaskGraphEpisodeCreateOrConnectWithoutTaskGraphInput[]
+    createMany?: TaskGraphEpisodeCreateManyTaskGraphInputEnvelope
+    connect?: TaskGraphEpisodeWhereUniqueInput | TaskGraphEpisodeWhereUniqueInput[]
+  }
+
+  export type TaskGraphEpisodeUncheckedCreateNestedManyWithoutTaskGraphInput = {
+    create?: XOR<TaskGraphEpisodeCreateWithoutTaskGraphInput, TaskGraphEpisodeUncheckedCreateWithoutTaskGraphInput> | TaskGraphEpisodeCreateWithoutTaskGraphInput[] | TaskGraphEpisodeUncheckedCreateWithoutTaskGraphInput[]
+    connectOrCreate?: TaskGraphEpisodeCreateOrConnectWithoutTaskGraphInput | TaskGraphEpisodeCreateOrConnectWithoutTaskGraphInput[]
+    createMany?: TaskGraphEpisodeCreateManyTaskGraphInputEnvelope
+    connect?: TaskGraphEpisodeWhereUniqueInput | TaskGraphEpisodeWhereUniqueInput[]
+  }
+
+  export type EnumTaskGraphStatusFieldUpdateOperationsInput = {
+    set?: $Enums.TaskGraphStatus
+  }
+
+  export type WorkspaceUpdateOneRequiredWithoutTaskGraphsNestedInput = {
+    create?: XOR<WorkspaceCreateWithoutTaskGraphsInput, WorkspaceUncheckedCreateWithoutTaskGraphsInput>
+    connectOrCreate?: WorkspaceCreateOrConnectWithoutTaskGraphsInput
+    upsert?: WorkspaceUpsertWithoutTaskGraphsInput
+    connect?: WorkspaceWhereUniqueInput
+    update?: XOR<XOR<WorkspaceUpdateToOneWithWhereWithoutTaskGraphsInput, WorkspaceUpdateWithoutTaskGraphsInput>, WorkspaceUncheckedUpdateWithoutTaskGraphsInput>
+  }
+
+  export type ProjectUpdateOneRequiredWithoutTaskGraphsNestedInput = {
+    create?: XOR<ProjectCreateWithoutTaskGraphsInput, ProjectUncheckedCreateWithoutTaskGraphsInput>
+    connectOrCreate?: ProjectCreateOrConnectWithoutTaskGraphsInput
+    upsert?: ProjectUpsertWithoutTaskGraphsInput
+    connect?: ProjectWhereUniqueInput
+    update?: XOR<XOR<ProjectUpdateToOneWithWhereWithoutTaskGraphsInput, ProjectUpdateWithoutTaskGraphsInput>, ProjectUncheckedUpdateWithoutTaskGraphsInput>
+  }
+
+  export type EpisodeUpdateOneRequiredWithoutOrchestratedTaskGraphsNestedInput = {
+    create?: XOR<EpisodeCreateWithoutOrchestratedTaskGraphsInput, EpisodeUncheckedCreateWithoutOrchestratedTaskGraphsInput>
+    connectOrCreate?: EpisodeCreateOrConnectWithoutOrchestratedTaskGraphsInput
+    upsert?: EpisodeUpsertWithoutOrchestratedTaskGraphsInput
+    connect?: EpisodeWhereUniqueInput
+    update?: XOR<XOR<EpisodeUpdateToOneWithWhereWithoutOrchestratedTaskGraphsInput, EpisodeUpdateWithoutOrchestratedTaskGraphsInput>, EpisodeUncheckedUpdateWithoutOrchestratedTaskGraphsInput>
+  }
+
+  export type AgentUpdateOneRequiredWithoutCreatedTaskGraphsNestedInput = {
+    create?: XOR<AgentCreateWithoutCreatedTaskGraphsInput, AgentUncheckedCreateWithoutCreatedTaskGraphsInput>
+    connectOrCreate?: AgentCreateOrConnectWithoutCreatedTaskGraphsInput
+    upsert?: AgentUpsertWithoutCreatedTaskGraphsInput
+    connect?: AgentWhereUniqueInput
+    update?: XOR<XOR<AgentUpdateToOneWithWhereWithoutCreatedTaskGraphsInput, AgentUpdateWithoutCreatedTaskGraphsInput>, AgentUncheckedUpdateWithoutCreatedTaskGraphsInput>
+  }
+
+  export type TaskGraphEpisodeUpdateManyWithoutTaskGraphNestedInput = {
+    create?: XOR<TaskGraphEpisodeCreateWithoutTaskGraphInput, TaskGraphEpisodeUncheckedCreateWithoutTaskGraphInput> | TaskGraphEpisodeCreateWithoutTaskGraphInput[] | TaskGraphEpisodeUncheckedCreateWithoutTaskGraphInput[]
+    connectOrCreate?: TaskGraphEpisodeCreateOrConnectWithoutTaskGraphInput | TaskGraphEpisodeCreateOrConnectWithoutTaskGraphInput[]
+    upsert?: TaskGraphEpisodeUpsertWithWhereUniqueWithoutTaskGraphInput | TaskGraphEpisodeUpsertWithWhereUniqueWithoutTaskGraphInput[]
+    createMany?: TaskGraphEpisodeCreateManyTaskGraphInputEnvelope
+    set?: TaskGraphEpisodeWhereUniqueInput | TaskGraphEpisodeWhereUniqueInput[]
+    disconnect?: TaskGraphEpisodeWhereUniqueInput | TaskGraphEpisodeWhereUniqueInput[]
+    delete?: TaskGraphEpisodeWhereUniqueInput | TaskGraphEpisodeWhereUniqueInput[]
+    connect?: TaskGraphEpisodeWhereUniqueInput | TaskGraphEpisodeWhereUniqueInput[]
+    update?: TaskGraphEpisodeUpdateWithWhereUniqueWithoutTaskGraphInput | TaskGraphEpisodeUpdateWithWhereUniqueWithoutTaskGraphInput[]
+    updateMany?: TaskGraphEpisodeUpdateManyWithWhereWithoutTaskGraphInput | TaskGraphEpisodeUpdateManyWithWhereWithoutTaskGraphInput[]
+    deleteMany?: TaskGraphEpisodeScalarWhereInput | TaskGraphEpisodeScalarWhereInput[]
+  }
+
+  export type TaskGraphEpisodeUncheckedUpdateManyWithoutTaskGraphNestedInput = {
+    create?: XOR<TaskGraphEpisodeCreateWithoutTaskGraphInput, TaskGraphEpisodeUncheckedCreateWithoutTaskGraphInput> | TaskGraphEpisodeCreateWithoutTaskGraphInput[] | TaskGraphEpisodeUncheckedCreateWithoutTaskGraphInput[]
+    connectOrCreate?: TaskGraphEpisodeCreateOrConnectWithoutTaskGraphInput | TaskGraphEpisodeCreateOrConnectWithoutTaskGraphInput[]
+    upsert?: TaskGraphEpisodeUpsertWithWhereUniqueWithoutTaskGraphInput | TaskGraphEpisodeUpsertWithWhereUniqueWithoutTaskGraphInput[]
+    createMany?: TaskGraphEpisodeCreateManyTaskGraphInputEnvelope
+    set?: TaskGraphEpisodeWhereUniqueInput | TaskGraphEpisodeWhereUniqueInput[]
+    disconnect?: TaskGraphEpisodeWhereUniqueInput | TaskGraphEpisodeWhereUniqueInput[]
+    delete?: TaskGraphEpisodeWhereUniqueInput | TaskGraphEpisodeWhereUniqueInput[]
+    connect?: TaskGraphEpisodeWhereUniqueInput | TaskGraphEpisodeWhereUniqueInput[]
+    update?: TaskGraphEpisodeUpdateWithWhereUniqueWithoutTaskGraphInput | TaskGraphEpisodeUpdateWithWhereUniqueWithoutTaskGraphInput[]
+    updateMany?: TaskGraphEpisodeUpdateManyWithWhereWithoutTaskGraphInput | TaskGraphEpisodeUpdateManyWithWhereWithoutTaskGraphInput[]
+    deleteMany?: TaskGraphEpisodeScalarWhereInput | TaskGraphEpisodeScalarWhereInput[]
+  }
+
+  export type TaskGraphEpisodeCreatedependencyEpisodeIdsInput = {
+    set: string[]
+  }
+
+  export type TaskGraphCreateNestedOneWithoutEpisodesInput = {
+    create?: XOR<TaskGraphCreateWithoutEpisodesInput, TaskGraphUncheckedCreateWithoutEpisodesInput>
+    connectOrCreate?: TaskGraphCreateOrConnectWithoutEpisodesInput
+    connect?: TaskGraphWhereUniqueInput
+  }
+
+  export type EpisodeCreateNestedOneWithoutTaskGraphEpisodesInput = {
+    create?: XOR<EpisodeCreateWithoutTaskGraphEpisodesInput, EpisodeUncheckedCreateWithoutTaskGraphEpisodesInput>
+    connectOrCreate?: EpisodeCreateOrConnectWithoutTaskGraphEpisodesInput
+    connect?: EpisodeWhereUniqueInput
+  }
+
+  export type AgentCreateNestedOneWithoutTaskGraphEpisodesInput = {
+    create?: XOR<AgentCreateWithoutTaskGraphEpisodesInput, AgentUncheckedCreateWithoutTaskGraphEpisodesInput>
+    connectOrCreate?: AgentCreateOrConnectWithoutTaskGraphEpisodesInput
+    connect?: AgentWhereUniqueInput
+  }
+
+  export type EnumTaskGraphEpisodeRoleFieldUpdateOperationsInput = {
+    set?: $Enums.TaskGraphEpisodeRole
+  }
+
+  export type TaskGraphEpisodeUpdatedependencyEpisodeIdsInput = {
+    set?: string[]
+    push?: string | string[]
+  }
+
+  export type TaskGraphUpdateOneRequiredWithoutEpisodesNestedInput = {
+    create?: XOR<TaskGraphCreateWithoutEpisodesInput, TaskGraphUncheckedCreateWithoutEpisodesInput>
+    connectOrCreate?: TaskGraphCreateOrConnectWithoutEpisodesInput
+    upsert?: TaskGraphUpsertWithoutEpisodesInput
+    connect?: TaskGraphWhereUniqueInput
+    update?: XOR<XOR<TaskGraphUpdateToOneWithWhereWithoutEpisodesInput, TaskGraphUpdateWithoutEpisodesInput>, TaskGraphUncheckedUpdateWithoutEpisodesInput>
+  }
+
+  export type EpisodeUpdateOneRequiredWithoutTaskGraphEpisodesNestedInput = {
+    create?: XOR<EpisodeCreateWithoutTaskGraphEpisodesInput, EpisodeUncheckedCreateWithoutTaskGraphEpisodesInput>
+    connectOrCreate?: EpisodeCreateOrConnectWithoutTaskGraphEpisodesInput
+    upsert?: EpisodeUpsertWithoutTaskGraphEpisodesInput
+    connect?: EpisodeWhereUniqueInput
+    update?: XOR<XOR<EpisodeUpdateToOneWithWhereWithoutTaskGraphEpisodesInput, EpisodeUpdateWithoutTaskGraphEpisodesInput>, EpisodeUncheckedUpdateWithoutTaskGraphEpisodesInput>
+  }
+
+  export type AgentUpdateOneRequiredWithoutTaskGraphEpisodesNestedInput = {
+    create?: XOR<AgentCreateWithoutTaskGraphEpisodesInput, AgentUncheckedCreateWithoutTaskGraphEpisodesInput>
+    connectOrCreate?: AgentCreateOrConnectWithoutTaskGraphEpisodesInput
+    upsert?: AgentUpsertWithoutTaskGraphEpisodesInput
+    connect?: AgentWhereUniqueInput
+    update?: XOR<XOR<AgentUpdateToOneWithWhereWithoutTaskGraphEpisodesInput, AgentUpdateWithoutTaskGraphEpisodesInput>, AgentUncheckedUpdateWithoutTaskGraphEpisodesInput>
+  }
+
   export type NestedStringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -24000,6 +27841,40 @@ export namespace Prisma {
     _max?: NestedEnumEdgeTypeFilter<$PrismaModel>
   }
 
+  export type NestedEnumTaskGraphStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.TaskGraphStatus | EnumTaskGraphStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.TaskGraphStatus[] | ListEnumTaskGraphStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.TaskGraphStatus[] | ListEnumTaskGraphStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumTaskGraphStatusFilter<$PrismaModel> | $Enums.TaskGraphStatus
+  }
+
+  export type NestedEnumTaskGraphStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.TaskGraphStatus | EnumTaskGraphStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.TaskGraphStatus[] | ListEnumTaskGraphStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.TaskGraphStatus[] | ListEnumTaskGraphStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumTaskGraphStatusWithAggregatesFilter<$PrismaModel> | $Enums.TaskGraphStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumTaskGraphStatusFilter<$PrismaModel>
+    _max?: NestedEnumTaskGraphStatusFilter<$PrismaModel>
+  }
+
+  export type NestedEnumTaskGraphEpisodeRoleFilter<$PrismaModel = never> = {
+    equals?: $Enums.TaskGraphEpisodeRole | EnumTaskGraphEpisodeRoleFieldRefInput<$PrismaModel>
+    in?: $Enums.TaskGraphEpisodeRole[] | ListEnumTaskGraphEpisodeRoleFieldRefInput<$PrismaModel>
+    notIn?: $Enums.TaskGraphEpisodeRole[] | ListEnumTaskGraphEpisodeRoleFieldRefInput<$PrismaModel>
+    not?: NestedEnumTaskGraphEpisodeRoleFilter<$PrismaModel> | $Enums.TaskGraphEpisodeRole
+  }
+
+  export type NestedEnumTaskGraphEpisodeRoleWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.TaskGraphEpisodeRole | EnumTaskGraphEpisodeRoleFieldRefInput<$PrismaModel>
+    in?: $Enums.TaskGraphEpisodeRole[] | ListEnumTaskGraphEpisodeRoleFieldRefInput<$PrismaModel>
+    notIn?: $Enums.TaskGraphEpisodeRole[] | ListEnumTaskGraphEpisodeRoleFieldRefInput<$PrismaModel>
+    not?: NestedEnumTaskGraphEpisodeRoleWithAggregatesFilter<$PrismaModel> | $Enums.TaskGraphEpisodeRole
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumTaskGraphEpisodeRoleFilter<$PrismaModel>
+    _max?: NestedEnumTaskGraphEpisodeRoleFilter<$PrismaModel>
+  }
+
   export type ProjectCreateWithoutWorkspaceInput = {
     id?: string
     slug: string
@@ -24015,6 +27890,7 @@ export namespace Prisma {
     policies?: PolicyCreateNestedManyWithoutProjectInput
     accessGrants?: AccessGrantCreateNestedManyWithoutProjectInput
     auditEvents?: AuditEventCreateNestedManyWithoutProjectInput
+    taskGraphs?: TaskGraphCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUncheckedCreateWithoutWorkspaceInput = {
@@ -24032,6 +27908,7 @@ export namespace Prisma {
     policies?: PolicyUncheckedCreateNestedManyWithoutProjectInput
     accessGrants?: AccessGrantUncheckedCreateNestedManyWithoutProjectInput
     auditEvents?: AuditEventUncheckedCreateNestedManyWithoutProjectInput
+    taskGraphs?: TaskGraphUncheckedCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectCreateOrConnectWithoutWorkspaceInput = {
@@ -24119,6 +27996,44 @@ export namespace Prisma {
 
   export type AuditEventCreateManyWorkspaceInputEnvelope = {
     data: AuditEventCreateManyWorkspaceInput | AuditEventCreateManyWorkspaceInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type TaskGraphCreateWithoutWorkspaceInput = {
+    id?: string
+    symphonyTaskId: string
+    status?: $Enums.TaskGraphStatus
+    sensitivity?: string
+    policyVersion: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    project: ProjectCreateNestedOneWithoutTaskGraphsInput
+    orchestratorEpisode: EpisodeCreateNestedOneWithoutOrchestratedTaskGraphsInput
+    createdByAgent: AgentCreateNestedOneWithoutCreatedTaskGraphsInput
+    episodes?: TaskGraphEpisodeCreateNestedManyWithoutTaskGraphInput
+  }
+
+  export type TaskGraphUncheckedCreateWithoutWorkspaceInput = {
+    id?: string
+    projectId: string
+    symphonyTaskId: string
+    orchestratorEpisodeId: string
+    status?: $Enums.TaskGraphStatus
+    sensitivity?: string
+    policyVersion: string
+    createdByAgentId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    episodes?: TaskGraphEpisodeUncheckedCreateNestedManyWithoutTaskGraphInput
+  }
+
+  export type TaskGraphCreateOrConnectWithoutWorkspaceInput = {
+    where: TaskGraphWhereUniqueInput
+    create: XOR<TaskGraphCreateWithoutWorkspaceInput, TaskGraphUncheckedCreateWithoutWorkspaceInput>
+  }
+
+  export type TaskGraphCreateManyWorkspaceInputEnvelope = {
+    data: TaskGraphCreateManyWorkspaceInput | TaskGraphCreateManyWorkspaceInput[]
     skipDuplicates?: boolean
   }
 
@@ -24223,6 +28138,39 @@ export namespace Prisma {
     denyReasonI18n?: JsonNullableFilter<"AuditEvent">
   }
 
+  export type TaskGraphUpsertWithWhereUniqueWithoutWorkspaceInput = {
+    where: TaskGraphWhereUniqueInput
+    update: XOR<TaskGraphUpdateWithoutWorkspaceInput, TaskGraphUncheckedUpdateWithoutWorkspaceInput>
+    create: XOR<TaskGraphCreateWithoutWorkspaceInput, TaskGraphUncheckedCreateWithoutWorkspaceInput>
+  }
+
+  export type TaskGraphUpdateWithWhereUniqueWithoutWorkspaceInput = {
+    where: TaskGraphWhereUniqueInput
+    data: XOR<TaskGraphUpdateWithoutWorkspaceInput, TaskGraphUncheckedUpdateWithoutWorkspaceInput>
+  }
+
+  export type TaskGraphUpdateManyWithWhereWithoutWorkspaceInput = {
+    where: TaskGraphScalarWhereInput
+    data: XOR<TaskGraphUpdateManyMutationInput, TaskGraphUncheckedUpdateManyWithoutWorkspaceInput>
+  }
+
+  export type TaskGraphScalarWhereInput = {
+    AND?: TaskGraphScalarWhereInput | TaskGraphScalarWhereInput[]
+    OR?: TaskGraphScalarWhereInput[]
+    NOT?: TaskGraphScalarWhereInput | TaskGraphScalarWhereInput[]
+    id?: StringFilter<"TaskGraph"> | string
+    workspaceId?: StringFilter<"TaskGraph"> | string
+    projectId?: StringFilter<"TaskGraph"> | string
+    symphonyTaskId?: StringFilter<"TaskGraph"> | string
+    orchestratorEpisodeId?: StringFilter<"TaskGraph"> | string
+    status?: EnumTaskGraphStatusFilter<"TaskGraph"> | $Enums.TaskGraphStatus
+    sensitivity?: StringFilter<"TaskGraph"> | string
+    policyVersion?: StringFilter<"TaskGraph"> | string
+    createdByAgentId?: StringFilter<"TaskGraph"> | string
+    createdAt?: DateTimeFilter<"TaskGraph"> | Date | string
+    updatedAt?: DateTimeFilter<"TaskGraph"> | Date | string
+  }
+
   export type WorkspaceCreateWithoutProjectsInput = {
     id?: string
     name: string
@@ -24232,6 +28180,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     policies?: PolicyCreateNestedManyWithoutWorkspaceInput
     auditEvents?: AuditEventCreateNestedManyWithoutWorkspaceInput
+    taskGraphs?: TaskGraphCreateNestedManyWithoutWorkspaceInput
   }
 
   export type WorkspaceUncheckedCreateWithoutProjectsInput = {
@@ -24243,6 +28192,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     policies?: PolicyUncheckedCreateNestedManyWithoutWorkspaceInput
     auditEvents?: AuditEventUncheckedCreateNestedManyWithoutWorkspaceInput
+    taskGraphs?: TaskGraphUncheckedCreateNestedManyWithoutWorkspaceInput
   }
 
   export type WorkspaceCreateOrConnectWithoutProjectsInput = {
@@ -24252,6 +28202,7 @@ export namespace Prisma {
 
   export type EpisodeCreateWithoutProjectInput = {
     id?: string
+    forkPointTraceId?: string | null
     titleI18n: JsonNullValueInput | InputJsonValue
     summaryI18n?: NullableJsonNullValueInput | InputJsonValue
     goalI18n?: NullableJsonNullValueInput | InputJsonValue
@@ -24278,12 +28229,15 @@ export namespace Prisma {
     artifacts?: ArtifactCreateNestedManyWithoutEpisodeInput
     auditEvents?: AuditEventCreateNestedManyWithoutEpisodeInput
     accessGrants?: AccessGrantCreateNestedManyWithoutEpisodeInput
+    orchestratedTaskGraphs?: TaskGraphCreateNestedManyWithoutOrchestratorEpisodeInput
+    taskGraphEpisodes?: TaskGraphEpisodeCreateNestedManyWithoutEpisodeInput
   }
 
   export type EpisodeUncheckedCreateWithoutProjectInput = {
     id?: string
     primaryAgentId: string
     parentEpisodeId?: string | null
+    forkPointTraceId?: string | null
     titleI18n: JsonNullValueInput | InputJsonValue
     summaryI18n?: NullableJsonNullValueInput | InputJsonValue
     goalI18n?: NullableJsonNullValueInput | InputJsonValue
@@ -24308,6 +28262,8 @@ export namespace Prisma {
     artifacts?: ArtifactUncheckedCreateNestedManyWithoutEpisodeInput
     auditEvents?: AuditEventUncheckedCreateNestedManyWithoutEpisodeInput
     accessGrants?: AccessGrantUncheckedCreateNestedManyWithoutEpisodeInput
+    orchestratedTaskGraphs?: TaskGraphUncheckedCreateNestedManyWithoutOrchestratorEpisodeInput
+    taskGraphEpisodes?: TaskGraphEpisodeUncheckedCreateNestedManyWithoutEpisodeInput
   }
 
   export type EpisodeCreateOrConnectWithoutProjectInput = {
@@ -24448,6 +28404,44 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type TaskGraphCreateWithoutProjectInput = {
+    id?: string
+    symphonyTaskId: string
+    status?: $Enums.TaskGraphStatus
+    sensitivity?: string
+    policyVersion: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    workspace: WorkspaceCreateNestedOneWithoutTaskGraphsInput
+    orchestratorEpisode: EpisodeCreateNestedOneWithoutOrchestratedTaskGraphsInput
+    createdByAgent: AgentCreateNestedOneWithoutCreatedTaskGraphsInput
+    episodes?: TaskGraphEpisodeCreateNestedManyWithoutTaskGraphInput
+  }
+
+  export type TaskGraphUncheckedCreateWithoutProjectInput = {
+    id?: string
+    workspaceId: string
+    symphonyTaskId: string
+    orchestratorEpisodeId: string
+    status?: $Enums.TaskGraphStatus
+    sensitivity?: string
+    policyVersion: string
+    createdByAgentId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    episodes?: TaskGraphEpisodeUncheckedCreateNestedManyWithoutTaskGraphInput
+  }
+
+  export type TaskGraphCreateOrConnectWithoutProjectInput = {
+    where: TaskGraphWhereUniqueInput
+    create: XOR<TaskGraphCreateWithoutProjectInput, TaskGraphUncheckedCreateWithoutProjectInput>
+  }
+
+  export type TaskGraphCreateManyProjectInputEnvelope = {
+    data: TaskGraphCreateManyProjectInput | TaskGraphCreateManyProjectInput[]
+    skipDuplicates?: boolean
+  }
+
   export type WorkspaceUpsertWithoutProjectsInput = {
     update: XOR<WorkspaceUpdateWithoutProjectsInput, WorkspaceUncheckedUpdateWithoutProjectsInput>
     create: XOR<WorkspaceCreateWithoutProjectsInput, WorkspaceUncheckedCreateWithoutProjectsInput>
@@ -24468,6 +28462,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     policies?: PolicyUpdateManyWithoutWorkspaceNestedInput
     auditEvents?: AuditEventUpdateManyWithoutWorkspaceNestedInput
+    taskGraphs?: TaskGraphUpdateManyWithoutWorkspaceNestedInput
   }
 
   export type WorkspaceUncheckedUpdateWithoutProjectsInput = {
@@ -24479,6 +28474,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     policies?: PolicyUncheckedUpdateManyWithoutWorkspaceNestedInput
     auditEvents?: AuditEventUncheckedUpdateManyWithoutWorkspaceNestedInput
+    taskGraphs?: TaskGraphUncheckedUpdateManyWithoutWorkspaceNestedInput
   }
 
   export type EpisodeUpsertWithWhereUniqueWithoutProjectInput = {
@@ -24505,6 +28501,7 @@ export namespace Prisma {
     projectId?: StringFilter<"Episode"> | string
     primaryAgentId?: StringFilter<"Episode"> | string
     parentEpisodeId?: StringNullableFilter<"Episode"> | string | null
+    forkPointTraceId?: StringNullableFilter<"Episode"> | string | null
     titleI18n?: JsonFilter<"Episode">
     summaryI18n?: JsonNullableFilter<"Episode">
     goalI18n?: JsonNullableFilter<"Episode">
@@ -24611,8 +28608,25 @@ export namespace Prisma {
     data: XOR<AuditEventUpdateManyMutationInput, AuditEventUncheckedUpdateManyWithoutProjectInput>
   }
 
+  export type TaskGraphUpsertWithWhereUniqueWithoutProjectInput = {
+    where: TaskGraphWhereUniqueInput
+    update: XOR<TaskGraphUpdateWithoutProjectInput, TaskGraphUncheckedUpdateWithoutProjectInput>
+    create: XOR<TaskGraphCreateWithoutProjectInput, TaskGraphUncheckedCreateWithoutProjectInput>
+  }
+
+  export type TaskGraphUpdateWithWhereUniqueWithoutProjectInput = {
+    where: TaskGraphWhereUniqueInput
+    data: XOR<TaskGraphUpdateWithoutProjectInput, TaskGraphUncheckedUpdateWithoutProjectInput>
+  }
+
+  export type TaskGraphUpdateManyWithWhereWithoutProjectInput = {
+    where: TaskGraphScalarWhereInput
+    data: XOR<TaskGraphUpdateManyMutationInput, TaskGraphUncheckedUpdateManyWithoutProjectInput>
+  }
+
   export type EpisodeCreateWithoutPrimaryAgentInput = {
     id?: string
+    forkPointTraceId?: string | null
     titleI18n: JsonNullValueInput | InputJsonValue
     summaryI18n?: NullableJsonNullValueInput | InputJsonValue
     goalI18n?: NullableJsonNullValueInput | InputJsonValue
@@ -24639,12 +28653,15 @@ export namespace Prisma {
     artifacts?: ArtifactCreateNestedManyWithoutEpisodeInput
     auditEvents?: AuditEventCreateNestedManyWithoutEpisodeInput
     accessGrants?: AccessGrantCreateNestedManyWithoutEpisodeInput
+    orchestratedTaskGraphs?: TaskGraphCreateNestedManyWithoutOrchestratorEpisodeInput
+    taskGraphEpisodes?: TaskGraphEpisodeCreateNestedManyWithoutEpisodeInput
   }
 
   export type EpisodeUncheckedCreateWithoutPrimaryAgentInput = {
     id?: string
     projectId: string
     parentEpisodeId?: string | null
+    forkPointTraceId?: string | null
     titleI18n: JsonNullValueInput | InputJsonValue
     summaryI18n?: NullableJsonNullValueInput | InputJsonValue
     goalI18n?: NullableJsonNullValueInput | InputJsonValue
@@ -24669,6 +28686,8 @@ export namespace Prisma {
     artifacts?: ArtifactUncheckedCreateNestedManyWithoutEpisodeInput
     auditEvents?: AuditEventUncheckedCreateNestedManyWithoutEpisodeInput
     accessGrants?: AccessGrantUncheckedCreateNestedManyWithoutEpisodeInput
+    orchestratedTaskGraphs?: TaskGraphUncheckedCreateNestedManyWithoutOrchestratorEpisodeInput
+    taskGraphEpisodes?: TaskGraphEpisodeUncheckedCreateNestedManyWithoutEpisodeInput
   }
 
   export type EpisodeCreateOrConnectWithoutPrimaryAgentInput = {
@@ -24774,6 +28793,7 @@ export namespace Prisma {
     errorSummaryI18n?: NullableJsonNullValueInput | InputJsonValue
     policyHitReasonI18n?: NullableJsonNullValueInput | InputJsonValue
     permissionDeniedI18n?: NullableJsonNullValueInput | InputJsonValue
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
     eventTime: Date | string
     createdAt?: Date | string
     episode: EpisodeCreateNestedOneWithoutTraceEventsInput
@@ -24797,6 +28817,7 @@ export namespace Prisma {
     errorSummaryI18n?: NullableJsonNullValueInput | InputJsonValue
     policyHitReasonI18n?: NullableJsonNullValueInput | InputJsonValue
     permissionDeniedI18n?: NullableJsonNullValueInput | InputJsonValue
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
     eventTime: Date | string
     createdAt?: Date | string
     sourceArtifacts?: ArtifactUncheckedCreateNestedManyWithoutSourceTraceEventInput
@@ -24854,6 +28875,76 @@ export namespace Prisma {
 
   export type ArtifactCreateManyCreatedByAgentInputEnvelope = {
     data: ArtifactCreateManyCreatedByAgentInput | ArtifactCreateManyCreatedByAgentInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type TaskGraphCreateWithoutCreatedByAgentInput = {
+    id?: string
+    symphonyTaskId: string
+    status?: $Enums.TaskGraphStatus
+    sensitivity?: string
+    policyVersion: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    workspace: WorkspaceCreateNestedOneWithoutTaskGraphsInput
+    project: ProjectCreateNestedOneWithoutTaskGraphsInput
+    orchestratorEpisode: EpisodeCreateNestedOneWithoutOrchestratedTaskGraphsInput
+    episodes?: TaskGraphEpisodeCreateNestedManyWithoutTaskGraphInput
+  }
+
+  export type TaskGraphUncheckedCreateWithoutCreatedByAgentInput = {
+    id?: string
+    workspaceId: string
+    projectId: string
+    symphonyTaskId: string
+    orchestratorEpisodeId: string
+    status?: $Enums.TaskGraphStatus
+    sensitivity?: string
+    policyVersion: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    episodes?: TaskGraphEpisodeUncheckedCreateNestedManyWithoutTaskGraphInput
+  }
+
+  export type TaskGraphCreateOrConnectWithoutCreatedByAgentInput = {
+    where: TaskGraphWhereUniqueInput
+    create: XOR<TaskGraphCreateWithoutCreatedByAgentInput, TaskGraphUncheckedCreateWithoutCreatedByAgentInput>
+  }
+
+  export type TaskGraphCreateManyCreatedByAgentInputEnvelope = {
+    data: TaskGraphCreateManyCreatedByAgentInput | TaskGraphCreateManyCreatedByAgentInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type TaskGraphEpisodeCreateWithoutAgentInput = {
+    id?: string
+    role: $Enums.TaskGraphEpisodeRole
+    assignedSubtask: string
+    dependencyEpisodeIds?: TaskGraphEpisodeCreatedependencyEpisodeIdsInput | string[]
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    taskGraph: TaskGraphCreateNestedOneWithoutEpisodesInput
+    episode: EpisodeCreateNestedOneWithoutTaskGraphEpisodesInput
+  }
+
+  export type TaskGraphEpisodeUncheckedCreateWithoutAgentInput = {
+    id?: string
+    taskGraphId: string
+    episodeId: string
+    role: $Enums.TaskGraphEpisodeRole
+    assignedSubtask: string
+    dependencyEpisodeIds?: TaskGraphEpisodeCreatedependencyEpisodeIdsInput | string[]
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type TaskGraphEpisodeCreateOrConnectWithoutAgentInput = {
+    where: TaskGraphEpisodeWhereUniqueInput
+    create: XOR<TaskGraphEpisodeCreateWithoutAgentInput, TaskGraphEpisodeUncheckedCreateWithoutAgentInput>
+  }
+
+  export type TaskGraphEpisodeCreateManyAgentInputEnvelope = {
+    data: TaskGraphEpisodeCreateManyAgentInput | TaskGraphEpisodeCreateManyAgentInput[]
     skipDuplicates?: boolean
   }
 
@@ -24983,6 +29074,7 @@ export namespace Prisma {
     errorSummaryI18n?: JsonNullableFilter<"TraceEvent">
     policyHitReasonI18n?: JsonNullableFilter<"TraceEvent">
     permissionDeniedI18n?: JsonNullableFilter<"TraceEvent">
+    snapshot?: JsonNullableFilter<"TraceEvent">
     eventTime?: DateTimeFilter<"TraceEvent"> | Date | string
     createdAt?: DateTimeFilter<"TraceEvent"> | Date | string
   }
@@ -25023,6 +29115,53 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"Artifact"> | Date | string
   }
 
+  export type TaskGraphUpsertWithWhereUniqueWithoutCreatedByAgentInput = {
+    where: TaskGraphWhereUniqueInput
+    update: XOR<TaskGraphUpdateWithoutCreatedByAgentInput, TaskGraphUncheckedUpdateWithoutCreatedByAgentInput>
+    create: XOR<TaskGraphCreateWithoutCreatedByAgentInput, TaskGraphUncheckedCreateWithoutCreatedByAgentInput>
+  }
+
+  export type TaskGraphUpdateWithWhereUniqueWithoutCreatedByAgentInput = {
+    where: TaskGraphWhereUniqueInput
+    data: XOR<TaskGraphUpdateWithoutCreatedByAgentInput, TaskGraphUncheckedUpdateWithoutCreatedByAgentInput>
+  }
+
+  export type TaskGraphUpdateManyWithWhereWithoutCreatedByAgentInput = {
+    where: TaskGraphScalarWhereInput
+    data: XOR<TaskGraphUpdateManyMutationInput, TaskGraphUncheckedUpdateManyWithoutCreatedByAgentInput>
+  }
+
+  export type TaskGraphEpisodeUpsertWithWhereUniqueWithoutAgentInput = {
+    where: TaskGraphEpisodeWhereUniqueInput
+    update: XOR<TaskGraphEpisodeUpdateWithoutAgentInput, TaskGraphEpisodeUncheckedUpdateWithoutAgentInput>
+    create: XOR<TaskGraphEpisodeCreateWithoutAgentInput, TaskGraphEpisodeUncheckedCreateWithoutAgentInput>
+  }
+
+  export type TaskGraphEpisodeUpdateWithWhereUniqueWithoutAgentInput = {
+    where: TaskGraphEpisodeWhereUniqueInput
+    data: XOR<TaskGraphEpisodeUpdateWithoutAgentInput, TaskGraphEpisodeUncheckedUpdateWithoutAgentInput>
+  }
+
+  export type TaskGraphEpisodeUpdateManyWithWhereWithoutAgentInput = {
+    where: TaskGraphEpisodeScalarWhereInput
+    data: XOR<TaskGraphEpisodeUpdateManyMutationInput, TaskGraphEpisodeUncheckedUpdateManyWithoutAgentInput>
+  }
+
+  export type TaskGraphEpisodeScalarWhereInput = {
+    AND?: TaskGraphEpisodeScalarWhereInput | TaskGraphEpisodeScalarWhereInput[]
+    OR?: TaskGraphEpisodeScalarWhereInput[]
+    NOT?: TaskGraphEpisodeScalarWhereInput | TaskGraphEpisodeScalarWhereInput[]
+    id?: StringFilter<"TaskGraphEpisode"> | string
+    taskGraphId?: StringFilter<"TaskGraphEpisode"> | string
+    episodeId?: StringFilter<"TaskGraphEpisode"> | string
+    role?: EnumTaskGraphEpisodeRoleFilter<"TaskGraphEpisode"> | $Enums.TaskGraphEpisodeRole
+    agentId?: StringFilter<"TaskGraphEpisode"> | string
+    assignedSubtask?: StringFilter<"TaskGraphEpisode"> | string
+    dependencyEpisodeIds?: StringNullableListFilter<"TaskGraphEpisode">
+    createdAt?: DateTimeFilter<"TaskGraphEpisode"> | Date | string
+    updatedAt?: DateTimeFilter<"TaskGraphEpisode"> | Date | string
+  }
+
   export type ProjectCreateWithoutProjectAgentsInput = {
     id?: string
     slug: string
@@ -25038,6 +29177,7 @@ export namespace Prisma {
     policies?: PolicyCreateNestedManyWithoutProjectInput
     accessGrants?: AccessGrantCreateNestedManyWithoutProjectInput
     auditEvents?: AuditEventCreateNestedManyWithoutProjectInput
+    taskGraphs?: TaskGraphCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUncheckedCreateWithoutProjectAgentsInput = {
@@ -25055,6 +29195,7 @@ export namespace Prisma {
     policies?: PolicyUncheckedCreateNestedManyWithoutProjectInput
     accessGrants?: AccessGrantUncheckedCreateNestedManyWithoutProjectInput
     auditEvents?: AuditEventUncheckedCreateNestedManyWithoutProjectInput
+    taskGraphs?: TaskGraphUncheckedCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectCreateOrConnectWithoutProjectAgentsInput = {
@@ -25077,6 +29218,8 @@ export namespace Prisma {
     memoryItems?: MemoryItemCreateNestedManyWithoutAgentInput
     traceEvents?: TraceEventCreateNestedManyWithoutActorAgentInput
     artifacts?: ArtifactCreateNestedManyWithoutCreatedByAgentInput
+    createdTaskGraphs?: TaskGraphCreateNestedManyWithoutCreatedByAgentInput
+    taskGraphEpisodes?: TaskGraphEpisodeCreateNestedManyWithoutAgentInput
   }
 
   export type AgentUncheckedCreateWithoutProjectAgentsInput = {
@@ -25094,6 +29237,8 @@ export namespace Prisma {
     memoryItems?: MemoryItemUncheckedCreateNestedManyWithoutAgentInput
     traceEvents?: TraceEventUncheckedCreateNestedManyWithoutActorAgentInput
     artifacts?: ArtifactUncheckedCreateNestedManyWithoutCreatedByAgentInput
+    createdTaskGraphs?: TaskGraphUncheckedCreateNestedManyWithoutCreatedByAgentInput
+    taskGraphEpisodes?: TaskGraphEpisodeUncheckedCreateNestedManyWithoutAgentInput
   }
 
   export type AgentCreateOrConnectWithoutProjectAgentsInput = {
@@ -25127,6 +29272,7 @@ export namespace Prisma {
     policies?: PolicyUpdateManyWithoutProjectNestedInput
     accessGrants?: AccessGrantUpdateManyWithoutProjectNestedInput
     auditEvents?: AuditEventUpdateManyWithoutProjectNestedInput
+    taskGraphs?: TaskGraphUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateWithoutProjectAgentsInput = {
@@ -25144,6 +29290,7 @@ export namespace Prisma {
     policies?: PolicyUncheckedUpdateManyWithoutProjectNestedInput
     accessGrants?: AccessGrantUncheckedUpdateManyWithoutProjectNestedInput
     auditEvents?: AuditEventUncheckedUpdateManyWithoutProjectNestedInput
+    taskGraphs?: TaskGraphUncheckedUpdateManyWithoutProjectNestedInput
   }
 
   export type AgentUpsertWithoutProjectAgentsInput = {
@@ -25172,6 +29319,8 @@ export namespace Prisma {
     memoryItems?: MemoryItemUpdateManyWithoutAgentNestedInput
     traceEvents?: TraceEventUpdateManyWithoutActorAgentNestedInput
     artifacts?: ArtifactUpdateManyWithoutCreatedByAgentNestedInput
+    createdTaskGraphs?: TaskGraphUpdateManyWithoutCreatedByAgentNestedInput
+    taskGraphEpisodes?: TaskGraphEpisodeUpdateManyWithoutAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutProjectAgentsInput = {
@@ -25189,6 +29338,8 @@ export namespace Prisma {
     memoryItems?: MemoryItemUncheckedUpdateManyWithoutAgentNestedInput
     traceEvents?: TraceEventUncheckedUpdateManyWithoutActorAgentNestedInput
     artifacts?: ArtifactUncheckedUpdateManyWithoutCreatedByAgentNestedInput
+    createdTaskGraphs?: TaskGraphUncheckedUpdateManyWithoutCreatedByAgentNestedInput
+    taskGraphEpisodes?: TaskGraphEpisodeUncheckedUpdateManyWithoutAgentNestedInput
   }
 
   export type ProjectCreateWithoutEpisodesInput = {
@@ -25206,6 +29357,7 @@ export namespace Prisma {
     policies?: PolicyCreateNestedManyWithoutProjectInput
     accessGrants?: AccessGrantCreateNestedManyWithoutProjectInput
     auditEvents?: AuditEventCreateNestedManyWithoutProjectInput
+    taskGraphs?: TaskGraphCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUncheckedCreateWithoutEpisodesInput = {
@@ -25223,6 +29375,7 @@ export namespace Prisma {
     policies?: PolicyUncheckedCreateNestedManyWithoutProjectInput
     accessGrants?: AccessGrantUncheckedCreateNestedManyWithoutProjectInput
     auditEvents?: AuditEventUncheckedCreateNestedManyWithoutProjectInput
+    taskGraphs?: TaskGraphUncheckedCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectCreateOrConnectWithoutEpisodesInput = {
@@ -25245,6 +29398,8 @@ export namespace Prisma {
     memoryItems?: MemoryItemCreateNestedManyWithoutAgentInput
     traceEvents?: TraceEventCreateNestedManyWithoutActorAgentInput
     artifacts?: ArtifactCreateNestedManyWithoutCreatedByAgentInput
+    createdTaskGraphs?: TaskGraphCreateNestedManyWithoutCreatedByAgentInput
+    taskGraphEpisodes?: TaskGraphEpisodeCreateNestedManyWithoutAgentInput
   }
 
   export type AgentUncheckedCreateWithoutPrimaryEpisodesInput = {
@@ -25262,6 +29417,8 @@ export namespace Prisma {
     memoryItems?: MemoryItemUncheckedCreateNestedManyWithoutAgentInput
     traceEvents?: TraceEventUncheckedCreateNestedManyWithoutActorAgentInput
     artifacts?: ArtifactUncheckedCreateNestedManyWithoutCreatedByAgentInput
+    createdTaskGraphs?: TaskGraphUncheckedCreateNestedManyWithoutCreatedByAgentInput
+    taskGraphEpisodes?: TaskGraphEpisodeUncheckedCreateNestedManyWithoutAgentInput
   }
 
   export type AgentCreateOrConnectWithoutPrimaryEpisodesInput = {
@@ -25271,6 +29428,7 @@ export namespace Prisma {
 
   export type EpisodeCreateWithoutChildEpisodesInput = {
     id?: string
+    forkPointTraceId?: string | null
     titleI18n: JsonNullValueInput | InputJsonValue
     summaryI18n?: NullableJsonNullValueInput | InputJsonValue
     goalI18n?: NullableJsonNullValueInput | InputJsonValue
@@ -25297,6 +29455,8 @@ export namespace Prisma {
     artifacts?: ArtifactCreateNestedManyWithoutEpisodeInput
     auditEvents?: AuditEventCreateNestedManyWithoutEpisodeInput
     accessGrants?: AccessGrantCreateNestedManyWithoutEpisodeInput
+    orchestratedTaskGraphs?: TaskGraphCreateNestedManyWithoutOrchestratorEpisodeInput
+    taskGraphEpisodes?: TaskGraphEpisodeCreateNestedManyWithoutEpisodeInput
   }
 
   export type EpisodeUncheckedCreateWithoutChildEpisodesInput = {
@@ -25304,6 +29464,7 @@ export namespace Prisma {
     projectId: string
     primaryAgentId: string
     parentEpisodeId?: string | null
+    forkPointTraceId?: string | null
     titleI18n: JsonNullValueInput | InputJsonValue
     summaryI18n?: NullableJsonNullValueInput | InputJsonValue
     goalI18n?: NullableJsonNullValueInput | InputJsonValue
@@ -25327,6 +29488,8 @@ export namespace Prisma {
     artifacts?: ArtifactUncheckedCreateNestedManyWithoutEpisodeInput
     auditEvents?: AuditEventUncheckedCreateNestedManyWithoutEpisodeInput
     accessGrants?: AccessGrantUncheckedCreateNestedManyWithoutEpisodeInput
+    orchestratedTaskGraphs?: TaskGraphUncheckedCreateNestedManyWithoutOrchestratorEpisodeInput
+    taskGraphEpisodes?: TaskGraphEpisodeUncheckedCreateNestedManyWithoutEpisodeInput
   }
 
   export type EpisodeCreateOrConnectWithoutChildEpisodesInput = {
@@ -25336,6 +29499,7 @@ export namespace Prisma {
 
   export type EpisodeCreateWithoutParentEpisodeInput = {
     id?: string
+    forkPointTraceId?: string | null
     titleI18n: JsonNullValueInput | InputJsonValue
     summaryI18n?: NullableJsonNullValueInput | InputJsonValue
     goalI18n?: NullableJsonNullValueInput | InputJsonValue
@@ -25362,12 +29526,15 @@ export namespace Prisma {
     artifacts?: ArtifactCreateNestedManyWithoutEpisodeInput
     auditEvents?: AuditEventCreateNestedManyWithoutEpisodeInput
     accessGrants?: AccessGrantCreateNestedManyWithoutEpisodeInput
+    orchestratedTaskGraphs?: TaskGraphCreateNestedManyWithoutOrchestratorEpisodeInput
+    taskGraphEpisodes?: TaskGraphEpisodeCreateNestedManyWithoutEpisodeInput
   }
 
   export type EpisodeUncheckedCreateWithoutParentEpisodeInput = {
     id?: string
     projectId: string
     primaryAgentId: string
+    forkPointTraceId?: string | null
     titleI18n: JsonNullValueInput | InputJsonValue
     summaryI18n?: NullableJsonNullValueInput | InputJsonValue
     goalI18n?: NullableJsonNullValueInput | InputJsonValue
@@ -25392,6 +29559,8 @@ export namespace Prisma {
     artifacts?: ArtifactUncheckedCreateNestedManyWithoutEpisodeInput
     auditEvents?: AuditEventUncheckedCreateNestedManyWithoutEpisodeInput
     accessGrants?: AccessGrantUncheckedCreateNestedManyWithoutEpisodeInput
+    orchestratedTaskGraphs?: TaskGraphUncheckedCreateNestedManyWithoutOrchestratorEpisodeInput
+    taskGraphEpisodes?: TaskGraphEpisodeUncheckedCreateNestedManyWithoutEpisodeInput
   }
 
   export type EpisodeCreateOrConnectWithoutParentEpisodeInput = {
@@ -25477,6 +29646,7 @@ export namespace Prisma {
     errorSummaryI18n?: NullableJsonNullValueInput | InputJsonValue
     policyHitReasonI18n?: NullableJsonNullValueInput | InputJsonValue
     permissionDeniedI18n?: NullableJsonNullValueInput | InputJsonValue
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
     eventTime: Date | string
     createdAt?: Date | string
     actorAgent?: AgentCreateNestedOneWithoutTraceEventsInput
@@ -25500,6 +29670,7 @@ export namespace Prisma {
     errorSummaryI18n?: NullableJsonNullValueInput | InputJsonValue
     policyHitReasonI18n?: NullableJsonNullValueInput | InputJsonValue
     permissionDeniedI18n?: NullableJsonNullValueInput | InputJsonValue
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
     eventTime: Date | string
     createdAt?: Date | string
     sourceArtifacts?: ArtifactUncheckedCreateNestedManyWithoutSourceTraceEventInput
@@ -25640,6 +29811,76 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type TaskGraphCreateWithoutOrchestratorEpisodeInput = {
+    id?: string
+    symphonyTaskId: string
+    status?: $Enums.TaskGraphStatus
+    sensitivity?: string
+    policyVersion: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    workspace: WorkspaceCreateNestedOneWithoutTaskGraphsInput
+    project: ProjectCreateNestedOneWithoutTaskGraphsInput
+    createdByAgent: AgentCreateNestedOneWithoutCreatedTaskGraphsInput
+    episodes?: TaskGraphEpisodeCreateNestedManyWithoutTaskGraphInput
+  }
+
+  export type TaskGraphUncheckedCreateWithoutOrchestratorEpisodeInput = {
+    id?: string
+    workspaceId: string
+    projectId: string
+    symphonyTaskId: string
+    status?: $Enums.TaskGraphStatus
+    sensitivity?: string
+    policyVersion: string
+    createdByAgentId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    episodes?: TaskGraphEpisodeUncheckedCreateNestedManyWithoutTaskGraphInput
+  }
+
+  export type TaskGraphCreateOrConnectWithoutOrchestratorEpisodeInput = {
+    where: TaskGraphWhereUniqueInput
+    create: XOR<TaskGraphCreateWithoutOrchestratorEpisodeInput, TaskGraphUncheckedCreateWithoutOrchestratorEpisodeInput>
+  }
+
+  export type TaskGraphCreateManyOrchestratorEpisodeInputEnvelope = {
+    data: TaskGraphCreateManyOrchestratorEpisodeInput | TaskGraphCreateManyOrchestratorEpisodeInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type TaskGraphEpisodeCreateWithoutEpisodeInput = {
+    id?: string
+    role: $Enums.TaskGraphEpisodeRole
+    assignedSubtask: string
+    dependencyEpisodeIds?: TaskGraphEpisodeCreatedependencyEpisodeIdsInput | string[]
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    taskGraph: TaskGraphCreateNestedOneWithoutEpisodesInput
+    agent: AgentCreateNestedOneWithoutTaskGraphEpisodesInput
+  }
+
+  export type TaskGraphEpisodeUncheckedCreateWithoutEpisodeInput = {
+    id?: string
+    taskGraphId: string
+    role: $Enums.TaskGraphEpisodeRole
+    agentId: string
+    assignedSubtask: string
+    dependencyEpisodeIds?: TaskGraphEpisodeCreatedependencyEpisodeIdsInput | string[]
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type TaskGraphEpisodeCreateOrConnectWithoutEpisodeInput = {
+    where: TaskGraphEpisodeWhereUniqueInput
+    create: XOR<TaskGraphEpisodeCreateWithoutEpisodeInput, TaskGraphEpisodeUncheckedCreateWithoutEpisodeInput>
+  }
+
+  export type TaskGraphEpisodeCreateManyEpisodeInputEnvelope = {
+    data: TaskGraphEpisodeCreateManyEpisodeInput | TaskGraphEpisodeCreateManyEpisodeInput[]
+    skipDuplicates?: boolean
+  }
+
   export type ProjectUpsertWithoutEpisodesInput = {
     update: XOR<ProjectUpdateWithoutEpisodesInput, ProjectUncheckedUpdateWithoutEpisodesInput>
     create: XOR<ProjectCreateWithoutEpisodesInput, ProjectUncheckedCreateWithoutEpisodesInput>
@@ -25666,6 +29907,7 @@ export namespace Prisma {
     policies?: PolicyUpdateManyWithoutProjectNestedInput
     accessGrants?: AccessGrantUpdateManyWithoutProjectNestedInput
     auditEvents?: AuditEventUpdateManyWithoutProjectNestedInput
+    taskGraphs?: TaskGraphUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateWithoutEpisodesInput = {
@@ -25683,6 +29925,7 @@ export namespace Prisma {
     policies?: PolicyUncheckedUpdateManyWithoutProjectNestedInput
     accessGrants?: AccessGrantUncheckedUpdateManyWithoutProjectNestedInput
     auditEvents?: AuditEventUncheckedUpdateManyWithoutProjectNestedInput
+    taskGraphs?: TaskGraphUncheckedUpdateManyWithoutProjectNestedInput
   }
 
   export type AgentUpsertWithoutPrimaryEpisodesInput = {
@@ -25711,6 +29954,8 @@ export namespace Prisma {
     memoryItems?: MemoryItemUpdateManyWithoutAgentNestedInput
     traceEvents?: TraceEventUpdateManyWithoutActorAgentNestedInput
     artifacts?: ArtifactUpdateManyWithoutCreatedByAgentNestedInput
+    createdTaskGraphs?: TaskGraphUpdateManyWithoutCreatedByAgentNestedInput
+    taskGraphEpisodes?: TaskGraphEpisodeUpdateManyWithoutAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutPrimaryEpisodesInput = {
@@ -25728,6 +29973,8 @@ export namespace Prisma {
     memoryItems?: MemoryItemUncheckedUpdateManyWithoutAgentNestedInput
     traceEvents?: TraceEventUncheckedUpdateManyWithoutActorAgentNestedInput
     artifacts?: ArtifactUncheckedUpdateManyWithoutCreatedByAgentNestedInput
+    createdTaskGraphs?: TaskGraphUncheckedUpdateManyWithoutCreatedByAgentNestedInput
+    taskGraphEpisodes?: TaskGraphEpisodeUncheckedUpdateManyWithoutAgentNestedInput
   }
 
   export type EpisodeUpsertWithoutChildEpisodesInput = {
@@ -25743,6 +29990,7 @@ export namespace Prisma {
 
   export type EpisodeUpdateWithoutChildEpisodesInput = {
     id?: StringFieldUpdateOperationsInput | string
+    forkPointTraceId?: NullableStringFieldUpdateOperationsInput | string | null
     titleI18n?: JsonNullValueInput | InputJsonValue
     summaryI18n?: NullableJsonNullValueInput | InputJsonValue
     goalI18n?: NullableJsonNullValueInput | InputJsonValue
@@ -25769,6 +30017,8 @@ export namespace Prisma {
     artifacts?: ArtifactUpdateManyWithoutEpisodeNestedInput
     auditEvents?: AuditEventUpdateManyWithoutEpisodeNestedInput
     accessGrants?: AccessGrantUpdateManyWithoutEpisodeNestedInput
+    orchestratedTaskGraphs?: TaskGraphUpdateManyWithoutOrchestratorEpisodeNestedInput
+    taskGraphEpisodes?: TaskGraphEpisodeUpdateManyWithoutEpisodeNestedInput
   }
 
   export type EpisodeUncheckedUpdateWithoutChildEpisodesInput = {
@@ -25776,6 +30026,7 @@ export namespace Prisma {
     projectId?: StringFieldUpdateOperationsInput | string
     primaryAgentId?: StringFieldUpdateOperationsInput | string
     parentEpisodeId?: NullableStringFieldUpdateOperationsInput | string | null
+    forkPointTraceId?: NullableStringFieldUpdateOperationsInput | string | null
     titleI18n?: JsonNullValueInput | InputJsonValue
     summaryI18n?: NullableJsonNullValueInput | InputJsonValue
     goalI18n?: NullableJsonNullValueInput | InputJsonValue
@@ -25799,6 +30050,8 @@ export namespace Prisma {
     artifacts?: ArtifactUncheckedUpdateManyWithoutEpisodeNestedInput
     auditEvents?: AuditEventUncheckedUpdateManyWithoutEpisodeNestedInput
     accessGrants?: AccessGrantUncheckedUpdateManyWithoutEpisodeNestedInput
+    orchestratedTaskGraphs?: TaskGraphUncheckedUpdateManyWithoutOrchestratorEpisodeNestedInput
+    taskGraphEpisodes?: TaskGraphEpisodeUncheckedUpdateManyWithoutEpisodeNestedInput
   }
 
   export type EpisodeUpsertWithWhereUniqueWithoutParentEpisodeInput = {
@@ -25913,8 +30166,41 @@ export namespace Prisma {
     data: XOR<AccessGrantUpdateManyMutationInput, AccessGrantUncheckedUpdateManyWithoutEpisodeInput>
   }
 
+  export type TaskGraphUpsertWithWhereUniqueWithoutOrchestratorEpisodeInput = {
+    where: TaskGraphWhereUniqueInput
+    update: XOR<TaskGraphUpdateWithoutOrchestratorEpisodeInput, TaskGraphUncheckedUpdateWithoutOrchestratorEpisodeInput>
+    create: XOR<TaskGraphCreateWithoutOrchestratorEpisodeInput, TaskGraphUncheckedCreateWithoutOrchestratorEpisodeInput>
+  }
+
+  export type TaskGraphUpdateWithWhereUniqueWithoutOrchestratorEpisodeInput = {
+    where: TaskGraphWhereUniqueInput
+    data: XOR<TaskGraphUpdateWithoutOrchestratorEpisodeInput, TaskGraphUncheckedUpdateWithoutOrchestratorEpisodeInput>
+  }
+
+  export type TaskGraphUpdateManyWithWhereWithoutOrchestratorEpisodeInput = {
+    where: TaskGraphScalarWhereInput
+    data: XOR<TaskGraphUpdateManyMutationInput, TaskGraphUncheckedUpdateManyWithoutOrchestratorEpisodeInput>
+  }
+
+  export type TaskGraphEpisodeUpsertWithWhereUniqueWithoutEpisodeInput = {
+    where: TaskGraphEpisodeWhereUniqueInput
+    update: XOR<TaskGraphEpisodeUpdateWithoutEpisodeInput, TaskGraphEpisodeUncheckedUpdateWithoutEpisodeInput>
+    create: XOR<TaskGraphEpisodeCreateWithoutEpisodeInput, TaskGraphEpisodeUncheckedCreateWithoutEpisodeInput>
+  }
+
+  export type TaskGraphEpisodeUpdateWithWhereUniqueWithoutEpisodeInput = {
+    where: TaskGraphEpisodeWhereUniqueInput
+    data: XOR<TaskGraphEpisodeUpdateWithoutEpisodeInput, TaskGraphEpisodeUncheckedUpdateWithoutEpisodeInput>
+  }
+
+  export type TaskGraphEpisodeUpdateManyWithWhereWithoutEpisodeInput = {
+    where: TaskGraphEpisodeScalarWhereInput
+    data: XOR<TaskGraphEpisodeUpdateManyMutationInput, TaskGraphEpisodeUncheckedUpdateManyWithoutEpisodeInput>
+  }
+
   export type EpisodeCreateWithoutEpisodeAgentsInput = {
     id?: string
+    forkPointTraceId?: string | null
     titleI18n: JsonNullValueInput | InputJsonValue
     summaryI18n?: NullableJsonNullValueInput | InputJsonValue
     goalI18n?: NullableJsonNullValueInput | InputJsonValue
@@ -25941,6 +30227,8 @@ export namespace Prisma {
     artifacts?: ArtifactCreateNestedManyWithoutEpisodeInput
     auditEvents?: AuditEventCreateNestedManyWithoutEpisodeInput
     accessGrants?: AccessGrantCreateNestedManyWithoutEpisodeInput
+    orchestratedTaskGraphs?: TaskGraphCreateNestedManyWithoutOrchestratorEpisodeInput
+    taskGraphEpisodes?: TaskGraphEpisodeCreateNestedManyWithoutEpisodeInput
   }
 
   export type EpisodeUncheckedCreateWithoutEpisodeAgentsInput = {
@@ -25948,6 +30236,7 @@ export namespace Prisma {
     projectId: string
     primaryAgentId: string
     parentEpisodeId?: string | null
+    forkPointTraceId?: string | null
     titleI18n: JsonNullValueInput | InputJsonValue
     summaryI18n?: NullableJsonNullValueInput | InputJsonValue
     goalI18n?: NullableJsonNullValueInput | InputJsonValue
@@ -25971,6 +30260,8 @@ export namespace Prisma {
     artifacts?: ArtifactUncheckedCreateNestedManyWithoutEpisodeInput
     auditEvents?: AuditEventUncheckedCreateNestedManyWithoutEpisodeInput
     accessGrants?: AccessGrantUncheckedCreateNestedManyWithoutEpisodeInput
+    orchestratedTaskGraphs?: TaskGraphUncheckedCreateNestedManyWithoutOrchestratorEpisodeInput
+    taskGraphEpisodes?: TaskGraphEpisodeUncheckedCreateNestedManyWithoutEpisodeInput
   }
 
   export type EpisodeCreateOrConnectWithoutEpisodeAgentsInput = {
@@ -25993,6 +30284,8 @@ export namespace Prisma {
     memoryItems?: MemoryItemCreateNestedManyWithoutAgentInput
     traceEvents?: TraceEventCreateNestedManyWithoutActorAgentInput
     artifacts?: ArtifactCreateNestedManyWithoutCreatedByAgentInput
+    createdTaskGraphs?: TaskGraphCreateNestedManyWithoutCreatedByAgentInput
+    taskGraphEpisodes?: TaskGraphEpisodeCreateNestedManyWithoutAgentInput
   }
 
   export type AgentUncheckedCreateWithoutEpisodeAgentsInput = {
@@ -26010,6 +30303,8 @@ export namespace Prisma {
     memoryItems?: MemoryItemUncheckedCreateNestedManyWithoutAgentInput
     traceEvents?: TraceEventUncheckedCreateNestedManyWithoutActorAgentInput
     artifacts?: ArtifactUncheckedCreateNestedManyWithoutCreatedByAgentInput
+    createdTaskGraphs?: TaskGraphUncheckedCreateNestedManyWithoutCreatedByAgentInput
+    taskGraphEpisodes?: TaskGraphEpisodeUncheckedCreateNestedManyWithoutAgentInput
   }
 
   export type AgentCreateOrConnectWithoutEpisodeAgentsInput = {
@@ -26030,6 +30325,7 @@ export namespace Prisma {
 
   export type EpisodeUpdateWithoutEpisodeAgentsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    forkPointTraceId?: NullableStringFieldUpdateOperationsInput | string | null
     titleI18n?: JsonNullValueInput | InputJsonValue
     summaryI18n?: NullableJsonNullValueInput | InputJsonValue
     goalI18n?: NullableJsonNullValueInput | InputJsonValue
@@ -26056,6 +30352,8 @@ export namespace Prisma {
     artifacts?: ArtifactUpdateManyWithoutEpisodeNestedInput
     auditEvents?: AuditEventUpdateManyWithoutEpisodeNestedInput
     accessGrants?: AccessGrantUpdateManyWithoutEpisodeNestedInput
+    orchestratedTaskGraphs?: TaskGraphUpdateManyWithoutOrchestratorEpisodeNestedInput
+    taskGraphEpisodes?: TaskGraphEpisodeUpdateManyWithoutEpisodeNestedInput
   }
 
   export type EpisodeUncheckedUpdateWithoutEpisodeAgentsInput = {
@@ -26063,6 +30361,7 @@ export namespace Prisma {
     projectId?: StringFieldUpdateOperationsInput | string
     primaryAgentId?: StringFieldUpdateOperationsInput | string
     parentEpisodeId?: NullableStringFieldUpdateOperationsInput | string | null
+    forkPointTraceId?: NullableStringFieldUpdateOperationsInput | string | null
     titleI18n?: JsonNullValueInput | InputJsonValue
     summaryI18n?: NullableJsonNullValueInput | InputJsonValue
     goalI18n?: NullableJsonNullValueInput | InputJsonValue
@@ -26086,6 +30385,8 @@ export namespace Prisma {
     artifacts?: ArtifactUncheckedUpdateManyWithoutEpisodeNestedInput
     auditEvents?: AuditEventUncheckedUpdateManyWithoutEpisodeNestedInput
     accessGrants?: AccessGrantUncheckedUpdateManyWithoutEpisodeNestedInput
+    orchestratedTaskGraphs?: TaskGraphUncheckedUpdateManyWithoutOrchestratorEpisodeNestedInput
+    taskGraphEpisodes?: TaskGraphEpisodeUncheckedUpdateManyWithoutEpisodeNestedInput
   }
 
   export type AgentUpsertWithoutEpisodeAgentsInput = {
@@ -26114,6 +30415,8 @@ export namespace Prisma {
     memoryItems?: MemoryItemUpdateManyWithoutAgentNestedInput
     traceEvents?: TraceEventUpdateManyWithoutActorAgentNestedInput
     artifacts?: ArtifactUpdateManyWithoutCreatedByAgentNestedInput
+    createdTaskGraphs?: TaskGraphUpdateManyWithoutCreatedByAgentNestedInput
+    taskGraphEpisodes?: TaskGraphEpisodeUpdateManyWithoutAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutEpisodeAgentsInput = {
@@ -26131,10 +30434,13 @@ export namespace Prisma {
     memoryItems?: MemoryItemUncheckedUpdateManyWithoutAgentNestedInput
     traceEvents?: TraceEventUncheckedUpdateManyWithoutActorAgentNestedInput
     artifacts?: ArtifactUncheckedUpdateManyWithoutCreatedByAgentNestedInput
+    createdTaskGraphs?: TaskGraphUncheckedUpdateManyWithoutCreatedByAgentNestedInput
+    taskGraphEpisodes?: TaskGraphEpisodeUncheckedUpdateManyWithoutAgentNestedInput
   }
 
   export type EpisodeCreateWithoutMemoryItemsInput = {
     id?: string
+    forkPointTraceId?: string | null
     titleI18n: JsonNullValueInput | InputJsonValue
     summaryI18n?: NullableJsonNullValueInput | InputJsonValue
     goalI18n?: NullableJsonNullValueInput | InputJsonValue
@@ -26161,6 +30467,8 @@ export namespace Prisma {
     artifacts?: ArtifactCreateNestedManyWithoutEpisodeInput
     auditEvents?: AuditEventCreateNestedManyWithoutEpisodeInput
     accessGrants?: AccessGrantCreateNestedManyWithoutEpisodeInput
+    orchestratedTaskGraphs?: TaskGraphCreateNestedManyWithoutOrchestratorEpisodeInput
+    taskGraphEpisodes?: TaskGraphEpisodeCreateNestedManyWithoutEpisodeInput
   }
 
   export type EpisodeUncheckedCreateWithoutMemoryItemsInput = {
@@ -26168,6 +30476,7 @@ export namespace Prisma {
     projectId: string
     primaryAgentId: string
     parentEpisodeId?: string | null
+    forkPointTraceId?: string | null
     titleI18n: JsonNullValueInput | InputJsonValue
     summaryI18n?: NullableJsonNullValueInput | InputJsonValue
     goalI18n?: NullableJsonNullValueInput | InputJsonValue
@@ -26191,6 +30500,8 @@ export namespace Prisma {
     artifacts?: ArtifactUncheckedCreateNestedManyWithoutEpisodeInput
     auditEvents?: AuditEventUncheckedCreateNestedManyWithoutEpisodeInput
     accessGrants?: AccessGrantUncheckedCreateNestedManyWithoutEpisodeInput
+    orchestratedTaskGraphs?: TaskGraphUncheckedCreateNestedManyWithoutOrchestratorEpisodeInput
+    taskGraphEpisodes?: TaskGraphEpisodeUncheckedCreateNestedManyWithoutEpisodeInput
   }
 
   export type EpisodeCreateOrConnectWithoutMemoryItemsInput = {
@@ -26213,6 +30524,8 @@ export namespace Prisma {
     projectAgents?: ProjectAgentCreateNestedManyWithoutAgentInput
     traceEvents?: TraceEventCreateNestedManyWithoutActorAgentInput
     artifacts?: ArtifactCreateNestedManyWithoutCreatedByAgentInput
+    createdTaskGraphs?: TaskGraphCreateNestedManyWithoutCreatedByAgentInput
+    taskGraphEpisodes?: TaskGraphEpisodeCreateNestedManyWithoutAgentInput
   }
 
   export type AgentUncheckedCreateWithoutMemoryItemsInput = {
@@ -26230,6 +30543,8 @@ export namespace Prisma {
     projectAgents?: ProjectAgentUncheckedCreateNestedManyWithoutAgentInput
     traceEvents?: TraceEventUncheckedCreateNestedManyWithoutActorAgentInput
     artifacts?: ArtifactUncheckedCreateNestedManyWithoutCreatedByAgentInput
+    createdTaskGraphs?: TaskGraphUncheckedCreateNestedManyWithoutCreatedByAgentInput
+    taskGraphEpisodes?: TaskGraphEpisodeUncheckedCreateNestedManyWithoutAgentInput
   }
 
   export type AgentCreateOrConnectWithoutMemoryItemsInput = {
@@ -26300,6 +30615,7 @@ export namespace Prisma {
 
   export type EpisodeUpdateWithoutMemoryItemsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    forkPointTraceId?: NullableStringFieldUpdateOperationsInput | string | null
     titleI18n?: JsonNullValueInput | InputJsonValue
     summaryI18n?: NullableJsonNullValueInput | InputJsonValue
     goalI18n?: NullableJsonNullValueInput | InputJsonValue
@@ -26326,6 +30642,8 @@ export namespace Prisma {
     artifacts?: ArtifactUpdateManyWithoutEpisodeNestedInput
     auditEvents?: AuditEventUpdateManyWithoutEpisodeNestedInput
     accessGrants?: AccessGrantUpdateManyWithoutEpisodeNestedInput
+    orchestratedTaskGraphs?: TaskGraphUpdateManyWithoutOrchestratorEpisodeNestedInput
+    taskGraphEpisodes?: TaskGraphEpisodeUpdateManyWithoutEpisodeNestedInput
   }
 
   export type EpisodeUncheckedUpdateWithoutMemoryItemsInput = {
@@ -26333,6 +30651,7 @@ export namespace Prisma {
     projectId?: StringFieldUpdateOperationsInput | string
     primaryAgentId?: StringFieldUpdateOperationsInput | string
     parentEpisodeId?: NullableStringFieldUpdateOperationsInput | string | null
+    forkPointTraceId?: NullableStringFieldUpdateOperationsInput | string | null
     titleI18n?: JsonNullValueInput | InputJsonValue
     summaryI18n?: NullableJsonNullValueInput | InputJsonValue
     goalI18n?: NullableJsonNullValueInput | InputJsonValue
@@ -26356,6 +30675,8 @@ export namespace Prisma {
     artifacts?: ArtifactUncheckedUpdateManyWithoutEpisodeNestedInput
     auditEvents?: AuditEventUncheckedUpdateManyWithoutEpisodeNestedInput
     accessGrants?: AccessGrantUncheckedUpdateManyWithoutEpisodeNestedInput
+    orchestratedTaskGraphs?: TaskGraphUncheckedUpdateManyWithoutOrchestratorEpisodeNestedInput
+    taskGraphEpisodes?: TaskGraphEpisodeUncheckedUpdateManyWithoutEpisodeNestedInput
   }
 
   export type AgentUpsertWithoutMemoryItemsInput = {
@@ -26384,6 +30705,8 @@ export namespace Prisma {
     projectAgents?: ProjectAgentUpdateManyWithoutAgentNestedInput
     traceEvents?: TraceEventUpdateManyWithoutActorAgentNestedInput
     artifacts?: ArtifactUpdateManyWithoutCreatedByAgentNestedInput
+    createdTaskGraphs?: TaskGraphUpdateManyWithoutCreatedByAgentNestedInput
+    taskGraphEpisodes?: TaskGraphEpisodeUpdateManyWithoutAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutMemoryItemsInput = {
@@ -26401,6 +30724,8 @@ export namespace Prisma {
     projectAgents?: ProjectAgentUncheckedUpdateManyWithoutAgentNestedInput
     traceEvents?: TraceEventUncheckedUpdateManyWithoutActorAgentNestedInput
     artifacts?: ArtifactUncheckedUpdateManyWithoutCreatedByAgentNestedInput
+    createdTaskGraphs?: TaskGraphUncheckedUpdateManyWithoutCreatedByAgentNestedInput
+    taskGraphEpisodes?: TaskGraphEpisodeUncheckedUpdateManyWithoutAgentNestedInput
   }
 
   export type AuditEventUpsertWithWhereUniqueWithoutMemoryItemInput = {
@@ -26421,6 +30746,7 @@ export namespace Prisma {
 
   export type EpisodeCreateWithoutTraceEventsInput = {
     id?: string
+    forkPointTraceId?: string | null
     titleI18n: JsonNullValueInput | InputJsonValue
     summaryI18n?: NullableJsonNullValueInput | InputJsonValue
     goalI18n?: NullableJsonNullValueInput | InputJsonValue
@@ -26447,6 +30773,8 @@ export namespace Prisma {
     artifacts?: ArtifactCreateNestedManyWithoutEpisodeInput
     auditEvents?: AuditEventCreateNestedManyWithoutEpisodeInput
     accessGrants?: AccessGrantCreateNestedManyWithoutEpisodeInput
+    orchestratedTaskGraphs?: TaskGraphCreateNestedManyWithoutOrchestratorEpisodeInput
+    taskGraphEpisodes?: TaskGraphEpisodeCreateNestedManyWithoutEpisodeInput
   }
 
   export type EpisodeUncheckedCreateWithoutTraceEventsInput = {
@@ -26454,6 +30782,7 @@ export namespace Prisma {
     projectId: string
     primaryAgentId: string
     parentEpisodeId?: string | null
+    forkPointTraceId?: string | null
     titleI18n: JsonNullValueInput | InputJsonValue
     summaryI18n?: NullableJsonNullValueInput | InputJsonValue
     goalI18n?: NullableJsonNullValueInput | InputJsonValue
@@ -26477,6 +30806,8 @@ export namespace Prisma {
     artifacts?: ArtifactUncheckedCreateNestedManyWithoutEpisodeInput
     auditEvents?: AuditEventUncheckedCreateNestedManyWithoutEpisodeInput
     accessGrants?: AccessGrantUncheckedCreateNestedManyWithoutEpisodeInput
+    orchestratedTaskGraphs?: TaskGraphUncheckedCreateNestedManyWithoutOrchestratorEpisodeInput
+    taskGraphEpisodes?: TaskGraphEpisodeUncheckedCreateNestedManyWithoutEpisodeInput
   }
 
   export type EpisodeCreateOrConnectWithoutTraceEventsInput = {
@@ -26499,6 +30830,8 @@ export namespace Prisma {
     projectAgents?: ProjectAgentCreateNestedManyWithoutAgentInput
     memoryItems?: MemoryItemCreateNestedManyWithoutAgentInput
     artifacts?: ArtifactCreateNestedManyWithoutCreatedByAgentInput
+    createdTaskGraphs?: TaskGraphCreateNestedManyWithoutCreatedByAgentInput
+    taskGraphEpisodes?: TaskGraphEpisodeCreateNestedManyWithoutAgentInput
   }
 
   export type AgentUncheckedCreateWithoutTraceEventsInput = {
@@ -26516,6 +30849,8 @@ export namespace Prisma {
     projectAgents?: ProjectAgentUncheckedCreateNestedManyWithoutAgentInput
     memoryItems?: MemoryItemUncheckedCreateNestedManyWithoutAgentInput
     artifacts?: ArtifactUncheckedCreateNestedManyWithoutCreatedByAgentInput
+    createdTaskGraphs?: TaskGraphUncheckedCreateNestedManyWithoutCreatedByAgentInput
+    taskGraphEpisodes?: TaskGraphEpisodeUncheckedCreateNestedManyWithoutAgentInput
   }
 
   export type AgentCreateOrConnectWithoutTraceEventsInput = {
@@ -26630,6 +30965,7 @@ export namespace Prisma {
 
   export type EpisodeUpdateWithoutTraceEventsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    forkPointTraceId?: NullableStringFieldUpdateOperationsInput | string | null
     titleI18n?: JsonNullValueInput | InputJsonValue
     summaryI18n?: NullableJsonNullValueInput | InputJsonValue
     goalI18n?: NullableJsonNullValueInput | InputJsonValue
@@ -26656,6 +30992,8 @@ export namespace Prisma {
     artifacts?: ArtifactUpdateManyWithoutEpisodeNestedInput
     auditEvents?: AuditEventUpdateManyWithoutEpisodeNestedInput
     accessGrants?: AccessGrantUpdateManyWithoutEpisodeNestedInput
+    orchestratedTaskGraphs?: TaskGraphUpdateManyWithoutOrchestratorEpisodeNestedInput
+    taskGraphEpisodes?: TaskGraphEpisodeUpdateManyWithoutEpisodeNestedInput
   }
 
   export type EpisodeUncheckedUpdateWithoutTraceEventsInput = {
@@ -26663,6 +31001,7 @@ export namespace Prisma {
     projectId?: StringFieldUpdateOperationsInput | string
     primaryAgentId?: StringFieldUpdateOperationsInput | string
     parentEpisodeId?: NullableStringFieldUpdateOperationsInput | string | null
+    forkPointTraceId?: NullableStringFieldUpdateOperationsInput | string | null
     titleI18n?: JsonNullValueInput | InputJsonValue
     summaryI18n?: NullableJsonNullValueInput | InputJsonValue
     goalI18n?: NullableJsonNullValueInput | InputJsonValue
@@ -26686,6 +31025,8 @@ export namespace Prisma {
     artifacts?: ArtifactUncheckedUpdateManyWithoutEpisodeNestedInput
     auditEvents?: AuditEventUncheckedUpdateManyWithoutEpisodeNestedInput
     accessGrants?: AccessGrantUncheckedUpdateManyWithoutEpisodeNestedInput
+    orchestratedTaskGraphs?: TaskGraphUncheckedUpdateManyWithoutOrchestratorEpisodeNestedInput
+    taskGraphEpisodes?: TaskGraphEpisodeUncheckedUpdateManyWithoutEpisodeNestedInput
   }
 
   export type AgentUpsertWithoutTraceEventsInput = {
@@ -26714,6 +31055,8 @@ export namespace Prisma {
     projectAgents?: ProjectAgentUpdateManyWithoutAgentNestedInput
     memoryItems?: MemoryItemUpdateManyWithoutAgentNestedInput
     artifacts?: ArtifactUpdateManyWithoutCreatedByAgentNestedInput
+    createdTaskGraphs?: TaskGraphUpdateManyWithoutCreatedByAgentNestedInput
+    taskGraphEpisodes?: TaskGraphEpisodeUpdateManyWithoutAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutTraceEventsInput = {
@@ -26731,6 +31074,8 @@ export namespace Prisma {
     projectAgents?: ProjectAgentUncheckedUpdateManyWithoutAgentNestedInput
     memoryItems?: MemoryItemUncheckedUpdateManyWithoutAgentNestedInput
     artifacts?: ArtifactUncheckedUpdateManyWithoutCreatedByAgentNestedInput
+    createdTaskGraphs?: TaskGraphUncheckedUpdateManyWithoutCreatedByAgentNestedInput
+    taskGraphEpisodes?: TaskGraphEpisodeUncheckedUpdateManyWithoutAgentNestedInput
   }
 
   export type ArtifactUpsertWithWhereUniqueWithoutSourceTraceEventInput = {
@@ -26767,6 +31112,7 @@ export namespace Prisma {
 
   export type EpisodeCreateWithoutArtifactsInput = {
     id?: string
+    forkPointTraceId?: string | null
     titleI18n: JsonNullValueInput | InputJsonValue
     summaryI18n?: NullableJsonNullValueInput | InputJsonValue
     goalI18n?: NullableJsonNullValueInput | InputJsonValue
@@ -26793,6 +31139,8 @@ export namespace Prisma {
     traceEvents?: TraceEventCreateNestedManyWithoutEpisodeInput
     auditEvents?: AuditEventCreateNestedManyWithoutEpisodeInput
     accessGrants?: AccessGrantCreateNestedManyWithoutEpisodeInput
+    orchestratedTaskGraphs?: TaskGraphCreateNestedManyWithoutOrchestratorEpisodeInput
+    taskGraphEpisodes?: TaskGraphEpisodeCreateNestedManyWithoutEpisodeInput
   }
 
   export type EpisodeUncheckedCreateWithoutArtifactsInput = {
@@ -26800,6 +31148,7 @@ export namespace Prisma {
     projectId: string
     primaryAgentId: string
     parentEpisodeId?: string | null
+    forkPointTraceId?: string | null
     titleI18n: JsonNullValueInput | InputJsonValue
     summaryI18n?: NullableJsonNullValueInput | InputJsonValue
     goalI18n?: NullableJsonNullValueInput | InputJsonValue
@@ -26823,6 +31172,8 @@ export namespace Prisma {
     traceEvents?: TraceEventUncheckedCreateNestedManyWithoutEpisodeInput
     auditEvents?: AuditEventUncheckedCreateNestedManyWithoutEpisodeInput
     accessGrants?: AccessGrantUncheckedCreateNestedManyWithoutEpisodeInput
+    orchestratedTaskGraphs?: TaskGraphUncheckedCreateNestedManyWithoutOrchestratorEpisodeInput
+    taskGraphEpisodes?: TaskGraphEpisodeUncheckedCreateNestedManyWithoutEpisodeInput
   }
 
   export type EpisodeCreateOrConnectWithoutArtifactsInput = {
@@ -26845,6 +31196,8 @@ export namespace Prisma {
     projectAgents?: ProjectAgentCreateNestedManyWithoutAgentInput
     memoryItems?: MemoryItemCreateNestedManyWithoutAgentInput
     traceEvents?: TraceEventCreateNestedManyWithoutActorAgentInput
+    createdTaskGraphs?: TaskGraphCreateNestedManyWithoutCreatedByAgentInput
+    taskGraphEpisodes?: TaskGraphEpisodeCreateNestedManyWithoutAgentInput
   }
 
   export type AgentUncheckedCreateWithoutArtifactsInput = {
@@ -26862,6 +31215,8 @@ export namespace Prisma {
     projectAgents?: ProjectAgentUncheckedCreateNestedManyWithoutAgentInput
     memoryItems?: MemoryItemUncheckedCreateNestedManyWithoutAgentInput
     traceEvents?: TraceEventUncheckedCreateNestedManyWithoutActorAgentInput
+    createdTaskGraphs?: TaskGraphUncheckedCreateNestedManyWithoutCreatedByAgentInput
+    taskGraphEpisodes?: TaskGraphEpisodeUncheckedCreateNestedManyWithoutAgentInput
   }
 
   export type AgentCreateOrConnectWithoutArtifactsInput = {
@@ -26884,6 +31239,7 @@ export namespace Prisma {
     errorSummaryI18n?: NullableJsonNullValueInput | InputJsonValue
     policyHitReasonI18n?: NullableJsonNullValueInput | InputJsonValue
     permissionDeniedI18n?: NullableJsonNullValueInput | InputJsonValue
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
     eventTime: Date | string
     createdAt?: Date | string
     episode: EpisodeCreateNestedOneWithoutTraceEventsInput
@@ -26908,6 +31264,7 @@ export namespace Prisma {
     errorSummaryI18n?: NullableJsonNullValueInput | InputJsonValue
     policyHitReasonI18n?: NullableJsonNullValueInput | InputJsonValue
     permissionDeniedI18n?: NullableJsonNullValueInput | InputJsonValue
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
     eventTime: Date | string
     createdAt?: Date | string
     auditEvents?: AuditEventUncheckedCreateNestedManyWithoutTraceEventInput
@@ -26981,6 +31338,7 @@ export namespace Prisma {
 
   export type EpisodeUpdateWithoutArtifactsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    forkPointTraceId?: NullableStringFieldUpdateOperationsInput | string | null
     titleI18n?: JsonNullValueInput | InputJsonValue
     summaryI18n?: NullableJsonNullValueInput | InputJsonValue
     goalI18n?: NullableJsonNullValueInput | InputJsonValue
@@ -27007,6 +31365,8 @@ export namespace Prisma {
     traceEvents?: TraceEventUpdateManyWithoutEpisodeNestedInput
     auditEvents?: AuditEventUpdateManyWithoutEpisodeNestedInput
     accessGrants?: AccessGrantUpdateManyWithoutEpisodeNestedInput
+    orchestratedTaskGraphs?: TaskGraphUpdateManyWithoutOrchestratorEpisodeNestedInput
+    taskGraphEpisodes?: TaskGraphEpisodeUpdateManyWithoutEpisodeNestedInput
   }
 
   export type EpisodeUncheckedUpdateWithoutArtifactsInput = {
@@ -27014,6 +31374,7 @@ export namespace Prisma {
     projectId?: StringFieldUpdateOperationsInput | string
     primaryAgentId?: StringFieldUpdateOperationsInput | string
     parentEpisodeId?: NullableStringFieldUpdateOperationsInput | string | null
+    forkPointTraceId?: NullableStringFieldUpdateOperationsInput | string | null
     titleI18n?: JsonNullValueInput | InputJsonValue
     summaryI18n?: NullableJsonNullValueInput | InputJsonValue
     goalI18n?: NullableJsonNullValueInput | InputJsonValue
@@ -27037,6 +31398,8 @@ export namespace Prisma {
     traceEvents?: TraceEventUncheckedUpdateManyWithoutEpisodeNestedInput
     auditEvents?: AuditEventUncheckedUpdateManyWithoutEpisodeNestedInput
     accessGrants?: AccessGrantUncheckedUpdateManyWithoutEpisodeNestedInput
+    orchestratedTaskGraphs?: TaskGraphUncheckedUpdateManyWithoutOrchestratorEpisodeNestedInput
+    taskGraphEpisodes?: TaskGraphEpisodeUncheckedUpdateManyWithoutEpisodeNestedInput
   }
 
   export type AgentUpsertWithoutArtifactsInput = {
@@ -27065,6 +31428,8 @@ export namespace Prisma {
     projectAgents?: ProjectAgentUpdateManyWithoutAgentNestedInput
     memoryItems?: MemoryItemUpdateManyWithoutAgentNestedInput
     traceEvents?: TraceEventUpdateManyWithoutActorAgentNestedInput
+    createdTaskGraphs?: TaskGraphUpdateManyWithoutCreatedByAgentNestedInput
+    taskGraphEpisodes?: TaskGraphEpisodeUpdateManyWithoutAgentNestedInput
   }
 
   export type AgentUncheckedUpdateWithoutArtifactsInput = {
@@ -27082,6 +31447,8 @@ export namespace Prisma {
     projectAgents?: ProjectAgentUncheckedUpdateManyWithoutAgentNestedInput
     memoryItems?: MemoryItemUncheckedUpdateManyWithoutAgentNestedInput
     traceEvents?: TraceEventUncheckedUpdateManyWithoutActorAgentNestedInput
+    createdTaskGraphs?: TaskGraphUncheckedUpdateManyWithoutCreatedByAgentNestedInput
+    taskGraphEpisodes?: TaskGraphEpisodeUncheckedUpdateManyWithoutAgentNestedInput
   }
 
   export type TraceEventUpsertWithoutSourceArtifactsInput = {
@@ -27110,6 +31477,7 @@ export namespace Prisma {
     errorSummaryI18n?: NullableJsonNullValueInput | InputJsonValue
     policyHitReasonI18n?: NullableJsonNullValueInput | InputJsonValue
     permissionDeniedI18n?: NullableJsonNullValueInput | InputJsonValue
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
     eventTime?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     episode?: EpisodeUpdateOneRequiredWithoutTraceEventsNestedInput
@@ -27134,6 +31502,7 @@ export namespace Prisma {
     errorSummaryI18n?: NullableJsonNullValueInput | InputJsonValue
     policyHitReasonI18n?: NullableJsonNullValueInput | InputJsonValue
     permissionDeniedI18n?: NullableJsonNullValueInput | InputJsonValue
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
     eventTime?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     auditEvents?: AuditEventUncheckedUpdateManyWithoutTraceEventNestedInput
@@ -27164,6 +31533,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     projects?: ProjectCreateNestedManyWithoutWorkspaceInput
     auditEvents?: AuditEventCreateNestedManyWithoutWorkspaceInput
+    taskGraphs?: TaskGraphCreateNestedManyWithoutWorkspaceInput
   }
 
   export type WorkspaceUncheckedCreateWithoutPoliciesInput = {
@@ -27175,6 +31545,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     projects?: ProjectUncheckedCreateNestedManyWithoutWorkspaceInput
     auditEvents?: AuditEventUncheckedCreateNestedManyWithoutWorkspaceInput
+    taskGraphs?: TaskGraphUncheckedCreateNestedManyWithoutWorkspaceInput
   }
 
   export type WorkspaceCreateOrConnectWithoutPoliciesInput = {
@@ -27197,6 +31568,7 @@ export namespace Prisma {
     projectAgents?: ProjectAgentCreateNestedManyWithoutProjectInput
     accessGrants?: AccessGrantCreateNestedManyWithoutProjectInput
     auditEvents?: AuditEventCreateNestedManyWithoutProjectInput
+    taskGraphs?: TaskGraphCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUncheckedCreateWithoutPoliciesInput = {
@@ -27214,6 +31586,7 @@ export namespace Prisma {
     projectAgents?: ProjectAgentUncheckedCreateNestedManyWithoutProjectInput
     accessGrants?: AccessGrantUncheckedCreateNestedManyWithoutProjectInput
     auditEvents?: AuditEventUncheckedCreateNestedManyWithoutProjectInput
+    taskGraphs?: TaskGraphUncheckedCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectCreateOrConnectWithoutPoliciesInput = {
@@ -27241,6 +31614,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     projects?: ProjectUpdateManyWithoutWorkspaceNestedInput
     auditEvents?: AuditEventUpdateManyWithoutWorkspaceNestedInput
+    taskGraphs?: TaskGraphUpdateManyWithoutWorkspaceNestedInput
   }
 
   export type WorkspaceUncheckedUpdateWithoutPoliciesInput = {
@@ -27252,6 +31626,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     projects?: ProjectUncheckedUpdateManyWithoutWorkspaceNestedInput
     auditEvents?: AuditEventUncheckedUpdateManyWithoutWorkspaceNestedInput
+    taskGraphs?: TaskGraphUncheckedUpdateManyWithoutWorkspaceNestedInput
   }
 
   export type ProjectUpsertWithoutPoliciesInput = {
@@ -27280,6 +31655,7 @@ export namespace Prisma {
     projectAgents?: ProjectAgentUpdateManyWithoutProjectNestedInput
     accessGrants?: AccessGrantUpdateManyWithoutProjectNestedInput
     auditEvents?: AuditEventUpdateManyWithoutProjectNestedInput
+    taskGraphs?: TaskGraphUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateWithoutPoliciesInput = {
@@ -27297,6 +31673,7 @@ export namespace Prisma {
     projectAgents?: ProjectAgentUncheckedUpdateManyWithoutProjectNestedInput
     accessGrants?: AccessGrantUncheckedUpdateManyWithoutProjectNestedInput
     auditEvents?: AuditEventUncheckedUpdateManyWithoutProjectNestedInput
+    taskGraphs?: TaskGraphUncheckedUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectCreateWithoutAccessGrantsInput = {
@@ -27314,6 +31691,7 @@ export namespace Prisma {
     projectAgents?: ProjectAgentCreateNestedManyWithoutProjectInput
     policies?: PolicyCreateNestedManyWithoutProjectInput
     auditEvents?: AuditEventCreateNestedManyWithoutProjectInput
+    taskGraphs?: TaskGraphCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUncheckedCreateWithoutAccessGrantsInput = {
@@ -27331,6 +31709,7 @@ export namespace Prisma {
     projectAgents?: ProjectAgentUncheckedCreateNestedManyWithoutProjectInput
     policies?: PolicyUncheckedCreateNestedManyWithoutProjectInput
     auditEvents?: AuditEventUncheckedCreateNestedManyWithoutProjectInput
+    taskGraphs?: TaskGraphUncheckedCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectCreateOrConnectWithoutAccessGrantsInput = {
@@ -27340,6 +31719,7 @@ export namespace Prisma {
 
   export type EpisodeCreateWithoutAccessGrantsInput = {
     id?: string
+    forkPointTraceId?: string | null
     titleI18n: JsonNullValueInput | InputJsonValue
     summaryI18n?: NullableJsonNullValueInput | InputJsonValue
     goalI18n?: NullableJsonNullValueInput | InputJsonValue
@@ -27366,6 +31746,8 @@ export namespace Prisma {
     traceEvents?: TraceEventCreateNestedManyWithoutEpisodeInput
     artifacts?: ArtifactCreateNestedManyWithoutEpisodeInput
     auditEvents?: AuditEventCreateNestedManyWithoutEpisodeInput
+    orchestratedTaskGraphs?: TaskGraphCreateNestedManyWithoutOrchestratorEpisodeInput
+    taskGraphEpisodes?: TaskGraphEpisodeCreateNestedManyWithoutEpisodeInput
   }
 
   export type EpisodeUncheckedCreateWithoutAccessGrantsInput = {
@@ -27373,6 +31755,7 @@ export namespace Prisma {
     projectId: string
     primaryAgentId: string
     parentEpisodeId?: string | null
+    forkPointTraceId?: string | null
     titleI18n: JsonNullValueInput | InputJsonValue
     summaryI18n?: NullableJsonNullValueInput | InputJsonValue
     goalI18n?: NullableJsonNullValueInput | InputJsonValue
@@ -27396,6 +31779,8 @@ export namespace Prisma {
     traceEvents?: TraceEventUncheckedCreateNestedManyWithoutEpisodeInput
     artifacts?: ArtifactUncheckedCreateNestedManyWithoutEpisodeInput
     auditEvents?: AuditEventUncheckedCreateNestedManyWithoutEpisodeInput
+    orchestratedTaskGraphs?: TaskGraphUncheckedCreateNestedManyWithoutOrchestratorEpisodeInput
+    taskGraphEpisodes?: TaskGraphEpisodeUncheckedCreateNestedManyWithoutEpisodeInput
   }
 
   export type EpisodeCreateOrConnectWithoutAccessGrantsInput = {
@@ -27429,6 +31814,7 @@ export namespace Prisma {
     projectAgents?: ProjectAgentUpdateManyWithoutProjectNestedInput
     policies?: PolicyUpdateManyWithoutProjectNestedInput
     auditEvents?: AuditEventUpdateManyWithoutProjectNestedInput
+    taskGraphs?: TaskGraphUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateWithoutAccessGrantsInput = {
@@ -27446,6 +31832,7 @@ export namespace Prisma {
     projectAgents?: ProjectAgentUncheckedUpdateManyWithoutProjectNestedInput
     policies?: PolicyUncheckedUpdateManyWithoutProjectNestedInput
     auditEvents?: AuditEventUncheckedUpdateManyWithoutProjectNestedInput
+    taskGraphs?: TaskGraphUncheckedUpdateManyWithoutProjectNestedInput
   }
 
   export type EpisodeUpsertWithoutAccessGrantsInput = {
@@ -27461,6 +31848,7 @@ export namespace Prisma {
 
   export type EpisodeUpdateWithoutAccessGrantsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    forkPointTraceId?: NullableStringFieldUpdateOperationsInput | string | null
     titleI18n?: JsonNullValueInput | InputJsonValue
     summaryI18n?: NullableJsonNullValueInput | InputJsonValue
     goalI18n?: NullableJsonNullValueInput | InputJsonValue
@@ -27487,6 +31875,8 @@ export namespace Prisma {
     traceEvents?: TraceEventUpdateManyWithoutEpisodeNestedInput
     artifacts?: ArtifactUpdateManyWithoutEpisodeNestedInput
     auditEvents?: AuditEventUpdateManyWithoutEpisodeNestedInput
+    orchestratedTaskGraphs?: TaskGraphUpdateManyWithoutOrchestratorEpisodeNestedInput
+    taskGraphEpisodes?: TaskGraphEpisodeUpdateManyWithoutEpisodeNestedInput
   }
 
   export type EpisodeUncheckedUpdateWithoutAccessGrantsInput = {
@@ -27494,6 +31884,7 @@ export namespace Prisma {
     projectId?: StringFieldUpdateOperationsInput | string
     primaryAgentId?: StringFieldUpdateOperationsInput | string
     parentEpisodeId?: NullableStringFieldUpdateOperationsInput | string | null
+    forkPointTraceId?: NullableStringFieldUpdateOperationsInput | string | null
     titleI18n?: JsonNullValueInput | InputJsonValue
     summaryI18n?: NullableJsonNullValueInput | InputJsonValue
     goalI18n?: NullableJsonNullValueInput | InputJsonValue
@@ -27517,6 +31908,8 @@ export namespace Prisma {
     traceEvents?: TraceEventUncheckedUpdateManyWithoutEpisodeNestedInput
     artifacts?: ArtifactUncheckedUpdateManyWithoutEpisodeNestedInput
     auditEvents?: AuditEventUncheckedUpdateManyWithoutEpisodeNestedInput
+    orchestratedTaskGraphs?: TaskGraphUncheckedUpdateManyWithoutOrchestratorEpisodeNestedInput
+    taskGraphEpisodes?: TaskGraphEpisodeUncheckedUpdateManyWithoutEpisodeNestedInput
   }
 
   export type WorkspaceCreateWithoutAuditEventsInput = {
@@ -27528,6 +31921,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     projects?: ProjectCreateNestedManyWithoutWorkspaceInput
     policies?: PolicyCreateNestedManyWithoutWorkspaceInput
+    taskGraphs?: TaskGraphCreateNestedManyWithoutWorkspaceInput
   }
 
   export type WorkspaceUncheckedCreateWithoutAuditEventsInput = {
@@ -27539,6 +31933,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     projects?: ProjectUncheckedCreateNestedManyWithoutWorkspaceInput
     policies?: PolicyUncheckedCreateNestedManyWithoutWorkspaceInput
+    taskGraphs?: TaskGraphUncheckedCreateNestedManyWithoutWorkspaceInput
   }
 
   export type WorkspaceCreateOrConnectWithoutAuditEventsInput = {
@@ -27561,6 +31956,7 @@ export namespace Prisma {
     projectAgents?: ProjectAgentCreateNestedManyWithoutProjectInput
     policies?: PolicyCreateNestedManyWithoutProjectInput
     accessGrants?: AccessGrantCreateNestedManyWithoutProjectInput
+    taskGraphs?: TaskGraphCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUncheckedCreateWithoutAuditEventsInput = {
@@ -27578,6 +31974,7 @@ export namespace Prisma {
     projectAgents?: ProjectAgentUncheckedCreateNestedManyWithoutProjectInput
     policies?: PolicyUncheckedCreateNestedManyWithoutProjectInput
     accessGrants?: AccessGrantUncheckedCreateNestedManyWithoutProjectInput
+    taskGraphs?: TaskGraphUncheckedCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectCreateOrConnectWithoutAuditEventsInput = {
@@ -27587,6 +31984,7 @@ export namespace Prisma {
 
   export type EpisodeCreateWithoutAuditEventsInput = {
     id?: string
+    forkPointTraceId?: string | null
     titleI18n: JsonNullValueInput | InputJsonValue
     summaryI18n?: NullableJsonNullValueInput | InputJsonValue
     goalI18n?: NullableJsonNullValueInput | InputJsonValue
@@ -27613,6 +32011,8 @@ export namespace Prisma {
     traceEvents?: TraceEventCreateNestedManyWithoutEpisodeInput
     artifacts?: ArtifactCreateNestedManyWithoutEpisodeInput
     accessGrants?: AccessGrantCreateNestedManyWithoutEpisodeInput
+    orchestratedTaskGraphs?: TaskGraphCreateNestedManyWithoutOrchestratorEpisodeInput
+    taskGraphEpisodes?: TaskGraphEpisodeCreateNestedManyWithoutEpisodeInput
   }
 
   export type EpisodeUncheckedCreateWithoutAuditEventsInput = {
@@ -27620,6 +32020,7 @@ export namespace Prisma {
     projectId: string
     primaryAgentId: string
     parentEpisodeId?: string | null
+    forkPointTraceId?: string | null
     titleI18n: JsonNullValueInput | InputJsonValue
     summaryI18n?: NullableJsonNullValueInput | InputJsonValue
     goalI18n?: NullableJsonNullValueInput | InputJsonValue
@@ -27643,6 +32044,8 @@ export namespace Prisma {
     traceEvents?: TraceEventUncheckedCreateNestedManyWithoutEpisodeInput
     artifacts?: ArtifactUncheckedCreateNestedManyWithoutEpisodeInput
     accessGrants?: AccessGrantUncheckedCreateNestedManyWithoutEpisodeInput
+    orchestratedTaskGraphs?: TaskGraphUncheckedCreateNestedManyWithoutOrchestratorEpisodeInput
+    taskGraphEpisodes?: TaskGraphEpisodeUncheckedCreateNestedManyWithoutEpisodeInput
   }
 
   export type EpisodeCreateOrConnectWithoutAuditEventsInput = {
@@ -27704,6 +32107,7 @@ export namespace Prisma {
     errorSummaryI18n?: NullableJsonNullValueInput | InputJsonValue
     policyHitReasonI18n?: NullableJsonNullValueInput | InputJsonValue
     permissionDeniedI18n?: NullableJsonNullValueInput | InputJsonValue
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
     eventTime: Date | string
     createdAt?: Date | string
     episode: EpisodeCreateNestedOneWithoutTraceEventsInput
@@ -27728,6 +32132,7 @@ export namespace Prisma {
     errorSummaryI18n?: NullableJsonNullValueInput | InputJsonValue
     policyHitReasonI18n?: NullableJsonNullValueInput | InputJsonValue
     permissionDeniedI18n?: NullableJsonNullValueInput | InputJsonValue
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
     eventTime: Date | string
     createdAt?: Date | string
     sourceArtifacts?: ArtifactUncheckedCreateNestedManyWithoutSourceTraceEventInput
@@ -27791,6 +32196,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     projects?: ProjectUpdateManyWithoutWorkspaceNestedInput
     policies?: PolicyUpdateManyWithoutWorkspaceNestedInput
+    taskGraphs?: TaskGraphUpdateManyWithoutWorkspaceNestedInput
   }
 
   export type WorkspaceUncheckedUpdateWithoutAuditEventsInput = {
@@ -27802,6 +32208,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     projects?: ProjectUncheckedUpdateManyWithoutWorkspaceNestedInput
     policies?: PolicyUncheckedUpdateManyWithoutWorkspaceNestedInput
+    taskGraphs?: TaskGraphUncheckedUpdateManyWithoutWorkspaceNestedInput
   }
 
   export type ProjectUpsertWithoutAuditEventsInput = {
@@ -27830,6 +32237,7 @@ export namespace Prisma {
     projectAgents?: ProjectAgentUpdateManyWithoutProjectNestedInput
     policies?: PolicyUpdateManyWithoutProjectNestedInput
     accessGrants?: AccessGrantUpdateManyWithoutProjectNestedInput
+    taskGraphs?: TaskGraphUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateWithoutAuditEventsInput = {
@@ -27847,6 +32255,7 @@ export namespace Prisma {
     projectAgents?: ProjectAgentUncheckedUpdateManyWithoutProjectNestedInput
     policies?: PolicyUncheckedUpdateManyWithoutProjectNestedInput
     accessGrants?: AccessGrantUncheckedUpdateManyWithoutProjectNestedInput
+    taskGraphs?: TaskGraphUncheckedUpdateManyWithoutProjectNestedInput
   }
 
   export type EpisodeUpsertWithoutAuditEventsInput = {
@@ -27862,6 +32271,7 @@ export namespace Prisma {
 
   export type EpisodeUpdateWithoutAuditEventsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    forkPointTraceId?: NullableStringFieldUpdateOperationsInput | string | null
     titleI18n?: JsonNullValueInput | InputJsonValue
     summaryI18n?: NullableJsonNullValueInput | InputJsonValue
     goalI18n?: NullableJsonNullValueInput | InputJsonValue
@@ -27888,6 +32298,8 @@ export namespace Prisma {
     traceEvents?: TraceEventUpdateManyWithoutEpisodeNestedInput
     artifacts?: ArtifactUpdateManyWithoutEpisodeNestedInput
     accessGrants?: AccessGrantUpdateManyWithoutEpisodeNestedInput
+    orchestratedTaskGraphs?: TaskGraphUpdateManyWithoutOrchestratorEpisodeNestedInput
+    taskGraphEpisodes?: TaskGraphEpisodeUpdateManyWithoutEpisodeNestedInput
   }
 
   export type EpisodeUncheckedUpdateWithoutAuditEventsInput = {
@@ -27895,6 +32307,7 @@ export namespace Prisma {
     projectId?: StringFieldUpdateOperationsInput | string
     primaryAgentId?: StringFieldUpdateOperationsInput | string
     parentEpisodeId?: NullableStringFieldUpdateOperationsInput | string | null
+    forkPointTraceId?: NullableStringFieldUpdateOperationsInput | string | null
     titleI18n?: JsonNullValueInput | InputJsonValue
     summaryI18n?: NullableJsonNullValueInput | InputJsonValue
     goalI18n?: NullableJsonNullValueInput | InputJsonValue
@@ -27918,6 +32331,8 @@ export namespace Prisma {
     traceEvents?: TraceEventUncheckedUpdateManyWithoutEpisodeNestedInput
     artifacts?: ArtifactUncheckedUpdateManyWithoutEpisodeNestedInput
     accessGrants?: AccessGrantUncheckedUpdateManyWithoutEpisodeNestedInput
+    orchestratedTaskGraphs?: TaskGraphUncheckedUpdateManyWithoutOrchestratorEpisodeNestedInput
+    taskGraphEpisodes?: TaskGraphEpisodeUncheckedUpdateManyWithoutEpisodeNestedInput
   }
 
   export type ArtifactUpsertWithoutAuditEventsInput = {
@@ -27991,6 +32406,7 @@ export namespace Prisma {
     errorSummaryI18n?: NullableJsonNullValueInput | InputJsonValue
     policyHitReasonI18n?: NullableJsonNullValueInput | InputJsonValue
     permissionDeniedI18n?: NullableJsonNullValueInput | InputJsonValue
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
     eventTime?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     episode?: EpisodeUpdateOneRequiredWithoutTraceEventsNestedInput
@@ -28015,6 +32431,7 @@ export namespace Prisma {
     errorSummaryI18n?: NullableJsonNullValueInput | InputJsonValue
     policyHitReasonI18n?: NullableJsonNullValueInput | InputJsonValue
     permissionDeniedI18n?: NullableJsonNullValueInput | InputJsonValue
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
     eventTime?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sourceArtifacts?: ArtifactUncheckedUpdateManyWithoutSourceTraceEventNestedInput
@@ -28059,6 +32476,758 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type WorkspaceCreateWithoutTaskGraphsInput = {
+    id?: string
+    name: string
+    slug: string
+    ownerId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    projects?: ProjectCreateNestedManyWithoutWorkspaceInput
+    policies?: PolicyCreateNestedManyWithoutWorkspaceInput
+    auditEvents?: AuditEventCreateNestedManyWithoutWorkspaceInput
+  }
+
+  export type WorkspaceUncheckedCreateWithoutTaskGraphsInput = {
+    id?: string
+    name: string
+    slug: string
+    ownerId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    projects?: ProjectUncheckedCreateNestedManyWithoutWorkspaceInput
+    policies?: PolicyUncheckedCreateNestedManyWithoutWorkspaceInput
+    auditEvents?: AuditEventUncheckedCreateNestedManyWithoutWorkspaceInput
+  }
+
+  export type WorkspaceCreateOrConnectWithoutTaskGraphsInput = {
+    where: WorkspaceWhereUniqueInput
+    create: XOR<WorkspaceCreateWithoutTaskGraphsInput, WorkspaceUncheckedCreateWithoutTaskGraphsInput>
+  }
+
+  export type ProjectCreateWithoutTaskGraphsInput = {
+    id?: string
+    slug: string
+    nameI18n: JsonNullValueInput | InputJsonValue
+    descriptionI18n?: NullableJsonNullValueInput | InputJsonValue
+    status?: $Enums.ProjectStatus
+    ownerName: string
+    activePolicyVersion: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    workspace: WorkspaceCreateNestedOneWithoutProjectsInput
+    episodes?: EpisodeCreateNestedManyWithoutProjectInput
+    projectAgents?: ProjectAgentCreateNestedManyWithoutProjectInput
+    policies?: PolicyCreateNestedManyWithoutProjectInput
+    accessGrants?: AccessGrantCreateNestedManyWithoutProjectInput
+    auditEvents?: AuditEventCreateNestedManyWithoutProjectInput
+  }
+
+  export type ProjectUncheckedCreateWithoutTaskGraphsInput = {
+    id?: string
+    workspaceId: string
+    slug: string
+    nameI18n: JsonNullValueInput | InputJsonValue
+    descriptionI18n?: NullableJsonNullValueInput | InputJsonValue
+    status?: $Enums.ProjectStatus
+    ownerName: string
+    activePolicyVersion: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    episodes?: EpisodeUncheckedCreateNestedManyWithoutProjectInput
+    projectAgents?: ProjectAgentUncheckedCreateNestedManyWithoutProjectInput
+    policies?: PolicyUncheckedCreateNestedManyWithoutProjectInput
+    accessGrants?: AccessGrantUncheckedCreateNestedManyWithoutProjectInput
+    auditEvents?: AuditEventUncheckedCreateNestedManyWithoutProjectInput
+  }
+
+  export type ProjectCreateOrConnectWithoutTaskGraphsInput = {
+    where: ProjectWhereUniqueInput
+    create: XOR<ProjectCreateWithoutTaskGraphsInput, ProjectUncheckedCreateWithoutTaskGraphsInput>
+  }
+
+  export type EpisodeCreateWithoutOrchestratedTaskGraphsInput = {
+    id?: string
+    forkPointTraceId?: string | null
+    titleI18n: JsonNullValueInput | InputJsonValue
+    summaryI18n?: NullableJsonNullValueInput | InputJsonValue
+    goalI18n?: NullableJsonNullValueInput | InputJsonValue
+    successCriteriaI18n?: NullableJsonNullValueInput | InputJsonValue
+    finalOutcomeI18n?: NullableJsonNullValueInput | InputJsonValue
+    primaryActor?: string | null
+    workType?: $Enums.WorkType
+    relationIntent?: $Enums.EdgeType | null
+    status: $Enums.EpisodeStatus
+    blockedReasonI18n?: NullableJsonNullValueInput | InputJsonValue
+    failureReasonI18n?: NullableJsonNullValueInput | InputJsonValue
+    reviewOutcome?: $Enums.ReviewOutcome | null
+    policyVersion: string
+    startedAt: Date | string
+    endedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    project: ProjectCreateNestedOneWithoutEpisodesInput
+    primaryAgent: AgentCreateNestedOneWithoutPrimaryEpisodesInput
+    parentEpisode?: EpisodeCreateNestedOneWithoutChildEpisodesInput
+    childEpisodes?: EpisodeCreateNestedManyWithoutParentEpisodeInput
+    episodeAgents?: EpisodeAgentCreateNestedManyWithoutEpisodeInput
+    memoryItems?: MemoryItemCreateNestedManyWithoutEpisodeInput
+    traceEvents?: TraceEventCreateNestedManyWithoutEpisodeInput
+    artifacts?: ArtifactCreateNestedManyWithoutEpisodeInput
+    auditEvents?: AuditEventCreateNestedManyWithoutEpisodeInput
+    accessGrants?: AccessGrantCreateNestedManyWithoutEpisodeInput
+    taskGraphEpisodes?: TaskGraphEpisodeCreateNestedManyWithoutEpisodeInput
+  }
+
+  export type EpisodeUncheckedCreateWithoutOrchestratedTaskGraphsInput = {
+    id?: string
+    projectId: string
+    primaryAgentId: string
+    parentEpisodeId?: string | null
+    forkPointTraceId?: string | null
+    titleI18n: JsonNullValueInput | InputJsonValue
+    summaryI18n?: NullableJsonNullValueInput | InputJsonValue
+    goalI18n?: NullableJsonNullValueInput | InputJsonValue
+    successCriteriaI18n?: NullableJsonNullValueInput | InputJsonValue
+    finalOutcomeI18n?: NullableJsonNullValueInput | InputJsonValue
+    primaryActor?: string | null
+    workType?: $Enums.WorkType
+    relationIntent?: $Enums.EdgeType | null
+    status: $Enums.EpisodeStatus
+    blockedReasonI18n?: NullableJsonNullValueInput | InputJsonValue
+    failureReasonI18n?: NullableJsonNullValueInput | InputJsonValue
+    reviewOutcome?: $Enums.ReviewOutcome | null
+    policyVersion: string
+    startedAt: Date | string
+    endedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    childEpisodes?: EpisodeUncheckedCreateNestedManyWithoutParentEpisodeInput
+    episodeAgents?: EpisodeAgentUncheckedCreateNestedManyWithoutEpisodeInput
+    memoryItems?: MemoryItemUncheckedCreateNestedManyWithoutEpisodeInput
+    traceEvents?: TraceEventUncheckedCreateNestedManyWithoutEpisodeInput
+    artifacts?: ArtifactUncheckedCreateNestedManyWithoutEpisodeInput
+    auditEvents?: AuditEventUncheckedCreateNestedManyWithoutEpisodeInput
+    accessGrants?: AccessGrantUncheckedCreateNestedManyWithoutEpisodeInput
+    taskGraphEpisodes?: TaskGraphEpisodeUncheckedCreateNestedManyWithoutEpisodeInput
+  }
+
+  export type EpisodeCreateOrConnectWithoutOrchestratedTaskGraphsInput = {
+    where: EpisodeWhereUniqueInput
+    create: XOR<EpisodeCreateWithoutOrchestratedTaskGraphsInput, EpisodeUncheckedCreateWithoutOrchestratedTaskGraphsInput>
+  }
+
+  export type AgentCreateWithoutCreatedTaskGraphsInput = {
+    id?: string
+    slug: string
+    name: string
+    roleI18n: JsonNullValueInput | InputJsonValue
+    ownerName: string
+    capabilities: JsonNullValueInput | InputJsonValue
+    lastActiveAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    primaryEpisodes?: EpisodeCreateNestedManyWithoutPrimaryAgentInput
+    episodeAgents?: EpisodeAgentCreateNestedManyWithoutAgentInput
+    projectAgents?: ProjectAgentCreateNestedManyWithoutAgentInput
+    memoryItems?: MemoryItemCreateNestedManyWithoutAgentInput
+    traceEvents?: TraceEventCreateNestedManyWithoutActorAgentInput
+    artifacts?: ArtifactCreateNestedManyWithoutCreatedByAgentInput
+    taskGraphEpisodes?: TaskGraphEpisodeCreateNestedManyWithoutAgentInput
+  }
+
+  export type AgentUncheckedCreateWithoutCreatedTaskGraphsInput = {
+    id?: string
+    slug: string
+    name: string
+    roleI18n: JsonNullValueInput | InputJsonValue
+    ownerName: string
+    capabilities: JsonNullValueInput | InputJsonValue
+    lastActiveAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    primaryEpisodes?: EpisodeUncheckedCreateNestedManyWithoutPrimaryAgentInput
+    episodeAgents?: EpisodeAgentUncheckedCreateNestedManyWithoutAgentInput
+    projectAgents?: ProjectAgentUncheckedCreateNestedManyWithoutAgentInput
+    memoryItems?: MemoryItemUncheckedCreateNestedManyWithoutAgentInput
+    traceEvents?: TraceEventUncheckedCreateNestedManyWithoutActorAgentInput
+    artifacts?: ArtifactUncheckedCreateNestedManyWithoutCreatedByAgentInput
+    taskGraphEpisodes?: TaskGraphEpisodeUncheckedCreateNestedManyWithoutAgentInput
+  }
+
+  export type AgentCreateOrConnectWithoutCreatedTaskGraphsInput = {
+    where: AgentWhereUniqueInput
+    create: XOR<AgentCreateWithoutCreatedTaskGraphsInput, AgentUncheckedCreateWithoutCreatedTaskGraphsInput>
+  }
+
+  export type TaskGraphEpisodeCreateWithoutTaskGraphInput = {
+    id?: string
+    role: $Enums.TaskGraphEpisodeRole
+    assignedSubtask: string
+    dependencyEpisodeIds?: TaskGraphEpisodeCreatedependencyEpisodeIdsInput | string[]
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    episode: EpisodeCreateNestedOneWithoutTaskGraphEpisodesInput
+    agent: AgentCreateNestedOneWithoutTaskGraphEpisodesInput
+  }
+
+  export type TaskGraphEpisodeUncheckedCreateWithoutTaskGraphInput = {
+    id?: string
+    episodeId: string
+    role: $Enums.TaskGraphEpisodeRole
+    agentId: string
+    assignedSubtask: string
+    dependencyEpisodeIds?: TaskGraphEpisodeCreatedependencyEpisodeIdsInput | string[]
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type TaskGraphEpisodeCreateOrConnectWithoutTaskGraphInput = {
+    where: TaskGraphEpisodeWhereUniqueInput
+    create: XOR<TaskGraphEpisodeCreateWithoutTaskGraphInput, TaskGraphEpisodeUncheckedCreateWithoutTaskGraphInput>
+  }
+
+  export type TaskGraphEpisodeCreateManyTaskGraphInputEnvelope = {
+    data: TaskGraphEpisodeCreateManyTaskGraphInput | TaskGraphEpisodeCreateManyTaskGraphInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type WorkspaceUpsertWithoutTaskGraphsInput = {
+    update: XOR<WorkspaceUpdateWithoutTaskGraphsInput, WorkspaceUncheckedUpdateWithoutTaskGraphsInput>
+    create: XOR<WorkspaceCreateWithoutTaskGraphsInput, WorkspaceUncheckedCreateWithoutTaskGraphsInput>
+    where?: WorkspaceWhereInput
+  }
+
+  export type WorkspaceUpdateToOneWithWhereWithoutTaskGraphsInput = {
+    where?: WorkspaceWhereInput
+    data: XOR<WorkspaceUpdateWithoutTaskGraphsInput, WorkspaceUncheckedUpdateWithoutTaskGraphsInput>
+  }
+
+  export type WorkspaceUpdateWithoutTaskGraphsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    ownerId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    projects?: ProjectUpdateManyWithoutWorkspaceNestedInput
+    policies?: PolicyUpdateManyWithoutWorkspaceNestedInput
+    auditEvents?: AuditEventUpdateManyWithoutWorkspaceNestedInput
+  }
+
+  export type WorkspaceUncheckedUpdateWithoutTaskGraphsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    ownerId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    projects?: ProjectUncheckedUpdateManyWithoutWorkspaceNestedInput
+    policies?: PolicyUncheckedUpdateManyWithoutWorkspaceNestedInput
+    auditEvents?: AuditEventUncheckedUpdateManyWithoutWorkspaceNestedInput
+  }
+
+  export type ProjectUpsertWithoutTaskGraphsInput = {
+    update: XOR<ProjectUpdateWithoutTaskGraphsInput, ProjectUncheckedUpdateWithoutTaskGraphsInput>
+    create: XOR<ProjectCreateWithoutTaskGraphsInput, ProjectUncheckedCreateWithoutTaskGraphsInput>
+    where?: ProjectWhereInput
+  }
+
+  export type ProjectUpdateToOneWithWhereWithoutTaskGraphsInput = {
+    where?: ProjectWhereInput
+    data: XOR<ProjectUpdateWithoutTaskGraphsInput, ProjectUncheckedUpdateWithoutTaskGraphsInput>
+  }
+
+  export type ProjectUpdateWithoutTaskGraphsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    nameI18n?: JsonNullValueInput | InputJsonValue
+    descriptionI18n?: NullableJsonNullValueInput | InputJsonValue
+    status?: EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
+    ownerName?: StringFieldUpdateOperationsInput | string
+    activePolicyVersion?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    workspace?: WorkspaceUpdateOneRequiredWithoutProjectsNestedInput
+    episodes?: EpisodeUpdateManyWithoutProjectNestedInput
+    projectAgents?: ProjectAgentUpdateManyWithoutProjectNestedInput
+    policies?: PolicyUpdateManyWithoutProjectNestedInput
+    accessGrants?: AccessGrantUpdateManyWithoutProjectNestedInput
+    auditEvents?: AuditEventUpdateManyWithoutProjectNestedInput
+  }
+
+  export type ProjectUncheckedUpdateWithoutTaskGraphsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    workspaceId?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    nameI18n?: JsonNullValueInput | InputJsonValue
+    descriptionI18n?: NullableJsonNullValueInput | InputJsonValue
+    status?: EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
+    ownerName?: StringFieldUpdateOperationsInput | string
+    activePolicyVersion?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    episodes?: EpisodeUncheckedUpdateManyWithoutProjectNestedInput
+    projectAgents?: ProjectAgentUncheckedUpdateManyWithoutProjectNestedInput
+    policies?: PolicyUncheckedUpdateManyWithoutProjectNestedInput
+    accessGrants?: AccessGrantUncheckedUpdateManyWithoutProjectNestedInput
+    auditEvents?: AuditEventUncheckedUpdateManyWithoutProjectNestedInput
+  }
+
+  export type EpisodeUpsertWithoutOrchestratedTaskGraphsInput = {
+    update: XOR<EpisodeUpdateWithoutOrchestratedTaskGraphsInput, EpisodeUncheckedUpdateWithoutOrchestratedTaskGraphsInput>
+    create: XOR<EpisodeCreateWithoutOrchestratedTaskGraphsInput, EpisodeUncheckedCreateWithoutOrchestratedTaskGraphsInput>
+    where?: EpisodeWhereInput
+  }
+
+  export type EpisodeUpdateToOneWithWhereWithoutOrchestratedTaskGraphsInput = {
+    where?: EpisodeWhereInput
+    data: XOR<EpisodeUpdateWithoutOrchestratedTaskGraphsInput, EpisodeUncheckedUpdateWithoutOrchestratedTaskGraphsInput>
+  }
+
+  export type EpisodeUpdateWithoutOrchestratedTaskGraphsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    forkPointTraceId?: NullableStringFieldUpdateOperationsInput | string | null
+    titleI18n?: JsonNullValueInput | InputJsonValue
+    summaryI18n?: NullableJsonNullValueInput | InputJsonValue
+    goalI18n?: NullableJsonNullValueInput | InputJsonValue
+    successCriteriaI18n?: NullableJsonNullValueInput | InputJsonValue
+    finalOutcomeI18n?: NullableJsonNullValueInput | InputJsonValue
+    primaryActor?: NullableStringFieldUpdateOperationsInput | string | null
+    workType?: EnumWorkTypeFieldUpdateOperationsInput | $Enums.WorkType
+    relationIntent?: NullableEnumEdgeTypeFieldUpdateOperationsInput | $Enums.EdgeType | null
+    status?: EnumEpisodeStatusFieldUpdateOperationsInput | $Enums.EpisodeStatus
+    blockedReasonI18n?: NullableJsonNullValueInput | InputJsonValue
+    failureReasonI18n?: NullableJsonNullValueInput | InputJsonValue
+    reviewOutcome?: NullableEnumReviewOutcomeFieldUpdateOperationsInput | $Enums.ReviewOutcome | null
+    policyVersion?: StringFieldUpdateOperationsInput | string
+    startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    project?: ProjectUpdateOneRequiredWithoutEpisodesNestedInput
+    primaryAgent?: AgentUpdateOneRequiredWithoutPrimaryEpisodesNestedInput
+    parentEpisode?: EpisodeUpdateOneWithoutChildEpisodesNestedInput
+    childEpisodes?: EpisodeUpdateManyWithoutParentEpisodeNestedInput
+    episodeAgents?: EpisodeAgentUpdateManyWithoutEpisodeNestedInput
+    memoryItems?: MemoryItemUpdateManyWithoutEpisodeNestedInput
+    traceEvents?: TraceEventUpdateManyWithoutEpisodeNestedInput
+    artifacts?: ArtifactUpdateManyWithoutEpisodeNestedInput
+    auditEvents?: AuditEventUpdateManyWithoutEpisodeNestedInput
+    accessGrants?: AccessGrantUpdateManyWithoutEpisodeNestedInput
+    taskGraphEpisodes?: TaskGraphEpisodeUpdateManyWithoutEpisodeNestedInput
+  }
+
+  export type EpisodeUncheckedUpdateWithoutOrchestratedTaskGraphsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    projectId?: StringFieldUpdateOperationsInput | string
+    primaryAgentId?: StringFieldUpdateOperationsInput | string
+    parentEpisodeId?: NullableStringFieldUpdateOperationsInput | string | null
+    forkPointTraceId?: NullableStringFieldUpdateOperationsInput | string | null
+    titleI18n?: JsonNullValueInput | InputJsonValue
+    summaryI18n?: NullableJsonNullValueInput | InputJsonValue
+    goalI18n?: NullableJsonNullValueInput | InputJsonValue
+    successCriteriaI18n?: NullableJsonNullValueInput | InputJsonValue
+    finalOutcomeI18n?: NullableJsonNullValueInput | InputJsonValue
+    primaryActor?: NullableStringFieldUpdateOperationsInput | string | null
+    workType?: EnumWorkTypeFieldUpdateOperationsInput | $Enums.WorkType
+    relationIntent?: NullableEnumEdgeTypeFieldUpdateOperationsInput | $Enums.EdgeType | null
+    status?: EnumEpisodeStatusFieldUpdateOperationsInput | $Enums.EpisodeStatus
+    blockedReasonI18n?: NullableJsonNullValueInput | InputJsonValue
+    failureReasonI18n?: NullableJsonNullValueInput | InputJsonValue
+    reviewOutcome?: NullableEnumReviewOutcomeFieldUpdateOperationsInput | $Enums.ReviewOutcome | null
+    policyVersion?: StringFieldUpdateOperationsInput | string
+    startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    childEpisodes?: EpisodeUncheckedUpdateManyWithoutParentEpisodeNestedInput
+    episodeAgents?: EpisodeAgentUncheckedUpdateManyWithoutEpisodeNestedInput
+    memoryItems?: MemoryItemUncheckedUpdateManyWithoutEpisodeNestedInput
+    traceEvents?: TraceEventUncheckedUpdateManyWithoutEpisodeNestedInput
+    artifacts?: ArtifactUncheckedUpdateManyWithoutEpisodeNestedInput
+    auditEvents?: AuditEventUncheckedUpdateManyWithoutEpisodeNestedInput
+    accessGrants?: AccessGrantUncheckedUpdateManyWithoutEpisodeNestedInput
+    taskGraphEpisodes?: TaskGraphEpisodeUncheckedUpdateManyWithoutEpisodeNestedInput
+  }
+
+  export type AgentUpsertWithoutCreatedTaskGraphsInput = {
+    update: XOR<AgentUpdateWithoutCreatedTaskGraphsInput, AgentUncheckedUpdateWithoutCreatedTaskGraphsInput>
+    create: XOR<AgentCreateWithoutCreatedTaskGraphsInput, AgentUncheckedCreateWithoutCreatedTaskGraphsInput>
+    where?: AgentWhereInput
+  }
+
+  export type AgentUpdateToOneWithWhereWithoutCreatedTaskGraphsInput = {
+    where?: AgentWhereInput
+    data: XOR<AgentUpdateWithoutCreatedTaskGraphsInput, AgentUncheckedUpdateWithoutCreatedTaskGraphsInput>
+  }
+
+  export type AgentUpdateWithoutCreatedTaskGraphsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    roleI18n?: JsonNullValueInput | InputJsonValue
+    ownerName?: StringFieldUpdateOperationsInput | string
+    capabilities?: JsonNullValueInput | InputJsonValue
+    lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    primaryEpisodes?: EpisodeUpdateManyWithoutPrimaryAgentNestedInput
+    episodeAgents?: EpisodeAgentUpdateManyWithoutAgentNestedInput
+    projectAgents?: ProjectAgentUpdateManyWithoutAgentNestedInput
+    memoryItems?: MemoryItemUpdateManyWithoutAgentNestedInput
+    traceEvents?: TraceEventUpdateManyWithoutActorAgentNestedInput
+    artifacts?: ArtifactUpdateManyWithoutCreatedByAgentNestedInput
+    taskGraphEpisodes?: TaskGraphEpisodeUpdateManyWithoutAgentNestedInput
+  }
+
+  export type AgentUncheckedUpdateWithoutCreatedTaskGraphsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    roleI18n?: JsonNullValueInput | InputJsonValue
+    ownerName?: StringFieldUpdateOperationsInput | string
+    capabilities?: JsonNullValueInput | InputJsonValue
+    lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    primaryEpisodes?: EpisodeUncheckedUpdateManyWithoutPrimaryAgentNestedInput
+    episodeAgents?: EpisodeAgentUncheckedUpdateManyWithoutAgentNestedInput
+    projectAgents?: ProjectAgentUncheckedUpdateManyWithoutAgentNestedInput
+    memoryItems?: MemoryItemUncheckedUpdateManyWithoutAgentNestedInput
+    traceEvents?: TraceEventUncheckedUpdateManyWithoutActorAgentNestedInput
+    artifacts?: ArtifactUncheckedUpdateManyWithoutCreatedByAgentNestedInput
+    taskGraphEpisodes?: TaskGraphEpisodeUncheckedUpdateManyWithoutAgentNestedInput
+  }
+
+  export type TaskGraphEpisodeUpsertWithWhereUniqueWithoutTaskGraphInput = {
+    where: TaskGraphEpisodeWhereUniqueInput
+    update: XOR<TaskGraphEpisodeUpdateWithoutTaskGraphInput, TaskGraphEpisodeUncheckedUpdateWithoutTaskGraphInput>
+    create: XOR<TaskGraphEpisodeCreateWithoutTaskGraphInput, TaskGraphEpisodeUncheckedCreateWithoutTaskGraphInput>
+  }
+
+  export type TaskGraphEpisodeUpdateWithWhereUniqueWithoutTaskGraphInput = {
+    where: TaskGraphEpisodeWhereUniqueInput
+    data: XOR<TaskGraphEpisodeUpdateWithoutTaskGraphInput, TaskGraphEpisodeUncheckedUpdateWithoutTaskGraphInput>
+  }
+
+  export type TaskGraphEpisodeUpdateManyWithWhereWithoutTaskGraphInput = {
+    where: TaskGraphEpisodeScalarWhereInput
+    data: XOR<TaskGraphEpisodeUpdateManyMutationInput, TaskGraphEpisodeUncheckedUpdateManyWithoutTaskGraphInput>
+  }
+
+  export type TaskGraphCreateWithoutEpisodesInput = {
+    id?: string
+    symphonyTaskId: string
+    status?: $Enums.TaskGraphStatus
+    sensitivity?: string
+    policyVersion: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    workspace: WorkspaceCreateNestedOneWithoutTaskGraphsInput
+    project: ProjectCreateNestedOneWithoutTaskGraphsInput
+    orchestratorEpisode: EpisodeCreateNestedOneWithoutOrchestratedTaskGraphsInput
+    createdByAgent: AgentCreateNestedOneWithoutCreatedTaskGraphsInput
+  }
+
+  export type TaskGraphUncheckedCreateWithoutEpisodesInput = {
+    id?: string
+    workspaceId: string
+    projectId: string
+    symphonyTaskId: string
+    orchestratorEpisodeId: string
+    status?: $Enums.TaskGraphStatus
+    sensitivity?: string
+    policyVersion: string
+    createdByAgentId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type TaskGraphCreateOrConnectWithoutEpisodesInput = {
+    where: TaskGraphWhereUniqueInput
+    create: XOR<TaskGraphCreateWithoutEpisodesInput, TaskGraphUncheckedCreateWithoutEpisodesInput>
+  }
+
+  export type EpisodeCreateWithoutTaskGraphEpisodesInput = {
+    id?: string
+    forkPointTraceId?: string | null
+    titleI18n: JsonNullValueInput | InputJsonValue
+    summaryI18n?: NullableJsonNullValueInput | InputJsonValue
+    goalI18n?: NullableJsonNullValueInput | InputJsonValue
+    successCriteriaI18n?: NullableJsonNullValueInput | InputJsonValue
+    finalOutcomeI18n?: NullableJsonNullValueInput | InputJsonValue
+    primaryActor?: string | null
+    workType?: $Enums.WorkType
+    relationIntent?: $Enums.EdgeType | null
+    status: $Enums.EpisodeStatus
+    blockedReasonI18n?: NullableJsonNullValueInput | InputJsonValue
+    failureReasonI18n?: NullableJsonNullValueInput | InputJsonValue
+    reviewOutcome?: $Enums.ReviewOutcome | null
+    policyVersion: string
+    startedAt: Date | string
+    endedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    project: ProjectCreateNestedOneWithoutEpisodesInput
+    primaryAgent: AgentCreateNestedOneWithoutPrimaryEpisodesInput
+    parentEpisode?: EpisodeCreateNestedOneWithoutChildEpisodesInput
+    childEpisodes?: EpisodeCreateNestedManyWithoutParentEpisodeInput
+    episodeAgents?: EpisodeAgentCreateNestedManyWithoutEpisodeInput
+    memoryItems?: MemoryItemCreateNestedManyWithoutEpisodeInput
+    traceEvents?: TraceEventCreateNestedManyWithoutEpisodeInput
+    artifacts?: ArtifactCreateNestedManyWithoutEpisodeInput
+    auditEvents?: AuditEventCreateNestedManyWithoutEpisodeInput
+    accessGrants?: AccessGrantCreateNestedManyWithoutEpisodeInput
+    orchestratedTaskGraphs?: TaskGraphCreateNestedManyWithoutOrchestratorEpisodeInput
+  }
+
+  export type EpisodeUncheckedCreateWithoutTaskGraphEpisodesInput = {
+    id?: string
+    projectId: string
+    primaryAgentId: string
+    parentEpisodeId?: string | null
+    forkPointTraceId?: string | null
+    titleI18n: JsonNullValueInput | InputJsonValue
+    summaryI18n?: NullableJsonNullValueInput | InputJsonValue
+    goalI18n?: NullableJsonNullValueInput | InputJsonValue
+    successCriteriaI18n?: NullableJsonNullValueInput | InputJsonValue
+    finalOutcomeI18n?: NullableJsonNullValueInput | InputJsonValue
+    primaryActor?: string | null
+    workType?: $Enums.WorkType
+    relationIntent?: $Enums.EdgeType | null
+    status: $Enums.EpisodeStatus
+    blockedReasonI18n?: NullableJsonNullValueInput | InputJsonValue
+    failureReasonI18n?: NullableJsonNullValueInput | InputJsonValue
+    reviewOutcome?: $Enums.ReviewOutcome | null
+    policyVersion: string
+    startedAt: Date | string
+    endedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    childEpisodes?: EpisodeUncheckedCreateNestedManyWithoutParentEpisodeInput
+    episodeAgents?: EpisodeAgentUncheckedCreateNestedManyWithoutEpisodeInput
+    memoryItems?: MemoryItemUncheckedCreateNestedManyWithoutEpisodeInput
+    traceEvents?: TraceEventUncheckedCreateNestedManyWithoutEpisodeInput
+    artifacts?: ArtifactUncheckedCreateNestedManyWithoutEpisodeInput
+    auditEvents?: AuditEventUncheckedCreateNestedManyWithoutEpisodeInput
+    accessGrants?: AccessGrantUncheckedCreateNestedManyWithoutEpisodeInput
+    orchestratedTaskGraphs?: TaskGraphUncheckedCreateNestedManyWithoutOrchestratorEpisodeInput
+  }
+
+  export type EpisodeCreateOrConnectWithoutTaskGraphEpisodesInput = {
+    where: EpisodeWhereUniqueInput
+    create: XOR<EpisodeCreateWithoutTaskGraphEpisodesInput, EpisodeUncheckedCreateWithoutTaskGraphEpisodesInput>
+  }
+
+  export type AgentCreateWithoutTaskGraphEpisodesInput = {
+    id?: string
+    slug: string
+    name: string
+    roleI18n: JsonNullValueInput | InputJsonValue
+    ownerName: string
+    capabilities: JsonNullValueInput | InputJsonValue
+    lastActiveAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    primaryEpisodes?: EpisodeCreateNestedManyWithoutPrimaryAgentInput
+    episodeAgents?: EpisodeAgentCreateNestedManyWithoutAgentInput
+    projectAgents?: ProjectAgentCreateNestedManyWithoutAgentInput
+    memoryItems?: MemoryItemCreateNestedManyWithoutAgentInput
+    traceEvents?: TraceEventCreateNestedManyWithoutActorAgentInput
+    artifacts?: ArtifactCreateNestedManyWithoutCreatedByAgentInput
+    createdTaskGraphs?: TaskGraphCreateNestedManyWithoutCreatedByAgentInput
+  }
+
+  export type AgentUncheckedCreateWithoutTaskGraphEpisodesInput = {
+    id?: string
+    slug: string
+    name: string
+    roleI18n: JsonNullValueInput | InputJsonValue
+    ownerName: string
+    capabilities: JsonNullValueInput | InputJsonValue
+    lastActiveAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    primaryEpisodes?: EpisodeUncheckedCreateNestedManyWithoutPrimaryAgentInput
+    episodeAgents?: EpisodeAgentUncheckedCreateNestedManyWithoutAgentInput
+    projectAgents?: ProjectAgentUncheckedCreateNestedManyWithoutAgentInput
+    memoryItems?: MemoryItemUncheckedCreateNestedManyWithoutAgentInput
+    traceEvents?: TraceEventUncheckedCreateNestedManyWithoutActorAgentInput
+    artifacts?: ArtifactUncheckedCreateNestedManyWithoutCreatedByAgentInput
+    createdTaskGraphs?: TaskGraphUncheckedCreateNestedManyWithoutCreatedByAgentInput
+  }
+
+  export type AgentCreateOrConnectWithoutTaskGraphEpisodesInput = {
+    where: AgentWhereUniqueInput
+    create: XOR<AgentCreateWithoutTaskGraphEpisodesInput, AgentUncheckedCreateWithoutTaskGraphEpisodesInput>
+  }
+
+  export type TaskGraphUpsertWithoutEpisodesInput = {
+    update: XOR<TaskGraphUpdateWithoutEpisodesInput, TaskGraphUncheckedUpdateWithoutEpisodesInput>
+    create: XOR<TaskGraphCreateWithoutEpisodesInput, TaskGraphUncheckedCreateWithoutEpisodesInput>
+    where?: TaskGraphWhereInput
+  }
+
+  export type TaskGraphUpdateToOneWithWhereWithoutEpisodesInput = {
+    where?: TaskGraphWhereInput
+    data: XOR<TaskGraphUpdateWithoutEpisodesInput, TaskGraphUncheckedUpdateWithoutEpisodesInput>
+  }
+
+  export type TaskGraphUpdateWithoutEpisodesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    symphonyTaskId?: StringFieldUpdateOperationsInput | string
+    status?: EnumTaskGraphStatusFieldUpdateOperationsInput | $Enums.TaskGraphStatus
+    sensitivity?: StringFieldUpdateOperationsInput | string
+    policyVersion?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    workspace?: WorkspaceUpdateOneRequiredWithoutTaskGraphsNestedInput
+    project?: ProjectUpdateOneRequiredWithoutTaskGraphsNestedInput
+    orchestratorEpisode?: EpisodeUpdateOneRequiredWithoutOrchestratedTaskGraphsNestedInput
+    createdByAgent?: AgentUpdateOneRequiredWithoutCreatedTaskGraphsNestedInput
+  }
+
+  export type TaskGraphUncheckedUpdateWithoutEpisodesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    workspaceId?: StringFieldUpdateOperationsInput | string
+    projectId?: StringFieldUpdateOperationsInput | string
+    symphonyTaskId?: StringFieldUpdateOperationsInput | string
+    orchestratorEpisodeId?: StringFieldUpdateOperationsInput | string
+    status?: EnumTaskGraphStatusFieldUpdateOperationsInput | $Enums.TaskGraphStatus
+    sensitivity?: StringFieldUpdateOperationsInput | string
+    policyVersion?: StringFieldUpdateOperationsInput | string
+    createdByAgentId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type EpisodeUpsertWithoutTaskGraphEpisodesInput = {
+    update: XOR<EpisodeUpdateWithoutTaskGraphEpisodesInput, EpisodeUncheckedUpdateWithoutTaskGraphEpisodesInput>
+    create: XOR<EpisodeCreateWithoutTaskGraphEpisodesInput, EpisodeUncheckedCreateWithoutTaskGraphEpisodesInput>
+    where?: EpisodeWhereInput
+  }
+
+  export type EpisodeUpdateToOneWithWhereWithoutTaskGraphEpisodesInput = {
+    where?: EpisodeWhereInput
+    data: XOR<EpisodeUpdateWithoutTaskGraphEpisodesInput, EpisodeUncheckedUpdateWithoutTaskGraphEpisodesInput>
+  }
+
+  export type EpisodeUpdateWithoutTaskGraphEpisodesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    forkPointTraceId?: NullableStringFieldUpdateOperationsInput | string | null
+    titleI18n?: JsonNullValueInput | InputJsonValue
+    summaryI18n?: NullableJsonNullValueInput | InputJsonValue
+    goalI18n?: NullableJsonNullValueInput | InputJsonValue
+    successCriteriaI18n?: NullableJsonNullValueInput | InputJsonValue
+    finalOutcomeI18n?: NullableJsonNullValueInput | InputJsonValue
+    primaryActor?: NullableStringFieldUpdateOperationsInput | string | null
+    workType?: EnumWorkTypeFieldUpdateOperationsInput | $Enums.WorkType
+    relationIntent?: NullableEnumEdgeTypeFieldUpdateOperationsInput | $Enums.EdgeType | null
+    status?: EnumEpisodeStatusFieldUpdateOperationsInput | $Enums.EpisodeStatus
+    blockedReasonI18n?: NullableJsonNullValueInput | InputJsonValue
+    failureReasonI18n?: NullableJsonNullValueInput | InputJsonValue
+    reviewOutcome?: NullableEnumReviewOutcomeFieldUpdateOperationsInput | $Enums.ReviewOutcome | null
+    policyVersion?: StringFieldUpdateOperationsInput | string
+    startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    project?: ProjectUpdateOneRequiredWithoutEpisodesNestedInput
+    primaryAgent?: AgentUpdateOneRequiredWithoutPrimaryEpisodesNestedInput
+    parentEpisode?: EpisodeUpdateOneWithoutChildEpisodesNestedInput
+    childEpisodes?: EpisodeUpdateManyWithoutParentEpisodeNestedInput
+    episodeAgents?: EpisodeAgentUpdateManyWithoutEpisodeNestedInput
+    memoryItems?: MemoryItemUpdateManyWithoutEpisodeNestedInput
+    traceEvents?: TraceEventUpdateManyWithoutEpisodeNestedInput
+    artifacts?: ArtifactUpdateManyWithoutEpisodeNestedInput
+    auditEvents?: AuditEventUpdateManyWithoutEpisodeNestedInput
+    accessGrants?: AccessGrantUpdateManyWithoutEpisodeNestedInput
+    orchestratedTaskGraphs?: TaskGraphUpdateManyWithoutOrchestratorEpisodeNestedInput
+  }
+
+  export type EpisodeUncheckedUpdateWithoutTaskGraphEpisodesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    projectId?: StringFieldUpdateOperationsInput | string
+    primaryAgentId?: StringFieldUpdateOperationsInput | string
+    parentEpisodeId?: NullableStringFieldUpdateOperationsInput | string | null
+    forkPointTraceId?: NullableStringFieldUpdateOperationsInput | string | null
+    titleI18n?: JsonNullValueInput | InputJsonValue
+    summaryI18n?: NullableJsonNullValueInput | InputJsonValue
+    goalI18n?: NullableJsonNullValueInput | InputJsonValue
+    successCriteriaI18n?: NullableJsonNullValueInput | InputJsonValue
+    finalOutcomeI18n?: NullableJsonNullValueInput | InputJsonValue
+    primaryActor?: NullableStringFieldUpdateOperationsInput | string | null
+    workType?: EnumWorkTypeFieldUpdateOperationsInput | $Enums.WorkType
+    relationIntent?: NullableEnumEdgeTypeFieldUpdateOperationsInput | $Enums.EdgeType | null
+    status?: EnumEpisodeStatusFieldUpdateOperationsInput | $Enums.EpisodeStatus
+    blockedReasonI18n?: NullableJsonNullValueInput | InputJsonValue
+    failureReasonI18n?: NullableJsonNullValueInput | InputJsonValue
+    reviewOutcome?: NullableEnumReviewOutcomeFieldUpdateOperationsInput | $Enums.ReviewOutcome | null
+    policyVersion?: StringFieldUpdateOperationsInput | string
+    startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    childEpisodes?: EpisodeUncheckedUpdateManyWithoutParentEpisodeNestedInput
+    episodeAgents?: EpisodeAgentUncheckedUpdateManyWithoutEpisodeNestedInput
+    memoryItems?: MemoryItemUncheckedUpdateManyWithoutEpisodeNestedInput
+    traceEvents?: TraceEventUncheckedUpdateManyWithoutEpisodeNestedInput
+    artifacts?: ArtifactUncheckedUpdateManyWithoutEpisodeNestedInput
+    auditEvents?: AuditEventUncheckedUpdateManyWithoutEpisodeNestedInput
+    accessGrants?: AccessGrantUncheckedUpdateManyWithoutEpisodeNestedInput
+    orchestratedTaskGraphs?: TaskGraphUncheckedUpdateManyWithoutOrchestratorEpisodeNestedInput
+  }
+
+  export type AgentUpsertWithoutTaskGraphEpisodesInput = {
+    update: XOR<AgentUpdateWithoutTaskGraphEpisodesInput, AgentUncheckedUpdateWithoutTaskGraphEpisodesInput>
+    create: XOR<AgentCreateWithoutTaskGraphEpisodesInput, AgentUncheckedCreateWithoutTaskGraphEpisodesInput>
+    where?: AgentWhereInput
+  }
+
+  export type AgentUpdateToOneWithWhereWithoutTaskGraphEpisodesInput = {
+    where?: AgentWhereInput
+    data: XOR<AgentUpdateWithoutTaskGraphEpisodesInput, AgentUncheckedUpdateWithoutTaskGraphEpisodesInput>
+  }
+
+  export type AgentUpdateWithoutTaskGraphEpisodesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    roleI18n?: JsonNullValueInput | InputJsonValue
+    ownerName?: StringFieldUpdateOperationsInput | string
+    capabilities?: JsonNullValueInput | InputJsonValue
+    lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    primaryEpisodes?: EpisodeUpdateManyWithoutPrimaryAgentNestedInput
+    episodeAgents?: EpisodeAgentUpdateManyWithoutAgentNestedInput
+    projectAgents?: ProjectAgentUpdateManyWithoutAgentNestedInput
+    memoryItems?: MemoryItemUpdateManyWithoutAgentNestedInput
+    traceEvents?: TraceEventUpdateManyWithoutActorAgentNestedInput
+    artifacts?: ArtifactUpdateManyWithoutCreatedByAgentNestedInput
+    createdTaskGraphs?: TaskGraphUpdateManyWithoutCreatedByAgentNestedInput
+  }
+
+  export type AgentUncheckedUpdateWithoutTaskGraphEpisodesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    roleI18n?: JsonNullValueInput | InputJsonValue
+    ownerName?: StringFieldUpdateOperationsInput | string
+    capabilities?: JsonNullValueInput | InputJsonValue
+    lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    primaryEpisodes?: EpisodeUncheckedUpdateManyWithoutPrimaryAgentNestedInput
+    episodeAgents?: EpisodeAgentUncheckedUpdateManyWithoutAgentNestedInput
+    projectAgents?: ProjectAgentUncheckedUpdateManyWithoutAgentNestedInput
+    memoryItems?: MemoryItemUncheckedUpdateManyWithoutAgentNestedInput
+    traceEvents?: TraceEventUncheckedUpdateManyWithoutActorAgentNestedInput
+    artifacts?: ArtifactUncheckedUpdateManyWithoutCreatedByAgentNestedInput
+    createdTaskGraphs?: TaskGraphUncheckedUpdateManyWithoutCreatedByAgentNestedInput
+  }
+
   export type ProjectCreateManyWorkspaceInput = {
     id?: string
     slug: string
@@ -28100,6 +33269,19 @@ export namespace Prisma {
     denyReasonI18n?: NullableJsonNullValueInput | InputJsonValue
   }
 
+  export type TaskGraphCreateManyWorkspaceInput = {
+    id?: string
+    projectId: string
+    symphonyTaskId: string
+    orchestratorEpisodeId: string
+    status?: $Enums.TaskGraphStatus
+    sensitivity?: string
+    policyVersion: string
+    createdByAgentId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type ProjectUpdateWithoutWorkspaceInput = {
     id?: StringFieldUpdateOperationsInput | string
     slug?: StringFieldUpdateOperationsInput | string
@@ -28115,6 +33297,7 @@ export namespace Prisma {
     policies?: PolicyUpdateManyWithoutProjectNestedInput
     accessGrants?: AccessGrantUpdateManyWithoutProjectNestedInput
     auditEvents?: AuditEventUpdateManyWithoutProjectNestedInput
+    taskGraphs?: TaskGraphUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateWithoutWorkspaceInput = {
@@ -28132,6 +33315,7 @@ export namespace Prisma {
     policies?: PolicyUncheckedUpdateManyWithoutProjectNestedInput
     accessGrants?: AccessGrantUncheckedUpdateManyWithoutProjectNestedInput
     auditEvents?: AuditEventUncheckedUpdateManyWithoutProjectNestedInput
+    taskGraphs?: TaskGraphUncheckedUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateManyWithoutWorkspaceInput = {
@@ -28233,10 +33417,52 @@ export namespace Prisma {
     denyReasonI18n?: NullableJsonNullValueInput | InputJsonValue
   }
 
+  export type TaskGraphUpdateWithoutWorkspaceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    symphonyTaskId?: StringFieldUpdateOperationsInput | string
+    status?: EnumTaskGraphStatusFieldUpdateOperationsInput | $Enums.TaskGraphStatus
+    sensitivity?: StringFieldUpdateOperationsInput | string
+    policyVersion?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    project?: ProjectUpdateOneRequiredWithoutTaskGraphsNestedInput
+    orchestratorEpisode?: EpisodeUpdateOneRequiredWithoutOrchestratedTaskGraphsNestedInput
+    createdByAgent?: AgentUpdateOneRequiredWithoutCreatedTaskGraphsNestedInput
+    episodes?: TaskGraphEpisodeUpdateManyWithoutTaskGraphNestedInput
+  }
+
+  export type TaskGraphUncheckedUpdateWithoutWorkspaceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    projectId?: StringFieldUpdateOperationsInput | string
+    symphonyTaskId?: StringFieldUpdateOperationsInput | string
+    orchestratorEpisodeId?: StringFieldUpdateOperationsInput | string
+    status?: EnumTaskGraphStatusFieldUpdateOperationsInput | $Enums.TaskGraphStatus
+    sensitivity?: StringFieldUpdateOperationsInput | string
+    policyVersion?: StringFieldUpdateOperationsInput | string
+    createdByAgentId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    episodes?: TaskGraphEpisodeUncheckedUpdateManyWithoutTaskGraphNestedInput
+  }
+
+  export type TaskGraphUncheckedUpdateManyWithoutWorkspaceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    projectId?: StringFieldUpdateOperationsInput | string
+    symphonyTaskId?: StringFieldUpdateOperationsInput | string
+    orchestratorEpisodeId?: StringFieldUpdateOperationsInput | string
+    status?: EnumTaskGraphStatusFieldUpdateOperationsInput | $Enums.TaskGraphStatus
+    sensitivity?: StringFieldUpdateOperationsInput | string
+    policyVersion?: StringFieldUpdateOperationsInput | string
+    createdByAgentId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type EpisodeCreateManyProjectInput = {
     id?: string
     primaryAgentId: string
     parentEpisodeId?: string | null
+    forkPointTraceId?: string | null
     titleI18n: JsonNullValueInput | InputJsonValue
     summaryI18n?: NullableJsonNullValueInput | InputJsonValue
     goalI18n?: NullableJsonNullValueInput | InputJsonValue
@@ -28300,8 +33526,22 @@ export namespace Prisma {
     denyReasonI18n?: NullableJsonNullValueInput | InputJsonValue
   }
 
+  export type TaskGraphCreateManyProjectInput = {
+    id?: string
+    workspaceId: string
+    symphonyTaskId: string
+    orchestratorEpisodeId: string
+    status?: $Enums.TaskGraphStatus
+    sensitivity?: string
+    policyVersion: string
+    createdByAgentId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type EpisodeUpdateWithoutProjectInput = {
     id?: StringFieldUpdateOperationsInput | string
+    forkPointTraceId?: NullableStringFieldUpdateOperationsInput | string | null
     titleI18n?: JsonNullValueInput | InputJsonValue
     summaryI18n?: NullableJsonNullValueInput | InputJsonValue
     goalI18n?: NullableJsonNullValueInput | InputJsonValue
@@ -28328,12 +33568,15 @@ export namespace Prisma {
     artifacts?: ArtifactUpdateManyWithoutEpisodeNestedInput
     auditEvents?: AuditEventUpdateManyWithoutEpisodeNestedInput
     accessGrants?: AccessGrantUpdateManyWithoutEpisodeNestedInput
+    orchestratedTaskGraphs?: TaskGraphUpdateManyWithoutOrchestratorEpisodeNestedInput
+    taskGraphEpisodes?: TaskGraphEpisodeUpdateManyWithoutEpisodeNestedInput
   }
 
   export type EpisodeUncheckedUpdateWithoutProjectInput = {
     id?: StringFieldUpdateOperationsInput | string
     primaryAgentId?: StringFieldUpdateOperationsInput | string
     parentEpisodeId?: NullableStringFieldUpdateOperationsInput | string | null
+    forkPointTraceId?: NullableStringFieldUpdateOperationsInput | string | null
     titleI18n?: JsonNullValueInput | InputJsonValue
     summaryI18n?: NullableJsonNullValueInput | InputJsonValue
     goalI18n?: NullableJsonNullValueInput | InputJsonValue
@@ -28358,12 +33601,15 @@ export namespace Prisma {
     artifacts?: ArtifactUncheckedUpdateManyWithoutEpisodeNestedInput
     auditEvents?: AuditEventUncheckedUpdateManyWithoutEpisodeNestedInput
     accessGrants?: AccessGrantUncheckedUpdateManyWithoutEpisodeNestedInput
+    orchestratedTaskGraphs?: TaskGraphUncheckedUpdateManyWithoutOrchestratorEpisodeNestedInput
+    taskGraphEpisodes?: TaskGraphEpisodeUncheckedUpdateManyWithoutEpisodeNestedInput
   }
 
   export type EpisodeUncheckedUpdateManyWithoutProjectInput = {
     id?: StringFieldUpdateOperationsInput | string
     primaryAgentId?: StringFieldUpdateOperationsInput | string
     parentEpisodeId?: NullableStringFieldUpdateOperationsInput | string | null
+    forkPointTraceId?: NullableStringFieldUpdateOperationsInput | string | null
     titleI18n?: JsonNullValueInput | InputJsonValue
     summaryI18n?: NullableJsonNullValueInput | InputJsonValue
     goalI18n?: NullableJsonNullValueInput | InputJsonValue
@@ -28515,10 +33761,52 @@ export namespace Prisma {
     denyReasonI18n?: NullableJsonNullValueInput | InputJsonValue
   }
 
+  export type TaskGraphUpdateWithoutProjectInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    symphonyTaskId?: StringFieldUpdateOperationsInput | string
+    status?: EnumTaskGraphStatusFieldUpdateOperationsInput | $Enums.TaskGraphStatus
+    sensitivity?: StringFieldUpdateOperationsInput | string
+    policyVersion?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    workspace?: WorkspaceUpdateOneRequiredWithoutTaskGraphsNestedInput
+    orchestratorEpisode?: EpisodeUpdateOneRequiredWithoutOrchestratedTaskGraphsNestedInput
+    createdByAgent?: AgentUpdateOneRequiredWithoutCreatedTaskGraphsNestedInput
+    episodes?: TaskGraphEpisodeUpdateManyWithoutTaskGraphNestedInput
+  }
+
+  export type TaskGraphUncheckedUpdateWithoutProjectInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    workspaceId?: StringFieldUpdateOperationsInput | string
+    symphonyTaskId?: StringFieldUpdateOperationsInput | string
+    orchestratorEpisodeId?: StringFieldUpdateOperationsInput | string
+    status?: EnumTaskGraphStatusFieldUpdateOperationsInput | $Enums.TaskGraphStatus
+    sensitivity?: StringFieldUpdateOperationsInput | string
+    policyVersion?: StringFieldUpdateOperationsInput | string
+    createdByAgentId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    episodes?: TaskGraphEpisodeUncheckedUpdateManyWithoutTaskGraphNestedInput
+  }
+
+  export type TaskGraphUncheckedUpdateManyWithoutProjectInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    workspaceId?: StringFieldUpdateOperationsInput | string
+    symphonyTaskId?: StringFieldUpdateOperationsInput | string
+    orchestratorEpisodeId?: StringFieldUpdateOperationsInput | string
+    status?: EnumTaskGraphStatusFieldUpdateOperationsInput | $Enums.TaskGraphStatus
+    sensitivity?: StringFieldUpdateOperationsInput | string
+    policyVersion?: StringFieldUpdateOperationsInput | string
+    createdByAgentId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type EpisodeCreateManyPrimaryAgentInput = {
     id?: string
     projectId: string
     parentEpisodeId?: string | null
+    forkPointTraceId?: string | null
     titleI18n: JsonNullValueInput | InputJsonValue
     summaryI18n?: NullableJsonNullValueInput | InputJsonValue
     goalI18n?: NullableJsonNullValueInput | InputJsonValue
@@ -28577,6 +33865,7 @@ export namespace Prisma {
     errorSummaryI18n?: NullableJsonNullValueInput | InputJsonValue
     policyHitReasonI18n?: NullableJsonNullValueInput | InputJsonValue
     permissionDeniedI18n?: NullableJsonNullValueInput | InputJsonValue
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
     eventTime: Date | string
     createdAt?: Date | string
   }
@@ -28597,8 +33886,33 @@ export namespace Prisma {
     updatedAt?: Date | string
   }
 
+  export type TaskGraphCreateManyCreatedByAgentInput = {
+    id?: string
+    workspaceId: string
+    projectId: string
+    symphonyTaskId: string
+    orchestratorEpisodeId: string
+    status?: $Enums.TaskGraphStatus
+    sensitivity?: string
+    policyVersion: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type TaskGraphEpisodeCreateManyAgentInput = {
+    id?: string
+    taskGraphId: string
+    episodeId: string
+    role: $Enums.TaskGraphEpisodeRole
+    assignedSubtask: string
+    dependencyEpisodeIds?: TaskGraphEpisodeCreatedependencyEpisodeIdsInput | string[]
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type EpisodeUpdateWithoutPrimaryAgentInput = {
     id?: StringFieldUpdateOperationsInput | string
+    forkPointTraceId?: NullableStringFieldUpdateOperationsInput | string | null
     titleI18n?: JsonNullValueInput | InputJsonValue
     summaryI18n?: NullableJsonNullValueInput | InputJsonValue
     goalI18n?: NullableJsonNullValueInput | InputJsonValue
@@ -28625,12 +33939,15 @@ export namespace Prisma {
     artifacts?: ArtifactUpdateManyWithoutEpisodeNestedInput
     auditEvents?: AuditEventUpdateManyWithoutEpisodeNestedInput
     accessGrants?: AccessGrantUpdateManyWithoutEpisodeNestedInput
+    orchestratedTaskGraphs?: TaskGraphUpdateManyWithoutOrchestratorEpisodeNestedInput
+    taskGraphEpisodes?: TaskGraphEpisodeUpdateManyWithoutEpisodeNestedInput
   }
 
   export type EpisodeUncheckedUpdateWithoutPrimaryAgentInput = {
     id?: StringFieldUpdateOperationsInput | string
     projectId?: StringFieldUpdateOperationsInput | string
     parentEpisodeId?: NullableStringFieldUpdateOperationsInput | string | null
+    forkPointTraceId?: NullableStringFieldUpdateOperationsInput | string | null
     titleI18n?: JsonNullValueInput | InputJsonValue
     summaryI18n?: NullableJsonNullValueInput | InputJsonValue
     goalI18n?: NullableJsonNullValueInput | InputJsonValue
@@ -28655,12 +33972,15 @@ export namespace Prisma {
     artifacts?: ArtifactUncheckedUpdateManyWithoutEpisodeNestedInput
     auditEvents?: AuditEventUncheckedUpdateManyWithoutEpisodeNestedInput
     accessGrants?: AccessGrantUncheckedUpdateManyWithoutEpisodeNestedInput
+    orchestratedTaskGraphs?: TaskGraphUncheckedUpdateManyWithoutOrchestratorEpisodeNestedInput
+    taskGraphEpisodes?: TaskGraphEpisodeUncheckedUpdateManyWithoutEpisodeNestedInput
   }
 
   export type EpisodeUncheckedUpdateManyWithoutPrimaryAgentInput = {
     id?: StringFieldUpdateOperationsInput | string
     projectId?: StringFieldUpdateOperationsInput | string
     parentEpisodeId?: NullableStringFieldUpdateOperationsInput | string | null
+    forkPointTraceId?: NullableStringFieldUpdateOperationsInput | string | null
     titleI18n?: JsonNullValueInput | InputJsonValue
     summaryI18n?: NullableJsonNullValueInput | InputJsonValue
     goalI18n?: NullableJsonNullValueInput | InputJsonValue
@@ -28766,6 +34086,7 @@ export namespace Prisma {
     errorSummaryI18n?: NullableJsonNullValueInput | InputJsonValue
     policyHitReasonI18n?: NullableJsonNullValueInput | InputJsonValue
     permissionDeniedI18n?: NullableJsonNullValueInput | InputJsonValue
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
     eventTime?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     episode?: EpisodeUpdateOneRequiredWithoutTraceEventsNestedInput
@@ -28789,6 +34110,7 @@ export namespace Prisma {
     errorSummaryI18n?: NullableJsonNullValueInput | InputJsonValue
     policyHitReasonI18n?: NullableJsonNullValueInput | InputJsonValue
     permissionDeniedI18n?: NullableJsonNullValueInput | InputJsonValue
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
     eventTime?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sourceArtifacts?: ArtifactUncheckedUpdateManyWithoutSourceTraceEventNestedInput
@@ -28811,6 +34133,7 @@ export namespace Prisma {
     errorSummaryI18n?: NullableJsonNullValueInput | InputJsonValue
     policyHitReasonI18n?: NullableJsonNullValueInput | InputJsonValue
     permissionDeniedI18n?: NullableJsonNullValueInput | InputJsonValue
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
     eventTime?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -28865,10 +34188,85 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type TaskGraphUpdateWithoutCreatedByAgentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    symphonyTaskId?: StringFieldUpdateOperationsInput | string
+    status?: EnumTaskGraphStatusFieldUpdateOperationsInput | $Enums.TaskGraphStatus
+    sensitivity?: StringFieldUpdateOperationsInput | string
+    policyVersion?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    workspace?: WorkspaceUpdateOneRequiredWithoutTaskGraphsNestedInput
+    project?: ProjectUpdateOneRequiredWithoutTaskGraphsNestedInput
+    orchestratorEpisode?: EpisodeUpdateOneRequiredWithoutOrchestratedTaskGraphsNestedInput
+    episodes?: TaskGraphEpisodeUpdateManyWithoutTaskGraphNestedInput
+  }
+
+  export type TaskGraphUncheckedUpdateWithoutCreatedByAgentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    workspaceId?: StringFieldUpdateOperationsInput | string
+    projectId?: StringFieldUpdateOperationsInput | string
+    symphonyTaskId?: StringFieldUpdateOperationsInput | string
+    orchestratorEpisodeId?: StringFieldUpdateOperationsInput | string
+    status?: EnumTaskGraphStatusFieldUpdateOperationsInput | $Enums.TaskGraphStatus
+    sensitivity?: StringFieldUpdateOperationsInput | string
+    policyVersion?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    episodes?: TaskGraphEpisodeUncheckedUpdateManyWithoutTaskGraphNestedInput
+  }
+
+  export type TaskGraphUncheckedUpdateManyWithoutCreatedByAgentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    workspaceId?: StringFieldUpdateOperationsInput | string
+    projectId?: StringFieldUpdateOperationsInput | string
+    symphonyTaskId?: StringFieldUpdateOperationsInput | string
+    orchestratorEpisodeId?: StringFieldUpdateOperationsInput | string
+    status?: EnumTaskGraphStatusFieldUpdateOperationsInput | $Enums.TaskGraphStatus
+    sensitivity?: StringFieldUpdateOperationsInput | string
+    policyVersion?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TaskGraphEpisodeUpdateWithoutAgentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    role?: EnumTaskGraphEpisodeRoleFieldUpdateOperationsInput | $Enums.TaskGraphEpisodeRole
+    assignedSubtask?: StringFieldUpdateOperationsInput | string
+    dependencyEpisodeIds?: TaskGraphEpisodeUpdatedependencyEpisodeIdsInput | string[]
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    taskGraph?: TaskGraphUpdateOneRequiredWithoutEpisodesNestedInput
+    episode?: EpisodeUpdateOneRequiredWithoutTaskGraphEpisodesNestedInput
+  }
+
+  export type TaskGraphEpisodeUncheckedUpdateWithoutAgentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    taskGraphId?: StringFieldUpdateOperationsInput | string
+    episodeId?: StringFieldUpdateOperationsInput | string
+    role?: EnumTaskGraphEpisodeRoleFieldUpdateOperationsInput | $Enums.TaskGraphEpisodeRole
+    assignedSubtask?: StringFieldUpdateOperationsInput | string
+    dependencyEpisodeIds?: TaskGraphEpisodeUpdatedependencyEpisodeIdsInput | string[]
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TaskGraphEpisodeUncheckedUpdateManyWithoutAgentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    taskGraphId?: StringFieldUpdateOperationsInput | string
+    episodeId?: StringFieldUpdateOperationsInput | string
+    role?: EnumTaskGraphEpisodeRoleFieldUpdateOperationsInput | $Enums.TaskGraphEpisodeRole
+    assignedSubtask?: StringFieldUpdateOperationsInput | string
+    dependencyEpisodeIds?: TaskGraphEpisodeUpdatedependencyEpisodeIdsInput | string[]
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type EpisodeCreateManyParentEpisodeInput = {
     id?: string
     projectId: string
     primaryAgentId: string
+    forkPointTraceId?: string | null
     titleI18n: JsonNullValueInput | InputJsonValue
     summaryI18n?: NullableJsonNullValueInput | InputJsonValue
     goalI18n?: NullableJsonNullValueInput | InputJsonValue
@@ -28922,6 +34320,7 @@ export namespace Prisma {
     errorSummaryI18n?: NullableJsonNullValueInput | InputJsonValue
     policyHitReasonI18n?: NullableJsonNullValueInput | InputJsonValue
     permissionDeniedI18n?: NullableJsonNullValueInput | InputJsonValue
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
     eventTime: Date | string
     createdAt?: Date | string
   }
@@ -28972,8 +34371,33 @@ export namespace Prisma {
     createdAt?: Date | string
   }
 
+  export type TaskGraphCreateManyOrchestratorEpisodeInput = {
+    id?: string
+    workspaceId: string
+    projectId: string
+    symphonyTaskId: string
+    status?: $Enums.TaskGraphStatus
+    sensitivity?: string
+    policyVersion: string
+    createdByAgentId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type TaskGraphEpisodeCreateManyEpisodeInput = {
+    id?: string
+    taskGraphId: string
+    role: $Enums.TaskGraphEpisodeRole
+    agentId: string
+    assignedSubtask: string
+    dependencyEpisodeIds?: TaskGraphEpisodeCreatedependencyEpisodeIdsInput | string[]
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type EpisodeUpdateWithoutParentEpisodeInput = {
     id?: StringFieldUpdateOperationsInput | string
+    forkPointTraceId?: NullableStringFieldUpdateOperationsInput | string | null
     titleI18n?: JsonNullValueInput | InputJsonValue
     summaryI18n?: NullableJsonNullValueInput | InputJsonValue
     goalI18n?: NullableJsonNullValueInput | InputJsonValue
@@ -29000,12 +34424,15 @@ export namespace Prisma {
     artifacts?: ArtifactUpdateManyWithoutEpisodeNestedInput
     auditEvents?: AuditEventUpdateManyWithoutEpisodeNestedInput
     accessGrants?: AccessGrantUpdateManyWithoutEpisodeNestedInput
+    orchestratedTaskGraphs?: TaskGraphUpdateManyWithoutOrchestratorEpisodeNestedInput
+    taskGraphEpisodes?: TaskGraphEpisodeUpdateManyWithoutEpisodeNestedInput
   }
 
   export type EpisodeUncheckedUpdateWithoutParentEpisodeInput = {
     id?: StringFieldUpdateOperationsInput | string
     projectId?: StringFieldUpdateOperationsInput | string
     primaryAgentId?: StringFieldUpdateOperationsInput | string
+    forkPointTraceId?: NullableStringFieldUpdateOperationsInput | string | null
     titleI18n?: JsonNullValueInput | InputJsonValue
     summaryI18n?: NullableJsonNullValueInput | InputJsonValue
     goalI18n?: NullableJsonNullValueInput | InputJsonValue
@@ -29030,12 +34457,15 @@ export namespace Prisma {
     artifacts?: ArtifactUncheckedUpdateManyWithoutEpisodeNestedInput
     auditEvents?: AuditEventUncheckedUpdateManyWithoutEpisodeNestedInput
     accessGrants?: AccessGrantUncheckedUpdateManyWithoutEpisodeNestedInput
+    orchestratedTaskGraphs?: TaskGraphUncheckedUpdateManyWithoutOrchestratorEpisodeNestedInput
+    taskGraphEpisodes?: TaskGraphEpisodeUncheckedUpdateManyWithoutEpisodeNestedInput
   }
 
   export type EpisodeUncheckedUpdateManyWithoutParentEpisodeInput = {
     id?: StringFieldUpdateOperationsInput | string
     projectId?: StringFieldUpdateOperationsInput | string
     primaryAgentId?: StringFieldUpdateOperationsInput | string
+    forkPointTraceId?: NullableStringFieldUpdateOperationsInput | string | null
     titleI18n?: JsonNullValueInput | InputJsonValue
     summaryI18n?: NullableJsonNullValueInput | InputJsonValue
     goalI18n?: NullableJsonNullValueInput | InputJsonValue
@@ -29126,6 +34556,7 @@ export namespace Prisma {
     errorSummaryI18n?: NullableJsonNullValueInput | InputJsonValue
     policyHitReasonI18n?: NullableJsonNullValueInput | InputJsonValue
     permissionDeniedI18n?: NullableJsonNullValueInput | InputJsonValue
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
     eventTime?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     actorAgent?: AgentUpdateOneWithoutTraceEventsNestedInput
@@ -29149,6 +34580,7 @@ export namespace Prisma {
     errorSummaryI18n?: NullableJsonNullValueInput | InputJsonValue
     policyHitReasonI18n?: NullableJsonNullValueInput | InputJsonValue
     permissionDeniedI18n?: NullableJsonNullValueInput | InputJsonValue
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
     eventTime?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sourceArtifacts?: ArtifactUncheckedUpdateManyWithoutSourceTraceEventNestedInput
@@ -29171,6 +34603,7 @@ export namespace Prisma {
     errorSummaryI18n?: NullableJsonNullValueInput | InputJsonValue
     policyHitReasonI18n?: NullableJsonNullValueInput | InputJsonValue
     permissionDeniedI18n?: NullableJsonNullValueInput | InputJsonValue
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
     eventTime?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -29313,6 +34746,80 @@ export namespace Prisma {
     scopeType?: StringFieldUpdateOperationsInput | string
     effect?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TaskGraphUpdateWithoutOrchestratorEpisodeInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    symphonyTaskId?: StringFieldUpdateOperationsInput | string
+    status?: EnumTaskGraphStatusFieldUpdateOperationsInput | $Enums.TaskGraphStatus
+    sensitivity?: StringFieldUpdateOperationsInput | string
+    policyVersion?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    workspace?: WorkspaceUpdateOneRequiredWithoutTaskGraphsNestedInput
+    project?: ProjectUpdateOneRequiredWithoutTaskGraphsNestedInput
+    createdByAgent?: AgentUpdateOneRequiredWithoutCreatedTaskGraphsNestedInput
+    episodes?: TaskGraphEpisodeUpdateManyWithoutTaskGraphNestedInput
+  }
+
+  export type TaskGraphUncheckedUpdateWithoutOrchestratorEpisodeInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    workspaceId?: StringFieldUpdateOperationsInput | string
+    projectId?: StringFieldUpdateOperationsInput | string
+    symphonyTaskId?: StringFieldUpdateOperationsInput | string
+    status?: EnumTaskGraphStatusFieldUpdateOperationsInput | $Enums.TaskGraphStatus
+    sensitivity?: StringFieldUpdateOperationsInput | string
+    policyVersion?: StringFieldUpdateOperationsInput | string
+    createdByAgentId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    episodes?: TaskGraphEpisodeUncheckedUpdateManyWithoutTaskGraphNestedInput
+  }
+
+  export type TaskGraphUncheckedUpdateManyWithoutOrchestratorEpisodeInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    workspaceId?: StringFieldUpdateOperationsInput | string
+    projectId?: StringFieldUpdateOperationsInput | string
+    symphonyTaskId?: StringFieldUpdateOperationsInput | string
+    status?: EnumTaskGraphStatusFieldUpdateOperationsInput | $Enums.TaskGraphStatus
+    sensitivity?: StringFieldUpdateOperationsInput | string
+    policyVersion?: StringFieldUpdateOperationsInput | string
+    createdByAgentId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TaskGraphEpisodeUpdateWithoutEpisodeInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    role?: EnumTaskGraphEpisodeRoleFieldUpdateOperationsInput | $Enums.TaskGraphEpisodeRole
+    assignedSubtask?: StringFieldUpdateOperationsInput | string
+    dependencyEpisodeIds?: TaskGraphEpisodeUpdatedependencyEpisodeIdsInput | string[]
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    taskGraph?: TaskGraphUpdateOneRequiredWithoutEpisodesNestedInput
+    agent?: AgentUpdateOneRequiredWithoutTaskGraphEpisodesNestedInput
+  }
+
+  export type TaskGraphEpisodeUncheckedUpdateWithoutEpisodeInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    taskGraphId?: StringFieldUpdateOperationsInput | string
+    role?: EnumTaskGraphEpisodeRoleFieldUpdateOperationsInput | $Enums.TaskGraphEpisodeRole
+    agentId?: StringFieldUpdateOperationsInput | string
+    assignedSubtask?: StringFieldUpdateOperationsInput | string
+    dependencyEpisodeIds?: TaskGraphEpisodeUpdatedependencyEpisodeIdsInput | string[]
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TaskGraphEpisodeUncheckedUpdateManyWithoutEpisodeInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    taskGraphId?: StringFieldUpdateOperationsInput | string
+    role?: EnumTaskGraphEpisodeRoleFieldUpdateOperationsInput | $Enums.TaskGraphEpisodeRole
+    agentId?: StringFieldUpdateOperationsInput | string
+    assignedSubtask?: StringFieldUpdateOperationsInput | string
+    dependencyEpisodeIds?: TaskGraphEpisodeUpdatedependencyEpisodeIdsInput | string[]
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type AuditEventCreateManyMemoryItemInput = {
@@ -29619,6 +35126,50 @@ export namespace Prisma {
     policyHitReasonI18n?: NullableJsonNullValueInput | InputJsonValue
     permissionDecision?: NullableStringFieldUpdateOperationsInput | string | null
     denyReasonI18n?: NullableJsonNullValueInput | InputJsonValue
+  }
+
+  export type TaskGraphEpisodeCreateManyTaskGraphInput = {
+    id?: string
+    episodeId: string
+    role: $Enums.TaskGraphEpisodeRole
+    agentId: string
+    assignedSubtask: string
+    dependencyEpisodeIds?: TaskGraphEpisodeCreatedependencyEpisodeIdsInput | string[]
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type TaskGraphEpisodeUpdateWithoutTaskGraphInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    role?: EnumTaskGraphEpisodeRoleFieldUpdateOperationsInput | $Enums.TaskGraphEpisodeRole
+    assignedSubtask?: StringFieldUpdateOperationsInput | string
+    dependencyEpisodeIds?: TaskGraphEpisodeUpdatedependencyEpisodeIdsInput | string[]
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    episode?: EpisodeUpdateOneRequiredWithoutTaskGraphEpisodesNestedInput
+    agent?: AgentUpdateOneRequiredWithoutTaskGraphEpisodesNestedInput
+  }
+
+  export type TaskGraphEpisodeUncheckedUpdateWithoutTaskGraphInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    episodeId?: StringFieldUpdateOperationsInput | string
+    role?: EnumTaskGraphEpisodeRoleFieldUpdateOperationsInput | $Enums.TaskGraphEpisodeRole
+    agentId?: StringFieldUpdateOperationsInput | string
+    assignedSubtask?: StringFieldUpdateOperationsInput | string
+    dependencyEpisodeIds?: TaskGraphEpisodeUpdatedependencyEpisodeIdsInput | string[]
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TaskGraphEpisodeUncheckedUpdateManyWithoutTaskGraphInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    episodeId?: StringFieldUpdateOperationsInput | string
+    role?: EnumTaskGraphEpisodeRoleFieldUpdateOperationsInput | $Enums.TaskGraphEpisodeRole
+    agentId?: StringFieldUpdateOperationsInput | string
+    assignedSubtask?: StringFieldUpdateOperationsInput | string
+    dependencyEpisodeIds?: TaskGraphEpisodeUpdatedependencyEpisodeIdsInput | string[]
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
 

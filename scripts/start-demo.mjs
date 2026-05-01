@@ -137,7 +137,8 @@ async function ensureDatabaseReady() {
     }
   }
 
-  const databaseUrl = process.env.DATABASE_URL ?? "file:./dev.db";
+  const databaseUrl =
+    process.env.DATABASE_URL ?? "postgresql://postgres:postgres@localhost:5432/traceplane?schema=public";
   const normalizedDatabaseUrl = normalizeDatabaseUrl(databaseUrl);
   const forceReset = process.env.DEMO_RESET_ENABLED === "true";
   const sqlitePath = resolveSqlitePath(normalizedDatabaseUrl);

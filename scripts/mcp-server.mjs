@@ -46,6 +46,207 @@ function toolResult(data) {
   };
 }
 
+function normalizeEpisodeContextStatus(status) {
+  if (status === "COMPLETED") return "done";
+  if (status === "FAILED") return "failed";
+  if (status === "BLOCKED" || status === "IN_REVIEW" || status === "PLANNED") return "paused";
+  return "active";
+}
+
+function normalizeStepStatus(status) {
+  if (status === "SUCCESS") return "done";
+  if (status === "FAILED") return "failed";
+  return "pending";
+}
+
+function mapTraceStep(trace, locale = "zh") {
+  return {
+    id: trace.id,
+    step_index: trace.stepIndex,
+    event_type: trace.eventType,
+    tool_name: trace.toolName ?? null,
+    title: localize(trace.stepTitleI18n, locale),
+    status: normalizeStepStatus(trace.status),
+    summary: localize(trace.shortResultI18n, locale),
+    occurred_at: trace.eventTime
+  };
+}
+
+function buildResumeHint(episode, traces, locale = "zh") {
+  const lastPending = [...traces].reverse().find((trace) => trace.status !== "SUCCESS");
+  if (lastPending) {
+    return `Resume from step ${lastPending.stepIndex}: ${localize(lastPending.stepTitleI18n, locale)}`;
+  }
+
+  const lastTrace = traces[traces.length - 1];
+  if (lastTrace && episode.status === "COMPLETED") {
+    return `Episode completed after step ${lastTrace.stepIndex}: ${localize(lastTrace.stepTitleI18n, locale)}`;
+  }
+
+  if (lastTrace) {
+    return `Continue after step ${lastTrace.stepIndex}: ${localize(lastTrace.stepTitleI18n, locale)}`;
+  }
+
+  return `Start from episode goal: ${localize(episode.goalI18n, locale) || localize(episode.titleI18n, locale)}`;
+}
+
+function buildOrchestratorContextPayload(episode, locale = "zh") {
+  const traces = [...(episode.traceEvents ?? [])].sort((left, right) => left.stepIndex - right.stepIndex);
+  const failedTraces = traces.filter((trace) => trace.status === "FAILED");
+  const deniedAudits = (episode.auditEvents ?? []).filter((event) => event.permissionDecision === "deny");
+  const policyHitAudits = (episode.auditEvents ?? []).filter((event) => event.policyHitReasonI18n);
+
+  return {
+    episode_id: episode.id,
+    status: normalizeEpisodeContextStatus(episode.status),
+    completed_steps: traces.filter((trace) => trace.status === "SUCCESS").map((trace) => mapTraceStep(trace, locale)),
+    pending_steps: traces.filter((trace) => trace.status !== "SUCCESS").map((trace) => mapTraceStep(trace, locale)),
+    artifacts: (episode.artifacts ?? []).map((artifact) => ({
+      id: artifact.id,
+      artifact_key: artifact.artifactKey,
+      title: localize(artifact.titleI18n, locale),
+      file_type: artifact.fileType,
+      version: artifact.version,
+      uri: artifact.uri,
+      sensitivity: artifact.sensitivity,
+      source_trace_event_id: artifact.sourceTraceEventId ?? null
+    })),
+    memory_snapshot: (episode.memoryItems ?? []).map((memory) => ({
+      id: memory.id,
+      title: localize(memory.titleI18n, locale),
+      content: localize(memory.contentI18n, locale),
+      type: memory.type,
+      source: memory.source,
+      importance: memory.importance,
+      sensitivity: memory.sensitivity,
+      created_at: memory.createdAt
+    })),
+    risk_flags: [
+      ...(episode.status === "FAILED" ? ["episode_failed"] : []),
+      ...failedTraces.map((trace) => `failed_trace:${trace.id}`),
+      ...deniedAudits.map((event) => `permission_denied:${event.action}`),
+      ...policyHitAudits.map((event) => `policy_hit:${event.action}`)
+    ],
+    resume_hint: buildResumeHint(episode, traces, locale)
+  };
+}
+
+function normalizeWorkType(value) {
+  const allowed = new Set(["RESEARCH", "GENERATE", "REVIEW", "REVISE", "APPROVE", "SUMMARIZE"]);
+  const raw = typeof value === "string" ? value.trim().toUpperCase() : "";
+  return allowed.has(raw) ? raw : "GENERATE";
+}
+
+function normalizeEpisodeLifecycleStatus(value) {
+  const raw = typeof value === "string" ? value.trim().toUpperCase() : "";
+  if (["PLANNED", "IN_PROGRESS", "BLOCKED", "IN_REVIEW", "COMPLETED", "FAILED"].includes(raw)) {
+    return raw;
+  }
+  if (raw === "RUNNING" || raw === "ACTIVE") return "IN_PROGRESS";
+  if (raw === "DONE" || raw === "SUCCESS") return "COMPLETED";
+  if (raw === "ERROR") return "FAILED";
+  throw new Error("status must be a valid episode status");
+}
+
+function traceStatusForEpisodeStatus(status) {
+  if (status === "COMPLETED") return "SUCCESS";
+  if (status === "FAILED") return "FAILED";
+  return "WARNING";
+}
+
+function graphStatusLabel(status) {
+  return (status ?? "RUNNING").toLowerCase();
+}
+
+function episodeStatusLabel(status) {
+  if (status === "COMPLETED") return "completed";
+  if (status === "FAILED") return "failed";
+  if (status === "PLANNED") return "planned";
+  return "running";
+}
+
+function taskGraphInclude() {
+  return {
+    episodes: {
+      include: {
+        episode: {
+          include: {
+            traceEvents: true
+          }
+        },
+        agent: true
+      }
+    }
+  };
+}
+
+async function findTaskGraph(identity) {
+  const byId = await prisma.taskGraph.findUnique({
+    where: { id: identity },
+    include: taskGraphInclude()
+  });
+  if (byId) return byId;
+
+  const bySymphonyTaskId = await prisma.taskGraph.findUnique({
+    where: { symphonyTaskId: identity },
+    include: taskGraphInclude()
+  });
+  if (!bySymphonyTaskId) {
+    throw new Error("Task graph not found");
+  }
+  return bySymphonyTaskId;
+}
+
+function taskGraphWorkers(graph) {
+  return (graph.episodes ?? []).filter((link) => link.role === "WORKER");
+}
+
+function aggregateTaskGraphStatus(graph, overrides = {}) {
+  const workers = taskGraphWorkers(graph);
+  if (workers.length === 0) return graph.status ?? "RUNNING";
+
+  const statuses = workers.map((link) => overrides[link.episodeId] ?? link.episode?.status);
+  if (statuses.some((status) => status === "FAILED")) return "FAILED";
+  if (statuses.every((status) => status === "COMPLETED")) return "COMPLETED";
+  return "RUNNING";
+}
+
+function taskGraphWorkerCounts(graph) {
+  return taskGraphWorkers(graph).reduce(
+    (counts, link) => {
+      counts.total += 1;
+      if (link.episode?.status === "COMPLETED") counts.completed += 1;
+      else if (link.episode?.status === "FAILED") counts.failed += 1;
+      else if (link.episode?.status === "PLANNED") counts.planned += 1;
+      else counts.running += 1;
+      return counts;
+    },
+    { total: 0, completed: 0, failed: 0, running: 0, planned: 0 }
+  );
+}
+
+function buildTaskGraphStatusPayload(graph) {
+  const status = aggregateTaskGraphStatus(graph);
+  return {
+    task_graph_id: graph.id,
+    symphony_task_id: graph.symphonyTaskId,
+    status: graphStatusLabel(status),
+    project_id: graph.projectId,
+    workspace_id: graph.workspaceId,
+    worker_counts: taskGraphWorkerCounts(graph),
+    episodes: (graph.episodes ?? []).map((link) => ({
+      id: link.id,
+      task_graph_id: link.taskGraphId,
+      episode_id: link.episodeId,
+      role: link.role.toLowerCase(),
+      agent_id: link.agentId,
+      assigned_subtask: link.assignedSubtask,
+      dependency_episode_ids: link.dependencyEpisodeIds ?? [],
+      status: episodeStatusLabel(link.episode?.status)
+    }))
+  };
+}
+
 const server = new McpServer({
   name: "enterprise-agent-work-graph",
   version: "1.1.0"
@@ -773,6 +974,292 @@ server.registerTool(
             })))
       ]
     });
+  }
+);
+
+server.registerTool(
+  "register_subtask",
+  {
+    description: "Register a Symphony worker subtask as an episode attached to a task graph.",
+    inputSchema: {
+      task_graph_id: z.string(),
+      agent_id: z.string(),
+      assigned_subtask: z.union([z.string(), z.object({ zh: z.string(), en: z.string().optional() })]),
+      dependency_episode_ids: z.array(z.string()).optional(),
+      work_type: z.enum(["RESEARCH", "GENERATE", "REVIEW", "REVISE", "APPROVE", "SUMMARIZE"]).optional(),
+      title: z.union([z.string(), z.object({ zh: z.string(), en: z.string().optional() })]).optional(),
+      goal: z.union([z.string(), z.object({ zh: z.string(), en: z.string().optional() })]).optional(),
+      success_criteria: z.union([z.string(), z.object({ zh: z.string(), en: z.string().optional() })]).optional(),
+      actor_id: z.string().optional()
+    }
+  },
+  async ({ task_graph_id, agent_id, assigned_subtask, dependency_episode_ids, work_type, title, goal, success_criteria, actor_id }) => {
+    const graph = await findTaskGraph(task_graph_id);
+    const agent = await prisma.agent.findFirst({
+      where: {
+        OR: [{ id: agent_id }, { slug: agent_id }]
+      }
+    });
+
+    if (!agent) {
+      throw new Error("Agent not found");
+    }
+
+    const assignedSubtaskText =
+      typeof assigned_subtask === "string" ? assigned_subtask.trim() : localize(assigned_subtask);
+    if (!assignedSubtaskText) {
+      throw new Error("assigned_subtask is required");
+    }
+
+    const dependencyEpisodeIds = Array.isArray(dependency_episode_ids)
+      ? dependency_episode_ids.filter((episodeId) => typeof episodeId === "string" && episodeId.trim())
+      : [];
+    const graphEpisodeIds = new Set((graph.episodes ?? []).map((link) => link.episodeId));
+    const missingDependency = dependencyEpisodeIds.find((episodeId) => !graphEpisodeIds.has(episodeId));
+    if (missingDependency) {
+      throw new Error(`Dependency episode ${missingDependency} is not part of the task graph`);
+    }
+
+    const created = await prisma.$transaction(async (tx) => {
+      const episode = await tx.episode.create({
+        data: {
+          projectId: graph.projectId,
+          primaryAgentId: agent.id,
+          parentEpisodeId: graph.orchestratorEpisodeId,
+          titleI18n: toI18n(title, toI18n(assignedSubtaskText, { zh: "Subtask", en: "Subtask" })),
+          summaryI18n: null,
+          goalI18n: toI18n(goal, toI18n(assignedSubtaskText)),
+          successCriteriaI18n: toI18n(success_criteria, toI18n(goal, toI18n(assignedSubtaskText))),
+          finalOutcomeI18n: null,
+          primaryActor: agent.id,
+          workType: normalizeWorkType(work_type),
+          relationIntent: dependencyEpisodeIds.length > 0 ? "DEPENDS_ON" : null,
+          status: "PLANNED",
+          policyVersion: graph.policyVersion,
+          startedAt: new Date()
+        }
+      });
+
+      await tx.episodeAgent.create({
+        data: {
+          episodeId: episode.id,
+          agentId: agent.id
+        }
+      });
+
+      const link = await tx.taskGraphEpisode.create({
+        data: {
+          taskGraphId: graph.id,
+          episodeId: episode.id,
+          role: "WORKER",
+          agentId: agent.id,
+          assignedSubtask: assignedSubtaskText,
+          dependencyEpisodeIds
+        }
+      });
+
+      if (dependencyEpisodeIds.length > 0) {
+        await tx.nodeEdge.createMany({
+          data: dependencyEpisodeIds.map((dependencyEpisodeId) => ({
+            fromNodeType: "episode",
+            fromNodeId: episode.id,
+            toNodeType: "episode",
+            toNodeId: dependencyEpisodeId,
+            edgeType: "DEPENDS_ON"
+          }))
+        });
+      }
+
+      await tx.auditEvent.create({
+        data: {
+          workspaceId: graph.workspaceId,
+          projectId: graph.projectId,
+          episodeId: episode.id,
+          occurredAt: new Date(),
+          actorType: "agent",
+          actorId: actor_id ?? agent.id,
+          action: "register_subtask",
+          targetType: "task_graph_episode",
+          targetId: link.id,
+          result: "success",
+          policyVersion: graph.policyVersion,
+          permissionDecision: "allow"
+        }
+      });
+
+      return { episode, link };
+    });
+
+    return toolResult({
+      task_graph_id: graph.id,
+      episode_id: created.episode.id,
+      role: "worker",
+      status: episodeStatusLabel(created.episode.status),
+      assigned_subtask: created.link.assignedSubtask,
+      dependency_episode_ids: created.link.dependencyEpisodeIds
+    });
+  }
+);
+
+server.registerTool(
+  "report_subtask_result",
+  {
+    description: "Report the latest result of a Symphony worker episode and update aggregate task graph status.",
+    inputSchema: {
+      task_graph_id: z.string(),
+      episode_id: z.string(),
+      status: z.enum(["PLANNED", "IN_PROGRESS", "BLOCKED", "IN_REVIEW", "COMPLETED", "FAILED"]),
+      summary: z.union([z.string(), z.object({ zh: z.string(), en: z.string().optional() })]),
+      actor_id: z.string().optional()
+    }
+  },
+  async ({ task_graph_id, episode_id, status, summary, actor_id }) => {
+    const graph = await findTaskGraph(task_graph_id);
+    const link = await prisma.taskGraphEpisode.findFirst({
+      where: {
+        taskGraphId: graph.id,
+        episodeId: episode_id
+      },
+      include: {
+        episode: {
+          include: {
+            traceEvents: true
+          }
+        }
+      }
+    });
+
+    if (!link) {
+      throw new Error("Episode is not part of the task graph");
+    }
+
+    const normalizedStatus = normalizeEpisodeLifecycleStatus(status);
+    const summaryI18n = toI18n(summary, { zh: "Subtask status reported", en: "Subtask status reported" });
+    const actorAgent = actor_id
+      ? await prisma.agent.findFirst({
+          where: {
+            OR: [{ id: actor_id }, { slug: actor_id }]
+          }
+        })
+      : null;
+    const actorAgentId = actorAgent?.id ?? link.agentId;
+    const stepIndex =
+      link.episode.traceEvents.length > 0 ? Math.max(...link.episode.traceEvents.map((trace) => trace.stepIndex)) + 1 : 1;
+    const graphStatus = aggregateTaskGraphStatus(graph, { [episode_id]: normalizedStatus });
+
+    const result = await prisma.$transaction(async (tx) => {
+      const updatedEpisode = await tx.episode.update({
+        where: { id: episode_id },
+        data: {
+          status: normalizedStatus,
+          finalOutcomeI18n: normalizedStatus === "COMPLETED" ? summaryI18n : link.episode.finalOutcomeI18n,
+          failureReasonI18n: normalizedStatus === "FAILED" ? summaryI18n : link.episode.failureReasonI18n,
+          blockedReasonI18n: normalizedStatus === "BLOCKED" ? summaryI18n : link.episode.blockedReasonI18n,
+          reviewOutcome: normalizedStatus === "COMPLETED" ? "APPROVED" : link.episode.reviewOutcome,
+          endedAt: normalizedStatus === "COMPLETED" || normalizedStatus === "FAILED" ? new Date() : link.episode.endedAt
+        }
+      });
+
+      const trace = await tx.traceEvent.create({
+        data: {
+          episodeId: episode_id,
+          actorAgentId,
+          stepIndex,
+          eventType: "symphony.subtask.result",
+          toolName: "symphony",
+          stepTitleI18n: toI18n("Subtask result"),
+          status: traceStatusForEpisodeStatus(normalizedStatus),
+          shortResultI18n: summaryI18n,
+          inputSummaryI18n: null,
+          decisionSummaryI18n: null,
+          toolPayloadSummaryI18n: null,
+          resultSummaryI18n: normalizedStatus === "COMPLETED" ? summaryI18n : null,
+          errorSummaryI18n: normalizedStatus === "FAILED" ? summaryI18n : null,
+          policyHitReasonI18n: null,
+          permissionDeniedI18n: null,
+          snapshot: { task_graph_id, episode_id, status: normalizedStatus, summary },
+          eventTime: new Date()
+        }
+      });
+
+      const updatedGraph = await tx.taskGraph.update({
+        where: { id: graph.id },
+        data: {
+          status: graphStatus
+        }
+      });
+
+      await tx.auditEvent.create({
+        data: {
+          workspaceId: graph.workspaceId,
+          projectId: graph.projectId,
+          episodeId: episode_id,
+          traceEventId: trace.id,
+          occurredAt: new Date(),
+          actorType: "agent",
+          actorId: actorAgentId,
+          action: "report_subtask_result",
+          targetType: "episode",
+          targetId: episode_id,
+          result: normalizedStatus === "FAILED" ? "warning" : "success",
+          policyVersion: graph.policyVersion,
+          permissionDecision: "allow"
+        }
+      });
+
+      return { updatedEpisode, trace, updatedGraph };
+    });
+
+    return toolResult({
+      task_graph_id: graph.id,
+      episode_id: result.updatedEpisode.id,
+      trace_event_id: result.trace.id,
+      status: graphStatusLabel(result.updatedGraph.status),
+      episode_status: episodeStatusLabel(result.updatedEpisode.status)
+    });
+  }
+);
+
+server.registerTool(
+  "get_task_graph_status",
+  {
+    description: "Return aggregate task graph progress and all attached orchestrator/worker episodes.",
+    inputSchema: {
+      task_graph_id: z.string()
+    }
+  },
+  async ({ task_graph_id }) => {
+    const graph = await findTaskGraph(task_graph_id);
+    return toolResult(buildTaskGraphStatusPayload(graph));
+  }
+);
+
+server.registerTool(
+  "get_orchestrator_context",
+  {
+    description: "Return machine-readable episode context for a Symphony orchestrator.",
+    inputSchema: {
+      episode_id: z.string(),
+      locale: z.enum(["zh", "en"]).optional()
+    }
+  },
+  async ({ episode_id, locale }) => {
+    const episode = await prisma.episode.findUnique({
+      where: { id: episode_id },
+      include: {
+        project: true,
+        memoryItems: { orderBy: { createdAt: "desc" }, take: 20 },
+        traceEvents: { orderBy: { stepIndex: "asc" } },
+        artifacts: { orderBy: { updatedAt: "desc" }, take: 20 },
+        auditEvents: { orderBy: { occurredAt: "desc" }, take: 50 }
+      }
+    });
+
+    if (!episode) {
+      throw new Error("Episode not found");
+    }
+
+    return toolResult(buildOrchestratorContextPayload(episode, locale));
   }
 );
 
