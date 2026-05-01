@@ -5,20 +5,20 @@ import Link from "next/link";
 
 const terminalLines = [
   { type: "prompt", text: "$ " },
-  { type: "cmd", text: "npx @traceplane/cli init customer-pulse" },
+  { type: "cmd", text: "sdk.startEpisode({ title: 'Weekly report' })" },
   { type: "output", text: "" },
   { type: "success", text: "✓ Episode created: ep_cmn71a7ob" },
   { type: "info", text: " → Agent: claude-code" },
   { type: "info", text: " → Status: active" },
   { type: "output", text: "" },
   { type: "prompt", text: "$ " },
-  { type: "cmd", text: "traceplane trace tool.fetch_data --duration 1200ms" },
+  { type: "cmd", text: "session.toolUse('fetch-data', 'pull feedback', '500 rows')" },
   { type: "output", text: "" },
   { type: "success", text: "✓ Trace recorded: tr_001" },
   { type: "info", text: " → Duration: 1200ms" },
   { type: "output", text: "" },
   { type: "prompt", text: "$ " },
-  { type: "cmd", text: "traceplane episode complete" },
+  { type: "cmd", text: "session.complete('handoff brief ready')" },
   { type: "output", text: "" },
   { type: "success", text: "✓ Episode completed — context saved" },
   { type: "success", text: "✓ Handoff brief ready for next agent" },
@@ -26,13 +26,21 @@ const terminalLines = [
 
 function TerminalOutput() {
   const [displayedLines, setDisplayedLines] = useState<Array<{ type: string; text: string }>>([]);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     let lineIdx = 0;
     let charIdx = 0;
     let currentText = "";
+    let isMounted = true;
+
+    const schedule = (callback: () => void, delay: number) => {
+      timeoutRef.current = setTimeout(callback, delay);
+    };
 
     const typeNext = () => {
+      if (!isMounted) return;
+
       if (lineIdx >= terminalLines.length) {
         setDisplayedLines((prev) => [...prev, { type: "prompt", text: "_" }]);
         return;
@@ -44,7 +52,7 @@ function TerminalOutput() {
         setDisplayedLines((prev) => [...prev, { type: line.type, text: "\u00A0" }]);
         lineIdx++;
         charIdx = 0;
-        setTimeout(typeNext, 300);
+        schedule(typeNext, 300);
         return;
       }
 
@@ -57,18 +65,25 @@ function TerminalOutput() {
         });
         charIdx++;
         const speed = line.type === "prompt" ? 0 : line.type === "cmd" ? 35 : 15;
-        setTimeout(typeNext, speed);
+        schedule(typeNext, speed);
       } else {
         lineIdx++;
         charIdx = 0;
         currentText = "";
         setDisplayedLines((prev) => [...prev, { type: line.type, text: "" }]);
-        setTimeout(typeNext, 200);
+        schedule(typeNext, 200);
       }
     };
 
     setDisplayedLines([{ type: "prompt", text: "" }]);
-    setTimeout(typeNext, 800);
+    schedule(typeNext, 800);
+
+    return () => {
+      isMounted = false;
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
   }, []);
 
   return (
@@ -105,37 +120,40 @@ const features = [
 
 const codeLines = [
   { type: "keyword", text: "import" },
-  { text: " { Traceplane } " },
+  { text: " { TraceplaneSDK } " },
   { type: "keyword", text: "from" },
-  { text: " '@traceplane/sdk';" },
+  { text: " '@traceplane/agent-sdk';" },
   { text: "\n\n" },
   { type: "comment", text: "// 创建 Episode — 一个完整的执行上下文" },
   { text: "\n" },
   { type: "keyword", text: "const" },
-  { text: " session = " },
+  { text: " sdk = " },
   { type: "keyword", text: "new" },
-  { text: " Traceplane({" },
-  { text: "\n  project: 'customer-pulse'," },
-  { text: "\n  agent: 'claude-code'" },
+  { text: " TraceplaneSDK({" },
+  { text: "\n  baseUrl: 'http://localhost:3000'," },
+  { text: "\n  projectId: 'customer-pulse'," },
+  { text: "\n  agentId: 'claude-code'" },
   { text: "\n});" },
   { text: "\n\n" },
   { type: "comment", text: "// 追踪每一步操作" },
   { text: "\n" },
   { type: "keyword", text: "const" },
-  { text: " ep = " },
+  { text: " session = " },
   { type: "keyword", text: "await" },
-  { text: " session.createEpisode({" },
-  { text: "\n  title: 'Weekly Report Generation'" },
+  { text: " sdk.startEpisode({" },
+  { text: "\n  title: 'Weekly Report Generation'," },
+  { text: "\n  goal: 'Generate customer feedback report'," },
+  { text: "\n  successCriteria: 'Report approved and delivered'" },
   { text: "\n});" },
   { text: "\n\n" },
   { type: "keyword", text: "await" },
-  { text: " ep.trace('tool.fetch_data', { duration: 1200 });" },
+  { text: " session.toolUse('fetch-data', 'pull feedback', '500 rows');" },
   { text: "\n" },
   { type: "keyword", text: "await" },
-  { text: " ep.artifact({ type: 'report', url: 's3://...' });" },
+  { text: " session.artifact('weekly-report', 'Report', '# Summary...');" },
   { text: "\n" },
   { type: "keyword", text: "await" },
-  { text: " ep.complete();" },
+  { text: " session.complete('Report delivered');" },
   { text: "\n\n" },
   { type: "comment", text: "// ✅ Episode 完成 — 上下文已保存" },
 ];

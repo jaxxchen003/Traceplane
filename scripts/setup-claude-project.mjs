@@ -7,7 +7,7 @@ const projectSlug = process.argv[2];
 const primaryAgentSlug = process.argv[3];
 const autoReviewOnStop = process.argv[4] ?? "true";
 const cwd = process.cwd();
-const dbUrl = process.env.DATABASE_URL || "file:./dev.db";
+const dbUrl = process.env.DATABASE_URL || "postgresql://postgres:postgres@localhost:5432/traceplane?schema=public";
 
 function printUsage() {
   console.log(

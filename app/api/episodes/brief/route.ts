@@ -20,6 +20,14 @@ export async function GET(request: NextRequest) {
 
   return NextResponse.json({
     episodeId: episode.id,
+    episode: {
+      id: episode.id,
+      title: episode.title,
+      goal: episode.goal,
+      status: episode.status,
+      workType: episode.workType,
+      primaryActor: episode.primaryActor
+    },
     title: episode.title,
     goal: episode.goal,
     status: episode.status,
@@ -33,6 +41,7 @@ export async function GET(request: NextRequest) {
     ) ?? [],
     handoffBrief: episode.handoffSummary,
     continuationPacket: episode.continuationPacket,
+    timeline: episode.timeline,
     keyMemories: episode.memories.slice(0, 3),
     latestArtifacts: episode.artifacts.slice(0, 3),
     attentionItems: [

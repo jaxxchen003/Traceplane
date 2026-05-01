@@ -82,6 +82,7 @@ git clone https://github.com/jaxxchen003/Traceplane.git
 cd Traceplane
 npm install
 cp .env.example .env
+# 确保 .env 里的 DATABASE_URL 指向可访问的 Postgres 实例
 npm run db:setup
 npm run dev
 # → http://localhost:3000
@@ -148,7 +149,7 @@ Traceplane 内置完整的使用分析能力，无需额外部署第三方工具
 | **实时事件流** | 项目详情页 | SSE 推送的实时执行事件 |
 | **Agent 接入状态** | `/connect` | 各 Host 的最新信号和接入状态 |
 
-**自托管友好**：所有数据存储在本地 SQLite/Postgres，不经过第三方服务器。
+**自托管友好**：所有数据存储在你自己的 Postgres 实例中，不经过第三方服务器。
 
 如需接入外部分析，可配置 Google Analytics 4（`NEXT_PUBLIC_GA_MEASUREMENT_ID` in `.env`）。
 
@@ -171,7 +172,7 @@ Traceplane 内置完整的使用分析能力，无需额外部署第三方工具
 |----|------|------|
 | Framework | Next.js 16 (App Router) | SSR + API Routes 一体 |
 | UI | React 19 + Tailwind v4 | 组件化 + CSS-first 主题 |
-| Database | SQLite (dev) / Supabase Postgres (prod) | 本地零配置，云端可扩展 |
+| Database | Postgres / Supabase Postgres | 本地自托管，云端可扩展 |
 | Object Storage | Cloudflare R2 | S3 兼容，无出站费 |
 | Agent Protocol | MCP (Model Context Protocol) | Claude / OpenCode / Gemini 通用 |
 | SDK | TypeScript | 类型安全，零依赖 |

@@ -1,8 +1,9 @@
 import { describe, it, expect, beforeAll } from 'vitest';
 
 const API_BASE = 'http://localhost:3000';
+const runHttpIntegration = process.env.TRACEPLANE_RUN_HTTP_INTEGRATION === 'true';
 
-describe('E2E: Full Agent Workflow', () => {
+describe.skipIf(!runHttpIntegration)('E2E: Full Agent Workflow', () => {
   let projectId: string;
   let agentId: string;
   let episodeId: string;

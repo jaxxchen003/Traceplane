@@ -76,6 +76,17 @@ enum EdgeType {
   REFERENCES
 }
 
+enum TaskGraphStatus {
+  RUNNING
+  COMPLETED
+  FAILED
+}
+
+enum TaskGraphEpisodeRole {
+  ORCHESTRATOR
+  WORKER
+}
+
 model Workspace {
   id          String       @id @default(cuid())
   name        String
@@ -86,6 +97,7 @@ model Workspace {
   projects    Project[]
   policies    Policy[]
   auditEvents AuditEvent[]
+  taskGraphs  TaskGraph[]
 }
 
 model Project {
@@ -105,24 +117,27 @@ model Project {
   policies            Policy[]
   accessGrants        AccessGrant[]
   auditEvents         AuditEvent[]
+  taskGraphs          TaskGraph[]
 }
 
 model Agent {
-  id              String         @id @default(cuid())
-  slug            String         @unique
-  name            String
-  roleI18n        Json
-  ownerName       String
-  capabilities    Json
-  lastActiveAt    DateTime?
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
-  primaryEpisodes Episode[]      @relation("PrimaryAgentEpisodes")
-  episodeAgents   EpisodeAgent[]
-  projectAgents   ProjectAgent[]
-  memoryItems     MemoryItem[]
-  traceEvents     TraceEvent[]
-  artifacts       Artifact[]
+  id                String             @id @default(cuid())
+  slug              String             @unique
+  name              String
+  roleI18n          Json
+  ownerName         String
+  capabilities      Json
+  lastActiveAt      DateTime?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  primaryEpisodes   Episode[]          @relation("PrimaryAgentEpisodes")
+  episodeAgents     EpisodeAgent[]
+  projectAgents     ProjectAgent[]
+  memoryItems       MemoryItem[]
+  traceEvents       TraceEvent[]
+  artifacts         Artifact[]
+  createdTaskGraphs TaskGraph[]        @relation("TaskGraphCreatedBy")
+  taskGraphEpisodes TaskGraphEpisode[]
 }
 
 model ProjectAgent {
@@ -136,37 +151,40 @@ model ProjectAgent {
 }
 
 model Episode {
-  id                  String         @id @default(cuid())
-  projectId           String
-  primaryAgentId      String
-  parentEpisodeId     String?
-  titleI18n           Json
-  summaryI18n         Json?
-  goalI18n            Json?
-  successCriteriaI18n Json?
-  finalOutcomeI18n    Json?
-  primaryActor        String?
-  workType            WorkType       @default(GENERATE)
-  relationIntent      EdgeType?
-  status              EpisodeStatus
-  blockedReasonI18n   Json?
-  failureReasonI18n   Json?
-  reviewOutcome       ReviewOutcome?
-  policyVersion       String
-  startedAt           DateTime
-  endedAt             DateTime?
-  createdAt           DateTime       @default(now())
-  updatedAt           DateTime       @updatedAt
-  project             Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  primaryAgent        Agent          @relation("PrimaryAgentEpisodes", fields: [primaryAgentId], references: [id], onDelete: Cascade)
-  parentEpisode       Episode?       @relation("EpisodeToEpisode", fields: [parentEpisodeId], references: [id], onDelete: SetNull)
-  childEpisodes       Episode[]      @relation("EpisodeToEpisode")
-  episodeAgents       EpisodeAgent[]
-  memoryItems         MemoryItem[]
-  traceEvents         TraceEvent[]
-  artifacts           Artifact[]
-  auditEvents         AuditEvent[]
-  accessGrants        AccessGrant[]
+  id                     String             @id @default(cuid())
+  projectId              String
+  primaryAgentId         String
+  parentEpisodeId        String?
+  forkPointTraceId       String?
+  titleI18n              Json
+  summaryI18n            Json?
+  goalI18n               Json?
+  successCriteriaI18n    Json?
+  finalOutcomeI18n       Json?
+  primaryActor           String?
+  workType               WorkType           @default(GENERATE)
+  relationIntent         EdgeType?
+  status                 EpisodeStatus
+  blockedReasonI18n      Json?
+  failureReasonI18n      Json?
+  reviewOutcome          ReviewOutcome?
+  policyVersion          String
+  startedAt              DateTime
+  endedAt                DateTime?
+  createdAt              DateTime           @default(now())
+  updatedAt              DateTime           @updatedAt
+  project                Project            @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  primaryAgent           Agent              @relation("PrimaryAgentEpisodes", fields: [primaryAgentId], references: [id], onDelete: Cascade)
+  parentEpisode          Episode?           @relation("EpisodeToEpisode", fields: [parentEpisodeId], references: [id], onDelete: SetNull)
+  childEpisodes          Episode[]          @relation("EpisodeToEpisode")
+  episodeAgents          EpisodeAgent[]
+  memoryItems            MemoryItem[]
+  traceEvents            TraceEvent[]
+  artifacts              Artifact[]
+  auditEvents            AuditEvent[]
+  accessGrants           AccessGrant[]
+  orchestratedTaskGraphs TaskGraph[]        @relation("TaskGraphOrchestratorEpisode")
+  taskGraphEpisodes      TaskGraphEpisode[]
 }
 
 model EpisodeAgent {
@@ -213,6 +231,7 @@ model TraceEvent {
   errorSummaryI18n       Json?
   policyHitReasonI18n    Json?
   permissionDeniedI18n   Json?
+  snapshot               Json?
   eventTime              DateTime
   createdAt              DateTime     @default(now())
   episode                Episode      @relation(fields: [episodeId], references: [id], onDelete: Cascade)
@@ -304,4 +323,49 @@ model NodeEdge {
   toNodeId     String
   edgeType     EdgeType
   createdAt    DateTime @default(now())
+}
+
+model TaskGraph {
+  id                    String             @id @default(cuid())
+  workspaceId           String
+  projectId             String
+  symphonyTaskId        String             @unique
+  orchestratorEpisodeId String
+  status                TaskGraphStatus    @default(RUNNING)
+  sensitivity           String             @default("Internal")
+  policyVersion         String
+  createdByAgentId      String
+  createdAt             DateTime           @default(now())
+  updatedAt             DateTime           @updatedAt
+  workspace             Workspace          @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  project               Project            @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  orchestratorEpisode   Episode            @relation("TaskGraphOrchestratorEpisode", fields: [orchestratorEpisodeId], references: [id], onDelete: Cascade)
+  createdByAgent        Agent              @relation("TaskGraphCreatedBy", fields: [createdByAgentId], references: [id], onDelete: Cascade)
+  episodes              TaskGraphEpisode[]
+
+  @@index([workspaceId])
+  @@index([projectId, status])
+  @@index([orchestratorEpisodeId])
+  @@index([createdByAgentId])
+  @@map("task_graphs")
+}
+
+model TaskGraphEpisode {
+  id                   String               @id @default(cuid())
+  taskGraphId          String
+  episodeId            String
+  role                 TaskGraphEpisodeRole
+  agentId              String
+  assignedSubtask      String
+  dependencyEpisodeIds String[]             @default([])
+  createdAt            DateTime             @default(now())
+  updatedAt            DateTime             @updatedAt
+  taskGraph            TaskGraph            @relation(fields: [taskGraphId], references: [id], onDelete: Cascade)
+  episode              Episode              @relation(fields: [episodeId], references: [id], onDelete: Cascade)
+  agent                Agent                @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@unique([taskGraphId, episodeId])
+  @@index([episodeId])
+  @@index([agentId])
+  @@map("task_graph_episodes")
 }
