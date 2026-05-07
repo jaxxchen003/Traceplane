@@ -1,35 +1,62 @@
-# Symphony Integration
+# Symphony × Traceplane 集成设计
 
-Traceplane treats Symphony as an external orchestration runtime. Symphony emits task
-events; Traceplane persists them as episode-first work graph evidence so an
-orchestrator can resume from structured context instead of replaying chat logs.
+本文档说明 Symphony 与 Traceplane 的组合价值、当前已实现能力，以及后续扩展边界。
 
-## Integration Goals
+## 1. 背景
 
-- Convert Symphony runtime events into Traceplane `Episode`, `TraceEvent`, and
-  `AuditEvent` records.
-- Preserve a machine-readable recovery context for the orchestrator.
-- Represent multi-worker Symphony tasks as durable Traceplane Task Graphs.
-- Keep every accepted write tied to an episode and audit trail.
+Symphony 负责多 Agent 编排：任务拆分、Orchestrator 分配、Worker 并行执行、结果回收。它关注的是“当前这次任务怎么跑”。
 
-## Webhook Endpoint
+Traceplane 负责多 Agent 连续性：Episode 主线、Trace 证据、Memory / Artifact 沉淀、Handoff Brief、审计与复盘。它关注的是“这次任务的状态怎么留下来，下一轮怎么续接”。
+
+两者组合后：
+
+```text
+Symphony:   task orchestration and execution
+Traceplane: durable episode state and handoff context
+```
+
+## 2. 场景价值
+
+### 大型代码重构
+
+Orchestrator 将一个重构任务分配给多个 Worker。Traceplane 为 Orchestrator 和 Worker 都创建 Episode，并把 step、artifact、failure、审计事件写入同一条工作图。中断后，下一个 Agent 可以读取结构化 context 续接。
+
+### 跨天长期项目
+
+今天的 Claude Code、明天的 Gemini CLI、后天的 OpenCode 可以通过同一个 project / episode / memory 主线共享上下文，不需要反复复述背景。
+
+### 错误回溯
+
+当某一步走错时，Traceplane 可以从具体 trace 节点 fork 出新 Episode。Symphony 后续可以从修正后的上下文重新编排，而不是重跑整个任务。
+
+### 企业审计
+
+所有核心写入都落到 audit event，管理者可以按 episode、agent、project 和时间线复盘 Agent 做了什么、读了什么、产出了什么。
+
+## 3. 当前实现状态
+
+当前分支已经实现 Phase 1 和 Phase 2 的最小闭环。
+
+### Symphony Webhook
 
 `POST /api/webhooks/symphony`
 
-The endpoint requires `SYMPHONY_WEBHOOK_SECRET` and verifies
-`x-symphony-signature` using HMAC-SHA256 over the raw request body. The header may
-be either a raw 64-character hex digest or `sha256=<digest>`.
+要求：
 
-Supported events:
+- 必须配置 `SYMPHONY_WEBHOOK_SECRET`
+- 使用 `x-symphony-signature` 验证 HMAC-SHA256
+- header 可传原始 64 位 hex digest，或 `sha256=<digest>`
+
+支持事件：
 
 | Event | Traceplane effect |
 | --- | --- |
-| `task.started` | Creates or reuses an Episode anchored to `task_id` |
-| `task.step_completed` | Appends a TraceEvent snapshot to the Episode |
-| `task.failed` | Marks the Episode `FAILED` and records failure context |
-| `task.completed` | Marks the Episode `COMPLETED` and records final outcome |
+| `task.started` | 创建或复用以 `task_id` 为 id 的 Episode |
+| `task.step_completed` | 向 Episode 追加 TraceEvent snapshot |
+| `task.failed` | 将 Episode 标记为 `FAILED` 并记录失败上下文 |
+| `task.completed` | 将 Episode 标记为 `COMPLETED` 并记录最终结果 |
 
-Minimal `task.started` payload:
+最小 `task.started` payload：
 
 ```json
 {
@@ -47,51 +74,86 @@ Minimal `task.started` payload:
 }
 ```
 
-## Orchestrator Context
+### Orchestrator Context API
 
 `GET /api/episodes/{id}/context`
 
-Returns machine-readable continuation state for an orchestrator:
+返回机器可读的续接上下文：
 
 - normalized episode status
-- completed and pending trace steps
+- completed / pending trace steps
 - recent memory snapshot
-- recent artifacts and source trace links
+- recent artifacts with source trace links
 - risk flags from failed traces, denied permissions, or policy hits
 - resume hint
 
-The Agent SDK exposes the same capability through `get_orchestrator_context`.
+Agent SDK 提供 `get_orchestrator_context` helper。
 
-## Task Graph Support
+### Task Graph
 
-Task Graphs model one orchestrated Symphony task and all worker subtasks as
-episode-backed graph nodes.
+Task Graph 表达一个 Symphony task 与其 Orchestrator / Worker Episodes 的持久关系。
 
 REST endpoints:
 
 | Endpoint | Purpose |
 | --- | --- |
-| `POST /api/task-graphs` | Create a Task Graph for a project and orchestrator Episode |
-| `GET /api/task-graphs/{id}/status` | Return aggregate worker counts and graph status |
+| `POST /api/task-graphs` | 创建 Task Graph |
+| `GET /api/task-graphs/{id}/status` | 查询 worker counts 和聚合状态 |
 
 MCP tools:
 
 | Tool | Purpose |
 | --- | --- |
-| `register_subtask` | Create a worker Episode and attach it to a Task Graph |
-| `report_subtask_result` | Update worker Episode status, append trace evidence, and refresh graph status |
-| `get_task_graph_status` | Query aggregate graph progress for orchestration decisions |
+| `register_subtask` | 创建 worker Episode 并挂到 Task Graph |
+| `report_subtask_result` | 更新 worker Episode 状态、追加 trace、刷新 graph 状态 |
+| `get_task_graph_status` | 查询 Task Graph 聚合进度 |
+| `get_orchestrator_context` | 查询 Orchestrator 续接上下文 |
 
-## Current Boundaries
+## 4. 关键代码路径
 
-- No separate Symphony runtime client is bundled yet.
-- Task Graph visualization is not implemented in the UI.
-- Fork/replay requests are intentionally left for a later phase.
-- Auth and tenant-aware permission enforcement must be added before public SaaS use.
+| Path | Role |
+| --- | --- |
+| `app/api/webhooks/symphony/route.ts` | Symphony webhook endpoint |
+| `lib/services/symphony-integration.ts` | webhook signature, event mapping, context builder |
+| `app/api/episodes/[id]/context/route.ts` | Orchestrator Context API |
+| `lib/services/task-graph.ts` | Task Graph creation, worker registration, status aggregation |
+| `app/api/task-graphs/route.ts` | Task Graph create endpoint |
+| `app/api/task-graphs/[id]/status/route.ts` | Task Graph status endpoint |
+| `scripts/mcp-server.mjs` | MCP tools for episode, context, task graph |
+| `tests/symphony-integration.test.ts` | webhook and context tests |
+| `tests/task-graph.test.ts` | task graph service tests |
 
-## Verification
+## 5. 当前边界
 
-Targeted checks:
+- 尚未提供独立 Symphony runtime client。
+- UI 尚未可视化 Task Graph。
+- `/api/episodes/fork` 已支持 trace fork 基础字段，但 `inherit_memory`、`inherit_artifacts`、`fork_reason` 等增强仍属于后续工作。
+- `request_fork` MCP tool 尚未实现。
+- 公开 SaaS 前仍需要补齐 auth、tenant-aware permission enforcement、sensitive read audit 和 rate limit。
+
+## 6. 后续规划
+
+### Phase 3: Replay enhancement
+
+- 增强 `/api/episodes/fork`
+- 支持从指定 trace 节点继承 memory / artifact
+- 记录 fork reason 和审计事件
+- 增加 `request_fork` MCP tool
+
+### Phase 4: Task Graph UI
+
+- 在项目页展示 Orchestrator / Worker Episode graph
+- 展示 worker status、dependency、failed trace、artifact output
+- 提供 manager-readable execution summary
+
+### Phase 5: SaaS hardening
+
+- user / workspace membership / API key
+- route 和 MCP tool 统一权限检查
+- denied read/write audit
+- preview smoke test 和 production migration flow
+
+## 7. 验证
 
 ```bash
 npx vitest run tests/symphony-integration.test.ts tests/task-graph.test.ts
