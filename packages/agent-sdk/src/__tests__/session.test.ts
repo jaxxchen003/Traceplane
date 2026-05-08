@@ -1,9 +1,22 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { TraceplaneSession } from '../session';
-import { TraceplaneClient } from '../client';
 
-// Mock the client
-vi.mock('../client');
+const { mockClient } = vi.hoisted(() => ({
+  mockClient: {
+    createEpisode: vi.fn(),
+    getEpisode: vi.fn(),
+    appendTrace: vi.fn(),
+    createMemory: vi.fn(),
+    createArtifact: vi.fn(),
+    updateEpisodeStatus: vi.fn()
+  }
+}));
+
+vi.mock('../client', () => ({
+  TraceplaneClient: vi.fn(function () {
+    return mockClient;
+  })
+}));
 
 describe('TraceplaneSession', () => {
   const mockConfig = {
@@ -13,19 +26,9 @@ describe('TraceplaneSession', () => {
   };
 
   let session: TraceplaneSession;
-  let mockClient: any;
 
   beforeEach(() => {
-    mockClient = {
-      createEpisode: vi.fn(),
-      getEpisode: vi.fn(),
-      appendTrace: vi.fn(),
-      createMemory: vi.fn(),
-      createArtifact: vi.fn(),
-      updateEpisodeStatus: vi.fn()
-    };
-
-    (TraceplaneClient as any).mockImplementation(() => mockClient);
+    vi.clearAllMocks();
     
     session = new TraceplaneSession(mockConfig, {
       autoFlushInterval: 0, // Disable auto flush for testing

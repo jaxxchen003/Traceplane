@@ -34,14 +34,18 @@ npm test
 npm run dev
 
 # 在另一个终端运行测试
-npm test
+npm run test:integration
 ```
 
 ### 3. E2E 测试
 
 ```bash
-npm run test:e2e
+npm run test:integration
 ```
+
+HTTP 集成和 E2E 测试默认不会随 `npm run test:run` 执行；它们依赖运行中的
+`http://localhost:3000` 和真实数据库。需要显式设置
+`TRACEPLANE_RUN_HTTP_INTEGRATION=true`，或直接使用 `npm run test:integration`。
 
 ### 4. 覆盖率报告
 

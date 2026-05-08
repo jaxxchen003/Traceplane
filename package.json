@@ -29,6 +29,7 @@
     "claude:hook:test": "node scripts/test-claude-hook-bridge.mjs",
     "test": "vitest",
     "test:run": "vitest run",
+    "test:integration": "TRACEPLANE_RUN_HTTP_INTEGRATION=true vitest run tests/api-integration tests/e2e",
     "test:coverage": "vitest run --coverage",
     "lint": "eslint .",
     "ci": "npm run lint && npm run build && npm run test:run",
@@ -75,7 +76,8 @@
     "eslint-config-next": "^16.2.1",
     "prisma": "^6.10.1",
     "tailwindcss": "^4.2.2",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.4"
   },
   "prisma": {
     "seed": "node prisma/seed.mjs"

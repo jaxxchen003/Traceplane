@@ -298,6 +298,55 @@ export interface StreamEvent {
   data: Record<string, unknown>;
 }
 
+// ===== Orchestrator Context =====
+
+export type OrchestratorEpisodeStatus = 'active' | 'paused' | 'done' | 'failed';
+export type OrchestratorStepStatus = 'done' | 'pending' | 'failed';
+
+export interface OrchestratorStep {
+  id: string;
+  step_index: number;
+  event_type: string;
+  tool_name: string | null;
+  title: string;
+  status: OrchestratorStepStatus;
+  summary: string;
+  occurred_at: string;
+}
+
+export interface OrchestratorArtifact {
+  id: string;
+  artifact_key: string;
+  title: string;
+  file_type: FileType;
+  version: number;
+  uri: string | null;
+  sensitivity: string;
+  source_trace_event_id: string | null;
+}
+
+export interface OrchestratorMemoryItem {
+  id: string;
+  title: string;
+  content: string;
+  type: MemoryType;
+  source: string;
+  importance: number;
+  sensitivity: string;
+  created_at: string;
+}
+
+export interface OrchestratorContext {
+  episode_id: string;
+  status: OrchestratorEpisodeStatus;
+  completed_steps: OrchestratorStep[];
+  pending_steps: OrchestratorStep[];
+  artifacts: OrchestratorArtifact[];
+  memory_snapshot: OrchestratorMemoryItem[];
+  risk_flags: string[];
+  resume_hint: string;
+}
+
 // ===== SDK 错误 =====
 
 /**

@@ -17,7 +17,8 @@ import {
   CreateArtifactParams,
   UpdateEpisodeStatusParams,
   ForkEpisodeParams,
-  StreamEvent
+  StreamEvent,
+  OrchestratorContext
 } from './types';
 
 /**
@@ -137,6 +138,10 @@ export class TraceplaneClient {
    */
   async getEpisode(episodeId: string): Promise<Episode> {
     return this.request<Episode>('GET', `/api/episodes/${episodeId}`);
+  }
+
+  async getOrchestratorContext(episodeId: string): Promise<OrchestratorContext> {
+    return this.request<OrchestratorContext>('GET', `/api/episodes/${encodeURIComponent(episodeId)}/context`);
   }
 
   async updateEpisodeStatus(params: UpdateEpisodeStatusParams): Promise<Episode> {

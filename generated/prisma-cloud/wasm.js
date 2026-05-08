@@ -165,6 +165,7 @@ exports.Prisma.EpisodeScalarFieldEnum = {
   projectId: 'projectId',
   primaryAgentId: 'primaryAgentId',
   parentEpisodeId: 'parentEpisodeId',
+  forkPointTraceId: 'forkPointTraceId',
   titleI18n: 'titleI18n',
   summaryI18n: 'summaryI18n',
   goalI18n: 'goalI18n',
@@ -221,6 +222,7 @@ exports.Prisma.TraceEventScalarFieldEnum = {
   errorSummaryI18n: 'errorSummaryI18n',
   policyHitReasonI18n: 'policyHitReasonI18n',
   permissionDeniedI18n: 'permissionDeniedI18n',
+  snapshot: 'snapshot',
   eventTime: 'eventTime',
   createdAt: 'createdAt'
 };
@@ -292,6 +294,32 @@ exports.Prisma.NodeEdgeScalarFieldEnum = {
   toNodeId: 'toNodeId',
   edgeType: 'edgeType',
   createdAt: 'createdAt'
+};
+
+exports.Prisma.TaskGraphScalarFieldEnum = {
+  id: 'id',
+  workspaceId: 'workspaceId',
+  projectId: 'projectId',
+  symphonyTaskId: 'symphonyTaskId',
+  orchestratorEpisodeId: 'orchestratorEpisodeId',
+  status: 'status',
+  sensitivity: 'sensitivity',
+  policyVersion: 'policyVersion',
+  createdByAgentId: 'createdByAgentId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.TaskGraphEpisodeScalarFieldEnum = {
+  id: 'id',
+  taskGraphId: 'taskGraphId',
+  episodeId: 'episodeId',
+  role: 'role',
+  agentId: 'agentId',
+  assignedSubtask: 'assignedSubtask',
+  dependencyEpisodeIds: 'dependencyEpisodeIds',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.SortOrder = {
@@ -391,6 +419,17 @@ exports.FileType = exports.$Enums.FileType = {
   IMAGE: 'IMAGE'
 };
 
+exports.TaskGraphStatus = exports.$Enums.TaskGraphStatus = {
+  RUNNING: 'RUNNING',
+  COMPLETED: 'COMPLETED',
+  FAILED: 'FAILED'
+};
+
+exports.TaskGraphEpisodeRole = exports.$Enums.TaskGraphEpisodeRole = {
+  ORCHESTRATOR: 'ORCHESTRATOR',
+  WORKER: 'WORKER'
+};
+
 exports.Prisma.ModelName = {
   Workspace: 'Workspace',
   Project: 'Project',
@@ -404,7 +443,9 @@ exports.Prisma.ModelName = {
   Policy: 'Policy',
   AccessGrant: 'AccessGrant',
   AuditEvent: 'AuditEvent',
-  NodeEdge: 'NodeEdge'
+  NodeEdge: 'NodeEdge',
+  TaskGraph: 'TaskGraph',
+  TaskGraphEpisode: 'TaskGraphEpisode'
 };
 
 /**

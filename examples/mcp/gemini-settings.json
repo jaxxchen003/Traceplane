@@ -5,7 +5,7 @@
       "args": ["scripts/mcp-server.mjs"],
       "cwd": "/ABSOLUTE/PATH/TO/enterprise-agent-work-graph",
       "env": {
-        "DATABASE_URL": "file:./dev.db"
+        "DATABASE_URL": "postgresql://postgres:postgres@localhost:5432/traceplane?schema=public"
       },
       "timeout": 30000,
       "trust": false

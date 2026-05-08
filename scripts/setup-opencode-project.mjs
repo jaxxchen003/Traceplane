@@ -4,7 +4,7 @@ import path from "node:path";
 import "./_lib/load-env.mjs";
 
 const cwd = process.cwd();
-const dbUrl = process.env.DATABASE_URL || "file:./dev.db";
+const dbUrl = process.env.DATABASE_URL || "postgresql://postgres:postgres@localhost:5432/traceplane?schema=public";
 const outputPath = process.argv[2] || "opencode.jsonc";
 
 const config = {

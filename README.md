@@ -82,6 +82,7 @@ git clone https://github.com/jaxxchen003/Traceplane.git
 cd Traceplane
 npm install
 cp .env.example .env
+# 确保 .env 里的 DATABASE_URL 指向可访问的 Postgres 实例
 npm run db:setup
 npm run dev
 # → http://localhost:3000
@@ -133,6 +134,7 @@ npm run mcp:host -- claude-code .mcp.json
 
 # Agent 现在可以直接调用：
 # create_episode · append_trace · write_memory · create_artifact · get_episode_brief
+# get_orchestrator_context · register_subtask · report_subtask_result · get_task_graph_status
 ```
 
 ---
@@ -148,7 +150,7 @@ Traceplane 内置完整的使用分析能力，无需额外部署第三方工具
 | **实时事件流** | 项目详情页 | SSE 推送的实时执行事件 |
 | **Agent 接入状态** | `/connect` | 各 Host 的最新信号和接入状态 |
 
-**自托管友好**：所有数据存储在本地 SQLite/Postgres，不经过第三方服务器。
+**自托管友好**：所有数据存储在你自己的 Postgres 实例中，不经过第三方服务器。
 
 如需接入外部分析，可配置 Google Analytics 4（`NEXT_PUBLIC_GA_MEASUREMENT_ID` in `.env`）。
 
@@ -171,7 +173,7 @@ Traceplane 内置完整的使用分析能力，无需额外部署第三方工具
 |----|------|------|
 | Framework | Next.js 16 (App Router) | SSR + API Routes 一体 |
 | UI | React 19 + Tailwind v4 | 组件化 + CSS-first 主题 |
-| Database | SQLite (dev) / Supabase Postgres (prod) | 本地零配置，云端可扩展 |
+| Database | Postgres / Supabase Postgres | 本地自托管，云端可扩展 |
 | Object Storage | Cloudflare R2 | S3 兼容，无出站费 |
 | Agent Protocol | MCP (Model Context Protocol) | Claude / OpenCode / Gemini 通用 |
 | SDK | TypeScript | 类型安全，零依赖 |
@@ -184,23 +186,40 @@ Traceplane 内置完整的使用分析能力，无需额外部署第三方工具
 
 | 端点 | 方法 | 说明 |
 |------|------|------|
+| `/api/projects` | POST | 创建 Project |
+| `/api/agents` | POST | 注册 Agent |
 | `/api/episodes` | POST | 创建 Episode |
 | `/api/episodes/{id}/status` | PATCH | 更新状态 |
+| `/api/episodes/{id}/context` | GET | 获取机器可读的恢复上下文 |
 | `/api/episodes/fork` | POST | Fork Episode |
+| `/api/episodes/brief` | GET | 获取交接文档 |
+| `/api/episodes/link` | POST | 连接 Episode 关系 |
 | `/api/traces` | POST | 上报 Trace |
 | `/api/memory` | POST/GET | Memory CRUD |
 | `/api/artifacts` | POST | 创建 Artifact |
+| `/api/task-graphs` | POST | 创建 Task Graph |
+| `/api/task-graphs/{id}/status` | GET | 查询 Task Graph 聚合状态 |
+| `/api/webhooks/symphony` | POST | 接收 Symphony 运行时事件 |
 | `/api/events/stream` | GET | SSE 实时事件 |
+| `/api/graph` | GET | 查询节点关系图 |
+| `/api/audit` | GET | 查询审计事件 |
 
 ### MCP Tools
 
 | 工具 | 说明 |
 |------|------|
 | `create_episode` | 创建 Episode |
+| `update_episode_status` | 更新 Episode 生命周期状态 |
+| `link_episode` | 连接两个 Episode 的工作关系 |
 | `append_trace` | 上报 Trace |
 | `write_memory` | 写入 Memory |
 | `create_artifact` | 创建产物 |
+| `query_context` | 查询项目和 Episode 相关上下文 |
 | `get_episode_brief` | 获取交接文档 |
+| `get_orchestrator_context` | 获取 Symphony Orchestrator 恢复上下文 |
+| `register_subtask` | 将 worker subtask 注册为 Task Graph Episode |
+| `report_subtask_result` | 上报 worker Episode 结果并更新聚合状态 |
+| `get_task_graph_status` | 查询 Task Graph 聚合进度 |
 
 ---
 

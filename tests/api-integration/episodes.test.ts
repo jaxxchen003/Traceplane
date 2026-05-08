@@ -1,8 +1,9 @@
 import { describe, it, expect, beforeAll } from 'vitest';
 
 const API_BASE = 'http://localhost:3000';
+const runHttpIntegration = process.env.TRACEPLANE_RUN_HTTP_INTEGRATION === 'true';
 
-describe('Episodes API Integration', () => {
+describe.skipIf(!runHttpIntegration)('Episodes API Integration', () => {
   let projectId: string;
   let agentId: string;
 

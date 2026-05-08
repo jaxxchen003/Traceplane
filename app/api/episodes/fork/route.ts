@@ -43,7 +43,7 @@ export async function POST(request: Request) {
         },
           goalI18n: body.goalI18n ?? parentEpisode.goalI18n,
           successCriteriaI18n: body.successCriteriaI18n ?? parentEpisode.successCriteriaI18n,
-          status: "PLANNED",
+          status: body.status ?? "IN_PROGRESS",
           policyVersion: parentEpisode.policyVersion,
           startedAt: new Date(),
           workType: body.workType ?? parentEpisode.workType,

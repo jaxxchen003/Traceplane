@@ -42,8 +42,12 @@ export { TraceplaneClient } from './client';
 export { TraceplaneSession } from './session';
 export type { SessionOptions } from './session';
 
+// 导出 Orchestrator 工具
+export { getOrchestratorContext, traceplaneTools } from './tools';
+
 // 导出便捷函数
 import { TraceplaneConfig } from './types';
+import { TraceplaneClient } from './client';
 import { TraceplaneSession } from './session';
 
 /**
@@ -94,6 +98,11 @@ export class TraceplaneSDK {
     const session = new TraceplaneSession(this.config);
     await session.resume(episodeId);
     return session;
+  }
+
+  async getOrchestratorContext(episodeId: string) {
+    const client = new TraceplaneClient(this.config);
+    return client.getOrchestratorContext(episodeId);
   }
 }
 

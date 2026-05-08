@@ -10,6 +10,7 @@
 ```bash
 npm install
 cp .env.example .env
+# 确保 .env 里的 DATABASE_URL 指向可访问的 Postgres 实例
 npm run db:setup
 ```
 
